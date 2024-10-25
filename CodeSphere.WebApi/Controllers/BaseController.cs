@@ -15,7 +15,7 @@ namespace CodeSphere.WebApi.Controllers
         protected IMediator mediator => mediatorInstance ??= HttpContext.RequestServices.GetRequiredService<IMediator>();
 
         #region Actions
-        public ObjectResult ResponseResult(Response response)
+        protected ObjectResult ResponseResult(Response response)
         {
             switch (response.StatusCode)
             {
