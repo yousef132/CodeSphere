@@ -1,20 +1,28 @@
-﻿namespace CodeSphere.Domain.Models.Entities
+﻿using CodeSphere.Domain.Models.Identity;
+using CodeSphere.Domain.Premitives;
+using System.ComponentModel.DataAnnotations.Schema;
+
+namespace CodeSphere.Domain.Models.Entities
 {
-    public class Problem
+    public class Problem : BaseEntity
     {
-        public int ID { get; set; }
-        public int SetterID { get; set; }
-        public int CID { get; set; }
+        public string ProblemSetterId { get; set; }
+        public Guid ContestId { get; set; }
         public string Name { get; set; }
         public string Difficulty { get; set; }
         public string Description { get; set; }
 
-        public User Setter { get; set; }
+        [ForeignKey(nameof(ProblemSetterId))]
+        public ApplicationUser ProblemSetter { get; set; }
+
+        [ForeignKey(nameof(ContestId))]
         public Contest Contest { get; set; }
         public ICollection<ProblemImage> Images { get; set; }
+
         public ICollection<Testcase> Testcases { get; set; }
-        public ICollection<Tutorial> Tutorials { get; set; }
+
         public ICollection<ProblemTopic> ProblemTopics { get; set; }
+
         public ICollection<Submit> Submissions { get; set; }
     }
 }

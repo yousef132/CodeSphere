@@ -4,6 +4,7 @@ using CodeSphere.Infrastructure.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CodeSphere.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241028191931_Initial")]
+    partial class Initial
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -36,9 +39,14 @@ namespace CodeSphere.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<Guid>("ProblemId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.HasKey("Id");
 
                     b.HasIndex("BlogCreatorId");
+
+                    b.HasIndex("ProblemId");
 
                     b.ToTable("Blogs");
                 });
@@ -217,7 +225,7 @@ namespace CodeSphere.Infrastructure.Migrations
                     b.Property<DateTime>("ContestDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid?>("ContestId")
+                    b.Property<Guid>("ContestId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<int>("Language")
@@ -531,7 +539,15 @@ namespace CodeSphere.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("CodeSphere.Domain.Models.Entities.Problem", "Problem")
+                        .WithMany()
+                        .HasForeignKey("ProblemId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.Navigation("BlogCreator");
+
+                    b.Navigation("Problem");
                 });
 
             modelBuilder.Entity("CodeSphere.Domain.Models.Entities.BlogImage", b =>
@@ -637,7 +653,8 @@ namespace CodeSphere.Infrastructure.Migrations
                     b.HasOne("CodeSphere.Domain.Models.Entities.Contest", "Contest")
                         .WithMany("Submissions")
                         .HasForeignKey("ContestId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("CodeSphere.Domain.Models.Entities.Problem", "Problem")
                         .WithMany("Submissions")

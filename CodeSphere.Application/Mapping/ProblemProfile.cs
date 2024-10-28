@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using CodeSphere.Application.Features.Problem.Commands.Create;
-using CodeSphere.Domain.Models;
+using CodeSphere.Domain.Models.Entities;
 
 namespace CodeSphere.Application.Mapping
 {

@@ -1,20 +1,31 @@
-﻿namespace CodeSphere.Domain.Models.Entities
-{
-    public class Submit
-    {
-        public int ID { get; set; }
-        public int UID { get; set; }
-        public int PID { get; set; }
-        public int CID { get; set; }
-        public DateTime DateContest { get; set; }
-        public DateTime SubmitTime { get; set; }
-        public int Memory { get; set; }
-        public string Result { get; set; }
-        public string Code { get; set; }
-        public DateTime Date { get; set; }
+﻿using CodeSphere.Domain.Models.Identity;
+using CodeSphere.Domain.Premitives;
+using System.ComponentModel.DataAnnotations.Schema;
 
-        public User User { get; set; }
+namespace CodeSphere.Domain.Models.Entities
+{
+    public class Submit : BaseEntity
+    {
+        public string UserId { get; set; }
+        public Guid ProblemId { get; set; }
+        public Guid? ContestId { get; set; }
+        public DateTime ContestDate { get; set; }
+        // the code execution time
+        public decimal SubmitTime { get; set; }
+        // the code execution memory
+        public decimal SubmitMemory { get; set; }
+        public SubmissionResult Result { get; set; }
+        public string Code { get; set; }
+        public DateTime SubmissionDate { get; set; }
+        public Language Language { get; set; }
+
+        [ForeignKey(nameof(UserId))]
+        public ApplicationUser User { get; set; }
+
+        [ForeignKey(nameof(ProblemId))]
         public Problem Problem { get; set; }
+
+        [ForeignKey(nameof(ContestId))]
         public Contest Contest { get; set; }
     }
 }

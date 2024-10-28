@@ -8,13 +8,13 @@ namespace CodeSphere.Infrastructure.Context
 {
     public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     {
-        public new DbSet<User> Users { get; set; }
+        public new DbSet<ApplicationUser> Users { get; set; }
         public DbSet<Contest> Contests { get; set; }
-        public DbSet<Register> Registers { get; set; }
+        public DbSet<UserContest> Registers { get; set; }
         public DbSet<Problem> Problems { get; set; }
         public DbSet<ProblemImage> ProblemImages { get; set; }
-        public DbSet<Tutorial> Tutorials { get; set; }
-        public DbSet<TutorialImage> TutorialImages { get; set; }
+        public DbSet<Blog> Blogs { get; set; }
+        public DbSet<BlogImage> TutorialImages { get; set; }
         public DbSet<Testcase> Testcases { get; set; }
         public DbSet<Topic> Topics { get; set; }
         public DbSet<ProblemTopic> ProblemTopics { get; set; }
@@ -38,127 +38,90 @@ namespace CodeSphere.Infrastructure.Context
         }
         private static void ConfigureCompositeKeys(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<Register>()
-                .HasKey(r => new { r.UID, r.CID });
+            modelBuilder.Entity<UserContest>()
+                .HasKey(r => new { r.UserId, r.ContestId });
 
             modelBuilder.Entity<ProblemTopic>()
-                .HasKey(pt => new { pt.PID, pt.TID });
+                .HasKey(pt => new { pt.ProblemId, pt.TopicId });
         }
 
         private static void ConfigureRelationships(ModelBuilder modelBuilder)
         {
             // One-to-Many: User -> Contest (Setter)
             modelBuilder.Entity<Contest>()
-                .HasOne(c => c.Setter)
+                .HasOne(c => c.ProblemSetter)
                 .WithMany(u => u.Contests)
-                .HasForeignKey(c => c.SetterID)
+                .HasForeignKey(c => c.ProblemSetterId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            // One-to-Many: User -> Problem (Setter)
-            modelBuilder.Entity<Problem>()
-                .HasOne(p => p.Setter)
-                .WithMany(u => u.Problems)
-                .HasForeignKey(p => p.SetterID)
-                .OnDelete(DeleteBehavior.Restrict);
 
-            // One-to-Many: Contest -> Problem
-            modelBuilder.Entity<Problem>()
-                .HasOne(p => p.Contest)
-                .WithMany(c => c.Problems)
-                .HasForeignKey(p => p.CID)
-                .OnDelete(DeleteBehavior.Cascade);
-
-            // One-to-Many: Problem -> ProblemImage
-            modelBuilder.Entity<ProblemImage>()
-                .HasOne(pi => pi.Problem)
-                .WithMany(p => p.Images)
-                .HasForeignKey(pi => pi.PID)
-                .OnDelete(DeleteBehavior.Cascade);
 
             // One-to-Many: Problem -> Testcase
             modelBuilder.Entity<Testcase>()
                 .HasOne(tc => tc.Problem)
                 .WithMany(p => p.Testcases)
-                .HasForeignKey(tc => tc.PID)
+                .HasForeignKey(tc => tc.ProblemId)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            // One-to-Many: User -> Tutorial (Setter)
-            modelBuilder.Entity<Tutorial>()
-                .HasOne(t => t.Setter)
-                .WithMany(u => u.Tutorials)
-                .HasForeignKey(t => t.SetterID)
+            // One-to-Many: User -> Blog (Setter)
+            modelBuilder.Entity<Blog>()
+                .HasOne(t => t.BlogCreator)
+                .WithMany(u => u.Blogs)
+                .HasForeignKey(b => b.BlogCreatorId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            // One-to-Many: Problem -> Tutorial
-            modelBuilder.Entity<Tutorial>()
-                .HasOne(t => t.Problem)
-                .WithMany(p => p.Tutorials)
-                .HasForeignKey(t => t.PID)
-                .OnDelete(DeleteBehavior.Cascade);
-
-            // One-to-Many: Tutorial -> TutorialImage
-            modelBuilder.Entity<TutorialImage>()
-                .HasOne(ti => ti.Tutorial)
+            // One-to-Many: Blog -> BlogImage
+            modelBuilder.Entity<BlogImage>()
+                .HasOne(ti => ti.Blog)
                 .WithMany(t => t.Images)
-                .HasForeignKey(ti => ti.TID)
+                .HasForeignKey(ti => ti.BlogId)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            // Many-to-Many: Problem <-> Topic (via ProblemTopic)
-            modelBuilder.Entity<ProblemTopic>()
-                .HasOne(pt => pt.Problem)
-                .WithMany(p => p.ProblemTopics)
-                .HasForeignKey(pt => pt.PID)
-                .OnDelete(DeleteBehavior.Cascade);
 
-            modelBuilder.Entity<ProblemTopic>()
-                .HasOne(pt => pt.Topic)
-                .WithMany(t => t.ProblemTopics)
-                .HasForeignKey(pt => pt.TID)
-                .OnDelete(DeleteBehavior.Cascade);
 
             // One-to-Many: User -> Register
-            modelBuilder.Entity<Register>()
+            modelBuilder.Entity<UserContest>()
                 .HasOne(r => r.User)
                 .WithMany(u => u.Registrations)
-                .HasForeignKey(r => r.UID)
+                .HasForeignKey(r => r.UserId)
                 .OnDelete(DeleteBehavior.Cascade);
 
             // One-to-Many: Contest -> Register
-            modelBuilder.Entity<Register>()
+            modelBuilder.Entity<UserContest>()
                 .HasOne(r => r.Contest)
                 .WithMany(c => c.Registrations)
-                .HasForeignKey(r => r.CID)
+                .HasForeignKey(r => r.ContestId)
                 .OnDelete(DeleteBehavior.Cascade);
 
             // One-to-Many: User -> Submit
             modelBuilder.Entity<Submit>()
                 .HasOne(s => s.User)
                 .WithMany(u => u.Submissions)
-                .HasForeignKey(s => s.UID)
+                .HasForeignKey(s => s.UserId)
                 .OnDelete(DeleteBehavior.Cascade);
 
             // One-to-Many: Problem -> Submit
             modelBuilder.Entity<Submit>()
                 .HasOne(s => s.Problem)
                 .WithMany(p => p.Submissions)
-                .HasForeignKey(s => s.PID)
+                .HasForeignKey(s => s.ProblemId)
                 .OnDelete(DeleteBehavior.Cascade);
 
             // One-to-Many: Contest -> Submit
             modelBuilder.Entity<Submit>()
                 .HasOne(s => s.Contest)
                 .WithMany(c => c.Submissions)
-                .HasForeignKey(s => s.CID)
+                .HasForeignKey(s => s.ContestId)
                 .OnDelete(DeleteBehavior.Cascade);
 
 
 
             //=======================ss
-            modelBuilder.Entity<User>()
+            modelBuilder.Entity<ApplicationUser>()
             .Property(u => u.Email)
             .IsRequired();
 
-            modelBuilder.Entity<User>()
+            modelBuilder.Entity<ApplicationUser>()
                 .HasIndex(u => u.Email)
                 .IsUnique();
 

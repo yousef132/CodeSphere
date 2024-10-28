@@ -1,8 +1,9 @@
-﻿namespace CodeSphere.Domain.Models.Entities
+﻿using CodeSphere.Domain.Premitives;
+
+namespace CodeSphere.Domain.Models.Entities
 {
-    public class Topic
+    public class Topic : BaseEntity
     {
-        public int ID { get; set; }
         public string Name { get; set; }
 
         public ICollection<ProblemTopic> ProblemTopics { get; set; }
