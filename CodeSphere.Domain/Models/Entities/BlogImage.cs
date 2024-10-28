@@ -2,10 +2,10 @@
 
 namespace CodeSphere.Domain.Models.Entities
 {
-    public class ProblemImage : BaseEntity
+    public class BlogImage : BaseEntity
     {
-        public Guid ProblemId { get; set; }
+        public Guid BlogId { get; set; }
         public string ImagePath { get; set; }
-        public Problem Problem { get; set; }
+        public Blog Blog { get; set; }
     }
 }

@@ -18,9 +18,9 @@ namespace CodeSphere.Application.Features.Problem.Commands.Create
         }
         public async Task<Response> Handle(CreateProblemCommand request, CancellationToken cancellationToken)
         {
-            var mappedProblem = mapper.Map<Domain.Models.Problem>(request);
+            var mappedProblem = mapper.Map<Domain.Models.Entities.Problem>(request);
 
-            await unitOfWork.Repository<Domain.Models.Problem>().AddAsync(mappedProblem);
+            await unitOfWork.Repository<Domain.Models.Entities.Problem>().AddAsync(mappedProblem);
             await unitOfWork.CompleteAsync();
 
             return await Response.SuccessAsync(mappedProblem, "Product added successfully");
