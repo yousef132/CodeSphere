@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using CodeSphere.Domain.Abstractions;
+using CodeSphere.Domain.Abstractions.Services;
 using CodeSphere.Domain.Models.Identity;
 using CodeSphere.Domain.Premitives;
 using MediatR;
@@ -17,15 +18,18 @@ namespace CodeSphere.Application.Features.Authentication.Commands.Register
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
         private readonly UserManager<ApplicationUser> _userManager;
+		private readonly IAuthService _authService;
 
-        public RegisterCommandHandler(IUnitOfWork unitOfWork,
+		public RegisterCommandHandler(IUnitOfWork unitOfWork,
                                       IMapper mapper,
-                                      UserManager<ApplicationUser> userManager)
+                                      UserManager<ApplicationUser> userManager
+                                     ,IAuthService authService)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
             _userManager = userManager;
-        }
+			_authService = authService;
+		}
         public async Task<Response> Handle(RegisterCommand request, CancellationToken cancellationToken)
         {
             var mappedUser = _mapper.Map<RegisterCommand, ApplicationUser>(request);
@@ -47,9 +51,14 @@ namespace CodeSphere.Application.Features.Authentication.Commands.Register
     System.Net.HttpStatusCode.BadRequest
 );
 
-            return await Response.SuccessAsync(request, "Register Successfully");
+            var registerCommandHandler = new RegisterCommandResponse()
+            {
+                Password = request.Password,
+                Email = request.Email,
+                Token = await _authService.CreateTokenAsync(mappedUser, _userManager)
+            };
 
-
+            return await Response.SuccessAsync(registerCommandHandler, "Registered Successfully");
         }
     }
 }

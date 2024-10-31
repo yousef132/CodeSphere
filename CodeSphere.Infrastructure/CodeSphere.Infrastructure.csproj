@@ -24,4 +24,14 @@
     <ProjectReference Include="..\CodeSphere.Domain\CodeSphere.Domain.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Implementation\NewFolder1\" />
+    <Folder Include="Implementation\NewFolder\" />
+    <Folder Include="Implementation\Services\NewFolder1\" />
+    <Folder Include="Implementation\Services\NewFolder2\" />
+    <Folder Include="Implementation\Services\NewFolder3\" />
+    <Folder Include="Implementation\Services\NewFolder4\" />
+    <Folder Include="Implementation\Services\NewFolder\" />
+  </ItemGroup>
+
 </Project>
