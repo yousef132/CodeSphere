@@ -8,7 +8,8 @@ namespace CodeSphere.Domain.Premitives
         public bool IsSuccess { get; set; } = true;
         public object? Data { get; set; }
         public string Message { get; set; } = "";
-        public async static Task<Response> SuccessAsync(object data, string message)
+
+		public async static Task<Response> SuccessAsync(object data, string message)
         {
             await Task.CompletedTask;
             Response response = new Response()
