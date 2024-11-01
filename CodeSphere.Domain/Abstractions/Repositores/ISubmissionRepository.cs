@@ -7,8 +7,8 @@ using System.Threading.Tasks;
 
 namespace CodeSphere.Domain.Abstractions.Repositores
 {
-    public interface IProblemRepository
+    public interface ISubmissionRepository
     {
-        Task<IEnumerable<Testcase>> GetTestCasesByProblemId(Guid problemId);
+        Task<IEnumerable<Submit>> GetAllSubmissions(Guid problemId, string userId);
     }
 }

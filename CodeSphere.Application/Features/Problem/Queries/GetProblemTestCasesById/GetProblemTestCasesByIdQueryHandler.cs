@@ -26,7 +26,7 @@ namespace CodeSphere.Application.Features.Problem.Queries.GetProblemTestCasesByI
         }
         public async Task<Response> Handle(GetProblemTestCasesByIdQuery request, CancellationToken cancellationToken)
         {
-            var TestCases = _problemRepository.GetTestCasesByProblemId(request.ProblemId);
+            var TestCases = await _problemRepository.GetTestCasesByProblemId(request.ProblemId);
             if (TestCases.IsNullOrEmpty())
             {
                 return await Response.FailureAsync("Problem not found");

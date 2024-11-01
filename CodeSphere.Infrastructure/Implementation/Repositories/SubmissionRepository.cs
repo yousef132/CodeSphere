@@ -10,16 +10,17 @@ using System.Threading.Tasks;
 
 namespace CodeSphere.Infrastructure.Implementation.Repositories
 {
-    public class ProblemRepository : IProblemRepository
+    public class SubmissionRepository : ISubmissionRepository
     {
         private readonly ApplicationDbContext _context;
-        public ProblemRepository(ApplicationDbContext context)
+
+        public SubmissionRepository(ApplicationDbContext context)
         {
             _context = context;
         }
-        public async Task<IEnumerable<Testcase>> GetTestCasesByProblemId(Guid problemId)
+        public async Task<IEnumerable<Submit>> GetAllSubmissions(Guid problemId, string userId)
         {
-            return await _context.Set<Testcase>().Where(x => x.ProblemId == problemId).ToListAsync();
+            return await _context.Submits.Where(x => x.ProblemId == problemId && x.UserId == userId).ToListAsync(); 
         }
     }
 }
