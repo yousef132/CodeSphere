@@ -1,5 +1,6 @@
 ﻿using CodeSphere.Application.Features.Problem.Commands.Create;
 using CodeSphere.Application.Features.Problem.Queries.GetProblemTestCasesById;
+using CodeSphere.Application.Features.Submission.Queries.GetProblemSubmissions;
 using CodeSphere.Domain.Premitives;
 using Microsoft.AspNetCore.Mvc;
 
@@ -14,6 +15,10 @@ namespace CodeSphere.WebApi.Controllers
 
         [HttpGet]
         public async Task<ActionResult<Response>> GetProblemTestCasesByIdAsync(GetProblemTestCasesByIdQuery query)
+         => ResponseResult(await mediator.Send(query));
+
+        [HttpGet]
+        public async Task<ActionResult<Response>> GetAllSubmissions(GetProblemSubmissionsQuery query)
          => ResponseResult(await mediator.Send(query));
     }
 }

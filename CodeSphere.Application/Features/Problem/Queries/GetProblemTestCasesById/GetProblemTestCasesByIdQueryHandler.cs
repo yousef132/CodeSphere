@@ -1,7 +1,9 @@
 ﻿using AutoMapper;
 using CodeSphere.Domain.Abstractions;
+using CodeSphere.Domain.Abstractions.Repositores;
 using CodeSphere.Domain.Premitives;
 using MediatR;
+using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,22 +15,23 @@ namespace CodeSphere.Application.Features.Problem.Queries.GetProblemTestCasesByI
     public class GetProblemTestCasesByIdQueryHandler : IRequestHandler<GetProblemTestCasesByIdQuery, Response>
     {
         private readonly IMapper mapper;
-        private readonly IUnitOfWork unitOfWork;
+        private readonly IProblemRepository _problemRepository;
 
-        public GetProblemTestCasesByIdQueryHandler(IMapper mapper, IUnitOfWork unitOfWork)
+
+        public GetProblemTestCasesByIdQueryHandler(IMapper mapper,
+            IProblemRepository problemRepository)
         {
             this.mapper = mapper;
-            this.unitOfWork = unitOfWork;
+            _problemRepository = problemRepository;
         }
-        public Task<Response> Handle(GetProblemTestCasesByIdQuery request, CancellationToken cancellationToken)
+        public async Task<Response> Handle(GetProblemTestCasesByIdQuery request, CancellationToken cancellationToken)
         {
-            var TestCases = unitOfWork.Repository<Domain.Models.Entities.Testcase>().GetByIdAsync(request.ProblemId);
-            if (TestCases is null)
+            var TestCases = await _problemRepository.GetTestCasesByProblemId(request.ProblemId);
+            if (TestCases.IsNullOrEmpty())
             {
-                return Response.FailureAsync("Problem not found");
-
+                return await Response.FailureAsync("Problem not found");
             }
-            return Response.SuccessAsync(TestCases, "TestCases fetched successfully");
+            return await Response.SuccessAsync(TestCases, "TestCases fetched successfully");
         }
     }
 }
