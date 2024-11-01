@@ -8,7 +8,6 @@ namespace CodeSphere.Domain.Abstractions.Repositores
 
         Task DeleteRangeAsync(ICollection<T> entities);
         Task DeleteAsync(T entity);
-        Task<T> GetByIdAsync(int id);
         Task<T> GetByIdAsync(Guid id);
 
         Task SaveChangesAsync();

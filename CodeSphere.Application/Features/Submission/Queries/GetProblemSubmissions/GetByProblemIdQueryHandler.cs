@@ -4,11 +4,6 @@ using CodeSphere.Domain.Models.Entities;
 using CodeSphere.Domain.Premitives;
 using MediatR;
 using Microsoft.IdentityModel.Tokens;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CodeSphere.Application.Features.Submission.Queries.GetProblemSubmissions
 {
@@ -26,11 +21,12 @@ namespace CodeSphere.Application.Features.Submission.Queries.GetProblemSubmissio
         public async Task<Response> Handle(GetProblemSubmissionsQuery request, CancellationToken cancellationToken)
         {
             var submissions = await _submissionRepository.GetAllSubmissions(request.ProblemId, request.UserId);
-            if(submissions.IsNullOrEmpty())
-            {
-                return await Response.FailureAsync("Submissions not found");
-            }
-            var mappedSubmissions = _mapper.Map<IEnumerable<Submit>, IEnumerable<GetProblemSubmissionsResponse>>(submissions);
+
+            if (submissions.IsNullOrEmpty())
+                return await Response.SuccessAsync("Not Submissions");
+
+            var mappedSubmissions = _mapper.Map<IQueryable<Submit>, IQueryable<GetProblemSubmissionsResponse>>(submissions);
+
             return await Response.SuccessAsync(mappedSubmissions, "Submissions fetched successfully");
         }
     }
