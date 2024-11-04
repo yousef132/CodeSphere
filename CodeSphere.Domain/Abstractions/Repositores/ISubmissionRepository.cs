@@ -4,6 +4,6 @@ namespace CodeSphere.Domain.Abstractions.Repositores
 {
     public interface ISubmissionRepository
     {
-        Task<IQueryable<Submit>> GetAllSubmissions(Guid problemId, string userId);
+        Task<IQueryable<Submit>> GetAllSubmissions(int problemId, string userId);
     }
 }

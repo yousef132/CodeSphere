@@ -39,7 +39,7 @@ namespace CodeSphere.Infrastructure.Implementation.Repositories
         public async Task DeleteRangeAsync(ICollection<T> entities)
            => context.Set<T>().RemoveRange(entities);
 
-        public async Task<T> GetByIdAsync(Guid id) => await context.Set<T>().FindAsync(id);
+        public async Task<T> GetByIdAsync(int id) => await context.Set<T>().FindAsync(id);
 
 
         public IQueryable<T> GetTableAsTracked() => context.Set<T>().AsQueryable();

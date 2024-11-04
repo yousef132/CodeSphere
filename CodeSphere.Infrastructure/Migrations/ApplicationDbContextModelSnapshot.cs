@@ -24,9 +24,11 @@ namespace CodeSphere.Infrastructure.Migrations
 
             modelBuilder.Entity("CodeSphere.Domain.Models.Entities.Blog", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("BlogCreatorId")
                         .IsRequired()
@@ -45,12 +47,14 @@ namespace CodeSphere.Infrastructure.Migrations
 
             modelBuilder.Entity("CodeSphere.Domain.Models.Entities.BlogImage", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("int");
 
-                    b.Property<Guid>("BlogId")
-                        .HasColumnType("uniqueidentifier");
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("BlogId")
+                        .HasColumnType("int");
 
                     b.Property<string>("ImagePath")
                         .IsRequired()
@@ -65,16 +69,18 @@ namespace CodeSphere.Infrastructure.Migrations
 
             modelBuilder.Entity("CodeSphere.Domain.Models.Entities.Comment", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("AuthorId")
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<Guid>("BlogId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<int>("BlogId")
+                        .HasColumnType("int");
 
                     b.Property<string>("Content")
                         .IsRequired()
@@ -101,12 +107,14 @@ namespace CodeSphere.Infrastructure.Migrations
 
             modelBuilder.Entity("CodeSphere.Domain.Models.Entities.Contest", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("int");
 
-                    b.Property<Guid>("BlogId")
-                        .HasColumnType("uniqueidentifier");
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int?>("BlogId")
+                        .HasColumnType("int");
 
                     b.Property<decimal>("Duration")
                         .HasColumnType("decimal(18,2)");
@@ -128,7 +136,8 @@ namespace CodeSphere.Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("BlogId")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasFilter("[BlogId] IS NOT NULL");
 
                     b.HasIndex("ProblemSetterId");
 
@@ -137,12 +146,14 @@ namespace CodeSphere.Infrastructure.Migrations
 
             modelBuilder.Entity("CodeSphere.Domain.Models.Entities.Problem", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("int");
 
-                    b.Property<Guid>("ContestId")
-                        .HasColumnType("uniqueidentifier");
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("ContestId")
+                        .HasColumnType("int");
 
                     b.Property<string>("Description")
                         .IsRequired()
@@ -152,6 +163,9 @@ namespace CodeSphere.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<decimal>("MemoryLimit")
+                        .HasColumnType("decimal(18,2)");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -159,6 +173,9 @@ namespace CodeSphere.Infrastructure.Migrations
                     b.Property<string>("ProblemSetterId")
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
+
+                    b.Property<decimal>("RunTimeLimit")
+                        .HasColumnType("decimal(18,2)");
 
                     b.HasKey("Id");
 
@@ -171,16 +188,18 @@ namespace CodeSphere.Infrastructure.Migrations
 
             modelBuilder.Entity("CodeSphere.Domain.Models.Entities.ProblemImage", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("ImagePath")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid>("ProblemId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<int>("ProblemId")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
@@ -191,11 +210,11 @@ namespace CodeSphere.Infrastructure.Migrations
 
             modelBuilder.Entity("CodeSphere.Domain.Models.Entities.ProblemTopic", b =>
                 {
-                    b.Property<Guid>("ProblemId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<int>("ProblemId")
+                        .HasColumnType("int");
 
-                    b.Property<Guid>("TopicId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<int>("TopicId")
+                        .HasColumnType("int");
 
                     b.HasKey("ProblemId", "TopicId");
 
@@ -206,25 +225,27 @@ namespace CodeSphere.Infrastructure.Migrations
 
             modelBuilder.Entity("CodeSphere.Domain.Models.Entities.Submit", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Code")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("ContestDate")
-                        .HasColumnType("datetime2");
+                    b.Property<int?>("ContestId")
+                        .HasColumnType("int");
 
-                    b.Property<Guid?>("ContestId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("Error")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("Language")
                         .HasColumnType("int");
 
-                    b.Property<Guid>("ProblemId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<int>("ProblemId")
+                        .HasColumnType("int");
 
                     b.Property<int>("Result")
                         .HasColumnType("int");
@@ -255,9 +276,11 @@ namespace CodeSphere.Infrastructure.Migrations
 
             modelBuilder.Entity("CodeSphere.Domain.Models.Entities.Testcase", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Input")
                         .IsRequired()
@@ -267,8 +290,8 @@ namespace CodeSphere.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid>("ProblemId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<int>("ProblemId")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
@@ -279,9 +302,11 @@ namespace CodeSphere.Infrastructure.Migrations
 
             modelBuilder.Entity("CodeSphere.Domain.Models.Entities.Topic", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -297,8 +322,8 @@ namespace CodeSphere.Infrastructure.Migrations
                     b.Property<string>("UserId")
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<Guid>("ContestId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<int>("ContestId")
+                        .HasColumnType("int");
 
                     b.Property<short>("RankChange")
                         .HasColumnType("smallint");
@@ -331,7 +356,6 @@ namespace CodeSphere.Infrastructure.Migrations
                         .HasColumnType("bit");
 
                     b.Property<string>("ImagePath")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("LockoutEnabled")
@@ -568,9 +592,7 @@ namespace CodeSphere.Infrastructure.Migrations
                 {
                     b.HasOne("CodeSphere.Domain.Models.Entities.Blog", "Blog")
                         .WithOne("Contest")
-                        .HasForeignKey("CodeSphere.Domain.Models.Entities.Contest", "BlogId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("CodeSphere.Domain.Models.Entities.Contest", "BlogId");
 
                     b.HasOne("CodeSphere.Domain.Models.Identity.ApplicationUser", "ProblemSetter")
                         .WithMany("Contests")

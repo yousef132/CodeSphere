@@ -6,6 +6,7 @@
         WrongAnswer,
         TimeLimitExceeded,
         MemoryLimitExceeded,
-        CompilationError
+        CompilationError,
+        RunTimeError
     }
 }

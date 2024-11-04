@@ -11,7 +11,7 @@ namespace CodeSphere.Domain.Models.Entities
         public decimal Duration { get; set; }
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }
-        public Guid BlogId { get; set; }
+        public int? BlogId { get; set; }
 
         [ForeignKey(nameof(BlogId))]
         public Blog Blog { get; set; }

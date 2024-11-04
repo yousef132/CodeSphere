@@ -2,11 +2,11 @@
 {
     public enum Language
     {
-        Cpp,
-        Py,
-        Js,
-        Csharp,
-        Java,
-        Go
+        cpp,
+        py,
+        js,
+        cs,
+        java,
+        go
     }
 }

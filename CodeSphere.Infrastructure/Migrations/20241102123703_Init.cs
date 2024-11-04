@@ -5,7 +5,7 @@
 namespace CodeSphere.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class Initial : Migration
+    public partial class Init : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -30,7 +30,7 @@ namespace CodeSphere.Infrastructure.Migrations
                 {
                     Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     RankName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    ImagePath = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ImagePath = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Rating = table.Column<short>(type: "smallint", nullable: false),
                     UserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     NormalizedUserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
@@ -56,7 +56,8 @@ namespace CodeSphere.Infrastructure.Migrations
                 name: "Topics",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
@@ -174,9 +175,9 @@ namespace CodeSphere.Infrastructure.Migrations
                 name: "Blogs",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
                     BlogCreatorId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    ProblemId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Content = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
@@ -194,11 +195,12 @@ namespace CodeSphere.Infrastructure.Migrations
                 name: "Comment",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     Path = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     AuthorId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    BlogId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    BlogId = table.Column<int>(type: "int", nullable: false),
                     Content = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     IsEdited = table.Column<bool>(type: "bit", nullable: false)
                 },
@@ -223,13 +225,14 @@ namespace CodeSphere.Infrastructure.Migrations
                 name: "Contests",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
                     ProblemSetterId = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Duration = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     StartDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     EndDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    BlogId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                    BlogId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -244,16 +247,16 @@ namespace CodeSphere.Infrastructure.Migrations
                         name: "FK_Contests_Blogs_BlogId",
                         column: x => x.BlogId,
                         principalTable: "Blogs",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
                 name: "TutorialImages",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    BlogId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    BlogId = table.Column<int>(type: "int", nullable: false),
                     ImagePath = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
@@ -271,11 +274,14 @@ namespace CodeSphere.Infrastructure.Migrations
                 name: "Problems",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
                     ProblemSetterId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    ContestId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    ContestId = table.Column<int>(type: "int", nullable: false),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Difficulty = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    RunTimeLimit = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    MemoryLimit = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
@@ -300,7 +306,7 @@ namespace CodeSphere.Infrastructure.Migrations
                 columns: table => new
                 {
                     UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    ContestId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    ContestId = table.Column<int>(type: "int", nullable: false),
                     RankChange = table.Column<short>(type: "smallint", nullable: false)
                 },
                 constraints: table =>
@@ -324,8 +330,9 @@ namespace CodeSphere.Infrastructure.Migrations
                 name: "ProblemImages",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    ProblemId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    ProblemId = table.Column<int>(type: "int", nullable: false),
                     ImagePath = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
@@ -343,8 +350,8 @@ namespace CodeSphere.Infrastructure.Migrations
                 name: "ProblemTopics",
                 columns: table => new
                 {
-                    ProblemId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    TopicId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                    ProblemId = table.Column<int>(type: "int", nullable: false),
+                    TopicId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -367,11 +374,12 @@ namespace CodeSphere.Infrastructure.Migrations
                 name: "Submits",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
                     UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    ProblemId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    ContestId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    ContestDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    ProblemId = table.Column<int>(type: "int", nullable: false),
+                    ContestId = table.Column<int>(type: "int", nullable: true),
+                    Error = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     SubmitTime = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     SubmitMemory = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     Result = table.Column<int>(type: "int", nullable: false),
@@ -406,8 +414,9 @@ namespace CodeSphere.Infrastructure.Migrations
                 name: "Testcases",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    ProblemId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    ProblemId = table.Column<int>(type: "int", nullable: false),
                     Input = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Output = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
@@ -473,11 +482,6 @@ namespace CodeSphere.Infrastructure.Migrations
                 column: "BlogCreatorId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Blogs_ProblemId",
-                table: "Blogs",
-                column: "ProblemId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_Comment_AuthorId",
                 table: "Comment",
                 column: "AuthorId");
@@ -491,7 +495,8 @@ namespace CodeSphere.Infrastructure.Migrations
                 name: "IX_Contests_BlogId",
                 table: "Contests",
                 column: "BlogId",
-                unique: true);
+                unique: true,
+                filter: "[BlogId] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Contests_ProblemSetterId",
@@ -547,35 +552,11 @@ namespace CodeSphere.Infrastructure.Migrations
                 name: "IX_TutorialImages_BlogId",
                 table: "TutorialImages",
                 column: "BlogId");
-
-            migrationBuilder.AddForeignKey(
-                name: "FK_Blogs_Problems_ProblemId",
-                table: "Blogs",
-                column: "ProblemId",
-                principalTable: "Problems",
-                principalColumn: "Id",
-                onDelete: ReferentialAction.Restrict);
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropForeignKey(
-                name: "FK_Blogs_AspNetUsers_BlogCreatorId",
-                table: "Blogs");
-
-            migrationBuilder.DropForeignKey(
-                name: "FK_Contests_AspNetUsers_ProblemSetterId",
-                table: "Contests");
-
-            migrationBuilder.DropForeignKey(
-                name: "FK_Problems_AspNetUsers_ProblemSetterId",
-                table: "Problems");
-
-            migrationBuilder.DropForeignKey(
-                name: "FK_Blogs_Problems_ProblemId",
-                table: "Blogs");
-
             migrationBuilder.DropTable(
                 name: "AspNetRoleClaims");
 
@@ -619,9 +600,6 @@ namespace CodeSphere.Infrastructure.Migrations
                 name: "Topics");
 
             migrationBuilder.DropTable(
-                name: "AspNetUsers");
-
-            migrationBuilder.DropTable(
                 name: "Problems");
 
             migrationBuilder.DropTable(
@@ -629,6 +607,9 @@ namespace CodeSphere.Infrastructure.Migrations
 
             migrationBuilder.DropTable(
                 name: "Blogs");
+
+            migrationBuilder.DropTable(
+                name: "AspNetUsers");
         }
     }
 }

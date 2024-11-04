@@ -26,7 +26,7 @@ namespace CodeSphere.Application.Features.Problem.Queries.GetProblemTestCasesByI
             if (problem == null)
                 return await Response.FailureAsync("Problem not found");
 
-            var TestCases = await _problemRepository.GetTestCasesByProblemId(request.ProblemId);
+            var TestCases = _problemRepository.GetTestCasesByProblemId(request.ProblemId);
 
             return await Response.SuccessAsync(TestCases, "TestCases fetched successfully");
         }

@@ -1,7 +1,6 @@
 ﻿using CodeSphere.Domain.Abstractions.Repositores;
 using CodeSphere.Domain.Models.Entities;
 using CodeSphere.Infrastructure.Context;
-using Microsoft.EntityFrameworkCore;
 
 namespace CodeSphere.Infrastructure.Implementation.Repositories
 {
@@ -12,7 +11,7 @@ namespace CodeSphere.Infrastructure.Implementation.Repositories
         {
             _context = context;
         }
-        public async Task<IEnumerable<Testcase>> GetTestCasesByProblemId(Guid problemId)
-           => await _context.Set<Testcase>().Where(x => x.ProblemId == problemId).ToListAsync();
+        public IQueryable<Testcase> GetTestCasesByProblemId(int problemId)
+           => _context.Set<Testcase>().Where(x => x.ProblemId == problemId);
     }
 }

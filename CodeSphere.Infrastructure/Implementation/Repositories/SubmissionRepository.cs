@@ -12,7 +12,7 @@ namespace CodeSphere.Infrastructure.Implementation.Repositories
         {
             _context = context;
         }
-        public async Task<IQueryable<Submit>> GetAllSubmissions(Guid problemId, string userId)
+        public async Task<IQueryable<Submit>> GetAllSubmissions(int problemId, string userId)
          => _context.Submits.Where(x => x.ProblemId == problemId && x.UserId == userId);
 
     }
