@@ -1,8 +1,43 @@
 ﻿using AutoMapper;
-using CodeSphere.Domain.Abstractions;
 using CodeSphere.Domain.Abstractions.Repositores;
 using CodeSphere.Domain.Premitives;
 using MediatR;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
+            var TestCases = _problemRepository.GetTestCasesByProblemId(request.ProblemId);
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace CodeSphere.Application.Features.Problem.Queries.GetProblemTestCasesById
 {

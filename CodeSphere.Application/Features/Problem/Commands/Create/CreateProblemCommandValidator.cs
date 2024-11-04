@@ -11,8 +11,5 @@ namespace CodeSphere.Application.Features.Problem.Commands.Create
             RuleFor(x => x.Rate).NotEmpty().NotNull();
 
         }
-
-
-
     }
 }
