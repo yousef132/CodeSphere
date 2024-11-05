@@ -7,9 +7,7 @@ namespace CodeSphere.Application.Features.Testcase.Commands.Create
         public CreateTestcaseCommandValidator()
         {
             RuleFor(x => x.ProblemId)
-               .NotEmpty().WithMessage("ProblemId is required.")
-               .Must(id => id != Guid.Empty).WithMessage("ProblemId must be a valid GUID.");
-
+               .NotEmpty().WithMessage("ProblemId is required.");
             RuleFor(x => x.Input)
                 .NotEmpty().WithMessage("Input is required.")
                 .MinimumLength(1).WithMessage("Input must be at least 1 character long.");

@@ -1,14 +1,19 @@
 ﻿using CodeSphere.Domain.Abstractions;
 using CodeSphere.Domain.Abstractions.Repositores;
 using CodeSphere.Domain.Abstractions.Services;
+using CodeSphere.Domain.Models.Identity;
+using CodeSphere.Infrastructure.Context;
 using CodeSphere.Infrastructure.Implementation;
 using CodeSphere.Infrastructure.Implementation.Repositories;
 using CodeSphere.Infrastructure.Implementation.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+
 
 namespace CodeSphere.Infrastructure
 {
@@ -17,6 +22,7 @@ namespace CodeSphere.Infrastructure
 
         public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
         {
+            #region Services Registration
 
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
@@ -25,6 +31,24 @@ namespace CodeSphere.Infrastructure
             services.AddScoped(typeof(ISubmissionRepository), typeof(SubmissionRepository));
             services.AddScoped(typeof(IProblemRepository), typeof(ProblemRepository));
             services.AddScoped(typeof(IFileService), typeof(FileService));
+
+
+            #endregion
+
+            #region db context
+            services.AddDbContext<ApplicationDbContext>(options =>
+             {
+                 options.UseSqlServer(configuration.GetConnectionString("DefaultConnection"));
+             });
+            #endregion
+
+            #region Identity context
+            services.AddIdentity<ApplicationUser, IdentityRole>()
+                            .AddEntityFrameworkStores<ApplicationDbContext>();
+            #endregion
+
+            #region JWT Authentication
+
             services.AddAuthentication(/*JwtBearerDefaults.AuthenticationScheme*/ options =>
             {
                 options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -44,7 +68,16 @@ namespace CodeSphere.Infrastructure
                         ClockSkew = TimeSpan.Zero,
                     };
                 });
+
+
+            #endregion
+
+
             return services;
         }
+
+
+
+
     }
 }

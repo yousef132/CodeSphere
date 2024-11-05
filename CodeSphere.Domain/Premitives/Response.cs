@@ -9,7 +9,7 @@ namespace CodeSphere.Domain.Premitives
         public object? Data { get; set; }
         public string Message { get; set; } = "";
 
-		public async static Task<Response> SuccessAsync(object data, string message)
+        public async static Task<Response> SuccessAsync(object data, string message)
         {
             await Task.CompletedTask;
             Response response = new Response()
@@ -17,6 +17,19 @@ namespace CodeSphere.Domain.Premitives
                 IsSuccess = true,
                 Message = message,
                 Data = data
+            };
+
+            return response;
+        }
+        public async static Task<Response> SuccessAsync(object? data, string message, HttpStatusCode code)
+        {
+            await Task.CompletedTask;
+            Response response = new Response()
+            {
+                IsSuccess = true,
+                Message = message,
+                Data = data,
+                StatusCode = code
             };
 
             return response;

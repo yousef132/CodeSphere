@@ -41,7 +41,8 @@ namespace CodeSphere.WebApi.Controllers
         #endregion
 
         [Authorize]
+        [ApiExplorerSettings(IgnoreApi = true)]
         internal string GetCurrentUserEmail()
-            => User.FindFirstValue(ClaimTypes.Email);
+            => User.FindFirstValue(ClaimTypes.NameIdentifier);
     }
 }

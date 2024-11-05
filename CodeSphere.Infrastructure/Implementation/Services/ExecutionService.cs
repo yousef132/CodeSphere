@@ -39,7 +39,6 @@ namespace CodeSphere.Infrastructure.Implementation.Services
             var results = new List<TestCaseRunResult>();
             try
             {
-
                 // create container 
                 await CreateAndStartContainer(language);
                 for (int i = 0; i < testCases.Count; i++)

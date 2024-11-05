@@ -17,11 +17,11 @@ namespace CodeSphere.WebApi.Controllers
         public async Task<ActionResult<Response>> SolveProblemAsync([FromForm] SubmitSolutionCommand command)
          => ResponseResult(await mediator.Send(command));
 
-        [HttpGet]
-        public async Task<ActionResult<Response>> GetProblemTestCasesByIdAsync(GetProblemTestCasesByIdQuery query)
-         => ResponseResult(await mediator.Send(query));
+        [HttpGet("{problemId}")]
+        public async Task<ActionResult<Response>> GetProblemTestCasesByIdAsync([FromRoute] int problemId)
+         => ResponseResult(await mediator.Send(new GetProblemTestCasesByIdQuery(problemId)));
 
-        [HttpGet("allsubmissions")]
+        [HttpGet("all-submissions")]
         public async Task<ActionResult<Response>> GetAllSubmissions(GetProblemSubmissionsQuery query)
          => ResponseResult(await mediator.Send(query));
 

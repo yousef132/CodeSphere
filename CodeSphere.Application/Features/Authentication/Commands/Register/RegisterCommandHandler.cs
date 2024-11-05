@@ -5,11 +5,6 @@ using CodeSphere.Domain.Models.Identity;
 using CodeSphere.Domain.Premitives;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CodeSphere.Application.Features.Authentication.Commands.Register
 {
@@ -18,18 +13,18 @@ namespace CodeSphere.Application.Features.Authentication.Commands.Register
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
         private readonly UserManager<ApplicationUser> _userManager;
-		private readonly IAuthService _authService;
+        private readonly IAuthService _authService;
 
-		public RegisterCommandHandler(IUnitOfWork unitOfWork,
+        public RegisterCommandHandler(IUnitOfWork unitOfWork,
                                       IMapper mapper,
                                       UserManager<ApplicationUser> userManager
-                                     ,IAuthService authService)
+                                     , IAuthService authService)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
             _userManager = userManager;
-			_authService = authService;
-		}
+            _authService = authService;
+        }
         public async Task<Response> Handle(RegisterCommand request, CancellationToken cancellationToken)
         {
             var mappedUser = _mapper.Map<RegisterCommand, ApplicationUser>(request);
@@ -47,9 +42,9 @@ namespace CodeSphere.Application.Features.Authentication.Commands.Register
             var registerResult = await _userManager.CreateAsync(mappedUser, request.Password);
             if (!registerResult.Succeeded)
                 return await Response.FailureAsync(
-    string.Join(", ", registerResult.Errors.Select(x => x.Description)),
-    System.Net.HttpStatusCode.BadRequest
-);
+                            string.Join(", ", registerResult.Errors.Select(x => x.Description)),
+                            System.Net.HttpStatusCode.BadRequest
+                        );
 
             var registerCommandHandler = new RegisterCommandResponse()
             {
@@ -58,7 +53,7 @@ namespace CodeSphere.Application.Features.Authentication.Commands.Register
                 Token = await _authService.CreateTokenAsync(mappedUser, _userManager)
             };
 
-            return await Response.SuccessAsync(registerCommandHandler, "Registered Successfully");
+            return await Response.SuccessAsync(registerCommandHandler, "Registered Successfully", System.Net.HttpStatusCode.Created);
         }
     }
 }

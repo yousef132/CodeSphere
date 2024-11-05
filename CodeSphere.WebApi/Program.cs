@@ -1,36 +1,30 @@
 using CodeSphere.Application;
 using CodeSphere.Domain.Middleware;
-using CodeSphere.Domain.Models.Identity;
 using CodeSphere.Infrastructure;
-using CodeSphere.Infrastructure.Context;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
+using CodeSphere.WebApi.Extentions;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
 
-builder.Services.AddControllers();
+builder.Services.AddControllers().AddNewtonsoftJson(options =>
+{
+    options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
+});
+// swagger documentation
+builder.Services.AddSwaggerServices()
+    .AddSwaggerDocumentation();
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
-builder.Services.AddApplication().AddInfrastructure(builder.Configuration);
-builder.Services.AddDbContext<ApplicationDbContext>(options =>
-{
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
-});
+builder.Services.AddApplication()
+    .AddInfrastructure(builder.Configuration);
 
-builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
-                .AddEntityFrameworkStores<ApplicationDbContext>();
 
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseSwaggerService();
 }
 app.UseMiddleware<ErrorHandlerMiddleware>();
 app.UseHttpsRedirection();

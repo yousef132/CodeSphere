@@ -29,12 +29,12 @@ namespace CodeSphere.Application.Features.Problem.Commands.SolveProblem
         {
             var problem = await unitOfWork.Repository<Domain.Models.Entities.Problem>().GetByIdAsync(request.ProblemId);
             if (problem == null)
-                return await Response.FailureAsync("Problem Not Found");
+                return await Response.FailureAsync("Problem Not Found", System.Net.HttpStatusCode.NotFound);
 
             var contest = await unitOfWork.Repository<Contest>().GetByIdAsync(request.ContestId);
 
             if (contest == null)
-                return await Response.FailureAsync("Contest Not Found");
+                return await Response.FailureAsync("Contest Not Found", System.Net.HttpStatusCode.NotFound);
 
             var problemTestCases = problemRepository.GetTestCasesByProblemId(request.ProblemId);
 
@@ -75,7 +75,7 @@ namespace CodeSphere.Application.Features.Problem.Commands.SolveProblem
             };
 
             // save submission result in database
-            return await Response.SuccessAsync(SubmitResponse);
+            return await Response.SuccessAsync(SubmitResponse, "Submitted Successfully", System.Net.HttpStatusCode.Created);
         }
     }
 }

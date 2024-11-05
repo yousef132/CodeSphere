@@ -1,43 +1,10 @@
 ﻿using AutoMapper;
+using CodeSphere.Domain.Abstractions;
 using CodeSphere.Domain.Abstractions.Repositores;
 using CodeSphere.Domain.Premitives;
 using MediatR;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 
-            var TestCases = _problemRepository.GetTestCasesByProblemId(request.ProblemId);
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CodeSphere.Application.Features.Problem.Queries.GetProblemTestCasesById
 {
@@ -59,7 +26,7 @@ namespace CodeSphere.Application.Features.Problem.Queries.GetProblemTestCasesByI
         {
             var problem = await unitOfWork.Repository<Domain.Models.Entities.Problem>().GetByIdAsync(request.ProblemId);
             if (problem == null)
-                return await Response.FailureAsync("Problem not found");
+                return await Response.FailureAsync("Problem not found", System.Net.HttpStatusCode.NotFound);
 
             var TestCases = _problemRepository.GetTestCasesByProblemId(request.ProblemId);
 

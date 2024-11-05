@@ -22,18 +22,18 @@ namespace CodeSphere.Infrastructure.Implementation.Services
 
             return found;
         }
-        private async Task<string> ReadFileAsync(string filePath)
+        public async Task<string> ReadFileAsync(string filePath)
                => await System.IO.File.ReadAllTextAsync(filePath);
 
 
-        private async Task<string> CreateTestCasesFile(string testCase, string requestDirectory)
+        public async Task<string> CreateTestCasesFile(string testCase, string requestDirectory)
         {
             string testCasesPath = Path.Combine(requestDirectory, "testcases.txt");
             await System.IO.File.WriteAllTextAsync(testCasesPath, testCase);
             return testCasesPath;
         }
 
-        private async Task<string> CreateCodeFile(string code, Language language, string requestDirectory)
+        public async Task<string> CreateCodeFile(string code, Language language, string requestDirectory)
         {
 
             string testCasesPath = Path.Combine(requestDirectory, $"main.{language.ToString()}");

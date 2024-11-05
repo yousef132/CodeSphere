@@ -4,6 +4,7 @@ using CodeSphere.Domain.Models.Entities;
 using CodeSphere.Domain.Premitives;
 using MediatR;
 using Microsoft.IdentityModel.Tokens;
+using System.Net;
 
 namespace CodeSphere.Application.Features.Submission.Queries.GetProblemSubmissions
 {
@@ -23,11 +24,11 @@ namespace CodeSphere.Application.Features.Submission.Queries.GetProblemSubmissio
             var submissions = await _submissionRepository.GetAllSubmissions(request.ProblemId, request.UserId);
 
             if (submissions.IsNullOrEmpty())
-                return await Response.SuccessAsync("Not Submissions");
+                return await Response.SuccessAsync(null, "Not Submissions", HttpStatusCode.NoContent);
 
             var mappedSubmissions = _mapper.Map<IQueryable<Submit>, IQueryable<GetProblemSubmissionsResponse>>(submissions);
 
-            return await Response.SuccessAsync(mappedSubmissions, "Submissions fetched successfully");
+            return await Response.SuccessAsync(mappedSubmissions, "Submissions fetched successfully", HttpStatusCode.Found);
         }
     }
 }

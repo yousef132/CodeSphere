@@ -9,6 +9,7 @@ namespace CodeSphere.Application.Mapping
         public ProblemProfile()
         {
             CreateMap<CreateProblemCommand, Problem>();
+            CreateMap<Problem, CreateProblemCommandResponse>();
         }
     }
 }

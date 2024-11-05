@@ -19,8 +19,7 @@ namespace CodeSphere.Domain.Middleware
             this.next = next;
 
         }
-        // called in runtime in pipline
-        // Get Current Request 
+
         public async Task Invoke(HttpContext context)
         {
             try
