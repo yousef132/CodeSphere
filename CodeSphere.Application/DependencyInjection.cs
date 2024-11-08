@@ -1,6 +1,8 @@
 ﻿using CodeSphere.Application.Behaviors;
+using CodeSphere.Application.Helpers;
 using FluentValidation;
 using MediatR;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
 
@@ -8,9 +10,11 @@ namespace CodeSphere.Application
 {
     public static class DependencyInjection
     {
-        public static IServiceCollection AddApplication(this IServiceCollection services)
+        public static IServiceCollection AddApplication(this IServiceCollection services, IConfiguration configuration)
         {
             var assembly = typeof(DependencyInjection).Assembly;
+            services.Configure<EmailSettings>(configuration.GetSection("EmailSettings"));
+
 
             // mediator
             services.AddMediatR(configuration =>
