@@ -31,6 +31,7 @@ namespace CodeSphere.Infrastructure
             services.AddScoped(typeof(ISubmissionRepository), typeof(SubmissionRepository));
             services.AddScoped(typeof(IProblemRepository), typeof(ProblemRepository));
             services.AddScoped(typeof(IFileService), typeof(FileService));
+            services.AddScoped(typeof(IEmailService), typeof(EmailService));
 
 
             #endregion

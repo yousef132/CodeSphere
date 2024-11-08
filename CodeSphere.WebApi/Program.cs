@@ -15,7 +15,7 @@ builder.Services.AddSwaggerServices()
     .AddSwaggerDocumentation();
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-builder.Services.AddApplication()
+builder.Services.AddApplication(builder.Configuration)
     .AddInfrastructure(builder.Configuration);
 
 
