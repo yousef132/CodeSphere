@@ -1,6 +1,6 @@
 ﻿using CodeSphere.Domain.Models.Entities;
 
-namespace CodeSphere.Application.Features.Problem.Commands.SolveProblem
+namespace CodeSphere.Domain.Responses
 {
     public class SubmitSolutionCommandResponse
     {

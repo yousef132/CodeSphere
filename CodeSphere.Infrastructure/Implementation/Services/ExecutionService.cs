@@ -1,8 +1,10 @@
-﻿using CodeSphere.Application.Features.Problem.Commands.SolveProblem;
+﻿using CodeSphere.Domain.Abstractions;
 using CodeSphere.Domain.Abstractions.Services;
 using CodeSphere.Domain.CustomExceptions;
 using CodeSphere.Domain.Models.Entities;
 using CodeSphere.Domain.Premitives;
+using CodeSphere.Domain.Responses;
+using CodeSphere.Domain.Responses.SubmissionResponses;
 using Docker.DotNet;
 using Docker.DotNet.Models;
 
@@ -12,13 +14,14 @@ namespace CodeSphere.Infrastructure.Implementation.Services
     {
         private readonly DockerClient _dockerClient;
         private readonly IFileService fileService;
+        private readonly IUnitOfWork unitOfWork;
         private string _requestDirectory = null;
         private string _containerId = null;
         private string outputFile;
         private string errorFile;
         private string runTimeFile;
         private string runTimeErrorFile;
-        public ExecutionService(IFileService fileService)
+        public ExecutionService(IFileService fileService, IUnitOfWork unitOfWork)
         {
             _dockerClient = new DockerClientConfiguration(new Uri("tcp://localhost:2375")).CreateClient();
             _requestDirectory = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
@@ -28,15 +31,13 @@ namespace CodeSphere.Infrastructure.Implementation.Services
             runTimeFile = Path.Combine(_requestDirectory, "runtime.txt");
             runTimeErrorFile = Path.Combine(_requestDirectory, "runtime_errors.txt");
             this.fileService = fileService;
+            this.unitOfWork = unitOfWork;
         }
 
-        public async Task<List<TestCaseRunResult>> ExecuteCodeAsync(string code, Language language, List<Testcase> testCases, decimal runTimeLimit)
+        public async Task<object> ExecuteCodeAsync(string code, Language language, List<Testcase> testCases, decimal runTimeLimit)
         {
-
-
             string path = await fileService.CreateCodeFile(code, language, _requestDirectory);
-
-            var results = new List<TestCaseRunResult>();
+            decimal maxRunTime = 0;
             try
             {
                 // create container 
@@ -52,12 +53,13 @@ namespace CodeSphere.Infrastructure.Implementation.Services
 
                     await ExecuteCodeInContainer(runTimeLimit);
 
-                    var result = await CalculateResult(testCases[i], runTimeLimit);
+                    var result = await CalculateResult(testCases[i], runTimeLimit, code);
 
-                    results.Add(result);
+                    if (result.SubmissionResult != SubmissionResult.Accepted)
+                        return result;
 
-                    if (result.Result != SubmissionResult.Accepted)
-                        return results;
+
+                    maxRunTime = Math.Max(maxRunTime, result.ExecutionTime);
 
 
                 }
@@ -78,10 +80,17 @@ namespace CodeSphere.Infrastructure.Implementation.Services
                     await _dockerClient.Containers.RemoveContainerAsync(_containerId, new ContainerRemoveParameters { Force = true });
                 }
             }
-            return results;
-        }
 
-        private async Task<TestCaseRunResult> CalculateResult(Testcase testCase, decimal runTimeLimit)
+
+            return new AcceptedResponse
+            {
+                ExecutionTime = maxRunTime,
+                Code = code,
+            };
+
+        }
+        //TODO : use strategy patter instead of this function
+        private async Task<BaseSubmissionResponse> CalculateResult(Testcase testCase, decimal runTimeLimit, string code)
         {
             string output = await fileService.ReadFileAsync(outputFile);
             string error = await fileService.ReadFileAsync(errorFile);
@@ -89,39 +98,64 @@ namespace CodeSphere.Infrastructure.Implementation.Services
             string runTimeError = await fileService.ReadFileAsync(runTimeErrorFile);
 
             // Initialize the run result
-            var runResult = new TestCaseRunResult
-            {
-                TestCaseId = testCase.Id,
-                Input = testCase.Input,
-                ExpectedOutput = testCase.Output,
-            };
+            BaseSubmissionResponse response = default;
+
 
             if (!string.IsNullOrEmpty(error))
             {
-                return SetResult(runResult, error, SubmissionResult.CompilationError);
-            }
+                return new CompilationErrorResponse
+                {
+                    Message = error,
+                    SubmissionResult = SubmissionResult.CompilationError,
+                    Code = code,
+                    ExecutionTime = 0m
 
+                };
+            }
             if (!string.IsNullOrEmpty(runTimeError))
             {
-                return SetResult(runResult, runTimeError, SubmissionResult.RunTimeError);
+                return new RunTimeErrorResponse
+                {
+                    Code = code,
+                    Message = runTimeError,
+                    SubmissionResult = SubmissionResult.RunTimeError,
+                    TestCaseNumber = testCase.Id,
+                    ExecutionTime = 0m
+                };
             }
-
             if (runTime?.Contains("TIMELIMITEXCEEDED") == true)
             {
-                runResult.Result = SubmissionResult.TimeLimitExceeded;
-                runResult.RunTime = runTimeLimit;
-                return runResult;
+                return new TimeLimitExceedResponse
+                {
+                    TestCaseNumber = testCase.Id,
+                    ExecutionTime = 1m,
+                    SubmissionResult = SubmissionResult.TimeLimitExceeded,
+                    Code = code
+                };
+            }
+            if (output?.Length > 0)
+            {
+                if (output != testCase.Output)
+                {
+                    return new WrongAnswerResponse
+                    {
+                        TestCaseNumber = testCase.Id,
+                        ActualOutput = output,
+                        ExpectedOutput = testCase.Output,
+                        SubmissionResult = SubmissionResult.WrongAnswer,
+                        Code = code,
+                        ExecutionTime = 0m
+                    };
+                }
             }
 
-            runResult.ActualOutput = output;
-            runResult.RunTime = 1m; // Replace with actual runtime if available
 
-            // Compare actual output with expected output
-            runResult.Result = testCase.Output != runResult.ActualOutput
-                ? SubmissionResult.WrongAnswer
-                : SubmissionResult.Accepted;
-
-            return runResult;
+            return new AcceptedResponse
+            {
+                Code = code,
+                ExecutionTime = 1m,
+                ExecutionMemory = 3m,
+            };
         }
 
         private TestCaseRunResult SetResult(TestCaseRunResult runResult, string error, SubmissionResult result)

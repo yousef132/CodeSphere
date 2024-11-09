@@ -5,11 +5,12 @@ using CodeSphere.WebApi.Extentions;
 
 var builder = WebApplication.CreateBuilder(args);
 
-
-builder.Services.AddControllers().AddNewtonsoftJson(options =>
+builder.Services.AddControllers().AddNewtonsoftJson(opt =>
 {
-    options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
+    opt.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
 });
+
+
 // swagger documentation
 builder.Services.AddSwaggerServices()
     .AddSwaggerDocumentation();
@@ -18,6 +19,18 @@ builder.Services.AddSwaggerServices()
 builder.Services.AddApplication(builder.Configuration)
     .AddInfrastructure(builder.Configuration);
 
+var Cors = "_CORS";
+builder.Services.AddCors(opt =>
+{
+    opt.AddPolicy(name: Cors,
+        policy =>
+        {
+            policy.AllowAnyHeader();
+            policy.AllowAnyMethod();
+            policy.AllowAnyOrigin();
+        }
+    );
+});
 
 var app = builder.Build();
 
@@ -28,7 +41,7 @@ if (app.Environment.IsDevelopment())
 }
 app.UseMiddleware<ErrorHandlerMiddleware>();
 app.UseHttpsRedirection();
-
+app.UseCors(Cors);
 app.UseAuthorization();
 
 app.MapControllers();

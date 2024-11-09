@@ -4,6 +4,7 @@ using CodeSphere.Domain.Abstractions.Repositores;
 using CodeSphere.Domain.Abstractions.Services;
 using CodeSphere.Domain.Models.Entities;
 using CodeSphere.Domain.Premitives;
+using CodeSphere.Domain.Responses.SubmissionResponses;
 using MediatR;
 
 namespace CodeSphere.Application.Features.Problem.Commands.SolveProblem
@@ -46,18 +47,16 @@ namespace CodeSphere.Application.Features.Problem.Commands.SolveProblem
 
             var result = await executionService.ExecuteCodeAsync(codeContent, request.Language, problemTestCases.ToList(), problem.RunTimeLimit);
 
-            var submitTime = result.Max(r => r.RunTime);
-
             var submission = new Submit
             {
                 UserId = request.UserId,
                 SubmissionDate = DateTime.UtcNow,
                 ContestId = request.ContestId,
                 Language = request.Language,
-                Result = result.Last().Result,
-                Error = result.Last()?.Error ?? "",
+                Result = (result as BaseSubmissionResponse).SubmissionResult,
+                Error = (result as CompilationErrorResponse)?.Message ?? "",
                 ProblemId = request.ProblemId,
-                SubmitTime = submitTime,
+                SubmitTime = (result as BaseSubmissionResponse).ExecutionTime,
                 Code = codeContent,
                 SubmitMemory = 1m
             };
@@ -65,17 +64,17 @@ namespace CodeSphere.Application.Features.Problem.Commands.SolveProblem
             await unitOfWork.Repository<Submit>().AddAsync(submission);
             await unitOfWork.CompleteAsync();
 
-            var SubmitResponse = new SubmitSolutionCommandResponse()
-            {
-                ProblemId = request.ProblemId,
-                SubmitTime = submitTime,
-                SubmissionResult = result.Last().Result,
-                Error = result.Last()?.Error ?? "",
-                TestCaseRuns = result,
-            };
+            //var SubmitResponse = new SubmitSolutionCommandResponse()
+            //{
+            //    ProblemId = request.ProblemId,
+            //    SubmitTime = submitTime,
+            //    SubmissionResult = result.Last().Result,
+            //    Error = result.Last()?.Error ?? "",
+            //    TestCaseRuns = result,
+            //};
 
             // save submission result in database
-            return await Response.SuccessAsync(SubmitResponse, "Submitted Successfully", System.Net.HttpStatusCode.Created);
+            return await Response.SuccessAsync(result, "Submitted Successfully", System.Net.HttpStatusCode.Created);
         }
     }
 }
