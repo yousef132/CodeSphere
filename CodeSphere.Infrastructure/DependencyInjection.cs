@@ -39,7 +39,7 @@ namespace CodeSphere.Infrastructure
             #region db context
             services.AddDbContext<ApplicationDbContext>(options =>
              {
-                 options.UseSqlServer(configuration.GetConnectionString("DefaultConnection"));
+                 options.UseSqlServer(configuration.GetConnectionString("Remote"));
              });
             #endregion
 
@@ -49,10 +49,10 @@ namespace CodeSphere.Infrastructure
             {
                 options.Password.RequiredLength = 8;
                 options.SignIn.RequireConfirmedEmail = true;
-                options.User.RequireUniqueEmail = true; 
+                options.User.RequireUniqueEmail = true;
             })
              .AddEntityFrameworkStores<ApplicationDbContext>()
-             .AddDefaultTokenProviders();   
+             .AddDefaultTokenProviders();
 
             #endregion
 

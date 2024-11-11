@@ -64,15 +64,6 @@ namespace CodeSphere.Application.Features.Problem.Commands.SolveProblem
             await unitOfWork.Repository<Submit>().AddAsync(submission);
             await unitOfWork.CompleteAsync();
 
-            //var SubmitResponse = new SubmitSolutionCommandResponse()
-            //{
-            //    ProblemId = request.ProblemId,
-            //    SubmitTime = submitTime,
-            //    SubmissionResult = result.Last().Result,
-            //    Error = result.Last()?.Error ?? "",
-            //    TestCaseRuns = result,
-            //};
-
             // save submission result in database
             return await Response.SuccessAsync(result, "Submitted Successfully", System.Net.HttpStatusCode.Created);
         }
