@@ -42,7 +42,7 @@ namespace CodeSphere.Infrastructure.Migrations
 
                     b.HasIndex("BlogCreatorId");
 
-                    b.ToTable("Blogs");
+                    b.ToTable("Blogs", (string)null);
                 });
 
             modelBuilder.Entity("CodeSphere.Domain.Models.Entities.BlogImage", b =>
@@ -64,7 +64,7 @@ namespace CodeSphere.Infrastructure.Migrations
 
                     b.HasIndex("BlogId");
 
-                    b.ToTable("TutorialImages");
+                    b.ToTable("TutorialImages", (string)null);
                 });
 
             modelBuilder.Entity("CodeSphere.Domain.Models.Entities.Comment", b =>
@@ -102,7 +102,7 @@ namespace CodeSphere.Infrastructure.Migrations
 
                     b.HasIndex("BlogId");
 
-                    b.ToTable("Comment");
+                    b.ToTable("Comment", (string)null);
                 });
 
             modelBuilder.Entity("CodeSphere.Domain.Models.Entities.Contest", b =>
@@ -141,7 +141,7 @@ namespace CodeSphere.Infrastructure.Migrations
 
                     b.HasIndex("ProblemSetterId");
 
-                    b.ToTable("Contests");
+                    b.ToTable("Contests", (string)null);
                 });
 
             modelBuilder.Entity("CodeSphere.Domain.Models.Entities.Problem", b =>
@@ -183,7 +183,7 @@ namespace CodeSphere.Infrastructure.Migrations
 
                     b.HasIndex("ProblemSetterId");
 
-                    b.ToTable("Problems");
+                    b.ToTable("Problems", (string)null);
                 });
 
             modelBuilder.Entity("CodeSphere.Domain.Models.Entities.ProblemImage", b =>
@@ -205,7 +205,7 @@ namespace CodeSphere.Infrastructure.Migrations
 
                     b.HasIndex("ProblemId");
 
-                    b.ToTable("ProblemImages");
+                    b.ToTable("ProblemImages", (string)null);
                 });
 
             modelBuilder.Entity("CodeSphere.Domain.Models.Entities.ProblemTopic", b =>
@@ -220,7 +220,7 @@ namespace CodeSphere.Infrastructure.Migrations
 
                     b.HasIndex("TopicId");
 
-                    b.ToTable("ProblemTopics");
+                    b.ToTable("ProblemTopics", (string)null);
                 });
 
             modelBuilder.Entity("CodeSphere.Domain.Models.Entities.Submit", b =>
@@ -271,7 +271,7 @@ namespace CodeSphere.Infrastructure.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Submits");
+                    b.ToTable("Submits", (string)null);
                 });
 
             modelBuilder.Entity("CodeSphere.Domain.Models.Entities.Testcase", b =>
@@ -297,7 +297,7 @@ namespace CodeSphere.Infrastructure.Migrations
 
                     b.HasIndex("ProblemId");
 
-                    b.ToTable("Testcases");
+                    b.ToTable("Testcases", (string)null);
                 });
 
             modelBuilder.Entity("CodeSphere.Domain.Models.Entities.Topic", b =>
@@ -314,7 +314,7 @@ namespace CodeSphere.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Topics");
+                    b.ToTable("Topics", (string)null);
                 });
 
             modelBuilder.Entity("CodeSphere.Domain.Models.Entities.UserContest", b =>
@@ -332,7 +332,7 @@ namespace CodeSphere.Infrastructure.Migrations
 
                     b.HasIndex("ContestId");
 
-                    b.ToTable("Registers");
+                    b.ToTable("Registers", (string)null);
                 });
 
             modelBuilder.Entity("CodeSphere.Domain.Models.Identity.ApplicationUser", b =>

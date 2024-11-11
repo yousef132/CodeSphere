@@ -4,7 +4,13 @@ using CodeSphere.Domain.Abstractions.Services;
 using CodeSphere.Domain.Models.Identity;
 using CodeSphere.Domain.Premitives;
 using MediatR;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Routing;
+using Microsoft.AspNetCore.WebUtilities;
+using System.Net.Http;
+using System.Text;
 
 namespace CodeSphere.Application.Features.Authentication.Commands.Register
 {
@@ -14,30 +20,41 @@ namespace CodeSphere.Application.Features.Authentication.Commands.Register
         private readonly IMapper _mapper;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IAuthService _authService;
+		private readonly IHttpContextAccessor httpContextAccessor;
+		private readonly IEmailService emailService;
 
-        public RegisterCommandHandler(IUnitOfWork unitOfWork,
+		public RegisterCommandHandler(IUnitOfWork unitOfWork,
                                       IMapper mapper,
                                       UserManager<ApplicationUser> userManager
-                                     , IAuthService authService)
+                                     , IAuthService authService,
+									  IHttpContextAccessor httpContextAccessor,
+                                      IEmailService emailService)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
             _userManager = userManager;
             _authService = authService;
-        }
+			this.httpContextAccessor = httpContextAccessor;
+			this.emailService = emailService;
+		}
         public async Task<Response> Handle(RegisterCommand request, CancellationToken cancellationToken)
         {
-            var mappedUser = _mapper.Map<RegisterCommand, ApplicationUser>(request);
 
             var applicationUser = await _userManager.FindByEmailAsync(request.Email);
 
             if (applicationUser is not null)
                 return await Response.FailureAsync("Email is Existed!", System.Net.HttpStatusCode.BadRequest);
 
+
+
+
+
             var applicationUserByUserName = await _userManager.FindByNameAsync(request.UserName);
 
             if (applicationUserByUserName is not null)
                 return await Response.FailureAsync("UserName is Existed!", System.Net.HttpStatusCode.BadRequest);
+
+            var mappedUser = _mapper.Map<RegisterCommand, ApplicationUser>(request);
 
             var registerResult = await _userManager.CreateAsync(mappedUser, request.Password);
             if (!registerResult.Succeeded)
@@ -46,7 +63,12 @@ namespace CodeSphere.Application.Features.Authentication.Commands.Register
                             System.Net.HttpStatusCode.BadRequest
                         );
 
-            var registerCommandHandler = new RegisterCommandResponse()
+
+			
+
+            await emailService.SendConfirmationEmail(mappedUser);
+
+			var registerCommandHandler = new RegisterCommandResponse()
             {
                 Password = request.Password,
                 Email = request.Email,
@@ -55,5 +77,7 @@ namespace CodeSphere.Application.Features.Authentication.Commands.Register
 
             return await Response.SuccessAsync(registerCommandHandler, "Registered Successfully", System.Net.HttpStatusCode.Created);
         }
-    }
+
+		
+	}
 }
