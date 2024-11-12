@@ -97,5 +97,18 @@ namespace CodeSphere.Domain.Premitives
 
             return response;
         }
+        public async static Task<Response> FailureAsync(object data, string message, HttpStatusCode statusCode)
+        {
+            await Task.CompletedTask;
+            Response response = new Response()
+            {
+                StatusCode = statusCode,
+                IsSuccess = false,
+                Message = message,
+                Data = data
+            };
+
+            return response;
+        }
     }
 }

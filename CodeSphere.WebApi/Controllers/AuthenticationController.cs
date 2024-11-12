@@ -19,15 +19,15 @@ namespace CodeSphere.WebApi.Controllers
             => ResponseResult(await mediator.Send(query));
 
 
-		[HttpGet("confirm-email")]
-		public async Task<ActionResult<Response>> ConfirmEmail([FromQuery] ConfirmEmailQuery query)
-			=> ResponseResult(await mediator.Send(query));
 
-
-
-
-		[HttpGet("resend-confirm-email")]
-		public async Task<ActionResult<Response>> ResendConfirmEmail([FromQuery] ResendConfirmEmailQuery query)
-			=> ResponseResult(await mediator.Send(query));
-	}
+        [HttpGet("confirm-email")]
+        public async Task<ActionResult<Response>> ConfirmEmail([FromQuery] ConfirmEmailQuery query)
+        {
+            var result = await mediator.Send(query);
+            return Redirect($"http://localhost:5173/email-Confirmation?success={result.IsSuccess}&email={result.Data}");
+        }
+        [HttpGet("resend-confirm-email")]
+        public async Task<ActionResult<Response>> ResendConfirmEmail([FromQuery] ResendConfirmEmailQuery query)
+            => ResponseResult(await mediator.Send(query));
+    }
 }
