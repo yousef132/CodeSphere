@@ -100,7 +100,7 @@ namespace CodeSphere.Infrastructure.Implementation.Services
             // Initialize the run result
             BaseSubmissionResponse response = default;
 
-
+            //"\nreal\t0m0.041s\nuser\t0m0.027s\nsys\t0m0.000s\n"
             if (!string.IsNullOrEmpty(error))
             {
                 return new CompilationErrorResponse
