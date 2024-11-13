@@ -23,10 +23,8 @@ namespace CodeSphere.Application.Features.TestCases.Commands.Create
             if (problem == null)
                 return await Response.FailureAsync("Problem not found!", System.Net.HttpStatusCode.NotFound);
 
-
             var newTestcase = _mapper.Map<CodeSphere.Domain.Models.Entities.Testcase>(request);
 
-            // Save the Testcase
             await _unitOfWork.Repository<CodeSphere.Domain.Models.Entities.Testcase>().AddAsync(newTestcase);
             await _unitOfWork.CompleteAsync();
 

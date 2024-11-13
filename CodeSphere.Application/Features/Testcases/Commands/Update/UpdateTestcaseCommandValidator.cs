@@ -1,13 +1,16 @@
-﻿using CodeSphere.Application.Features.TestCase.Commands.Create;
-using FluentValidation;
-namespace CodeSphere.Application.Features.Testcase.Commands.Create
+﻿using FluentValidation;
+
+namespace CodeSphere.Application.Features.Testcases.Commands.Update
 {
-    public class CreateTestcaseCommandValidator : AbstractValidator<CreateTestcaseCommand>
+    public class UpdateTestcaseCommandValidator : AbstractValidator<UpdateTestcaseCommand>
     {
-        public CreateTestcaseCommandValidator()
+        public UpdateTestcaseCommandValidator()
         {
+            RuleFor(x => x.TestcaseId)
+                .GreaterThan(0).WithMessage("TestcaseId is required.");
+
             RuleFor(x => x.ProblemId)
-               .NotEmpty().WithMessage("ProblemId is required.");
+                .NotEmpty().WithMessage("ProblemId is required.");
 
             RuleFor(x => x.Input)
                 .NotEmpty().WithMessage("Input is required.")
