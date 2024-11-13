@@ -1,4 +1,5 @@
 using CodeSphere.Application;
+using CodeSphere.Application.Helpers;
 using CodeSphere.Domain.Models.Identity;
 using CodeSphere.Infrastructure;
 using CodeSphere.Infrastructure.Context;
@@ -21,7 +22,9 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 });
 
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
-				.AddEntityFrameworkStores<ApplicationDbContext>();
+                .AddEntityFrameworkStores<ApplicationDbContext>();
+
+builder.Services.AddScoped<IRoleService, RoleService>();
 
 var app = builder.Build();
 
