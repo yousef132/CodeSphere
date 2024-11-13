@@ -9,4 +9,10 @@
         CompilationError,
         RunTimeError
     }
+    public enum Difficulty
+    {
+        Easy,
+        Medium,
+        Hard
+    }
 }

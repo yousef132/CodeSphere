@@ -39,7 +39,8 @@ namespace CodeSphere.Infrastructure
             #region db context
             services.AddDbContext<ApplicationDbContext>(options =>
              {
-                 options.UseSqlServer(configuration.GetConnectionString("Remote"));
+                 //options.UseSqlServer(configuration.GetConnectionString("Remote"));
+                 options.UseSqlServer(configuration.GetConnectionString("DefaultConnection"));
              });
             #endregion
 
@@ -81,12 +82,7 @@ namespace CodeSphere.Infrastructure
 
             #endregion
 
-
             return services;
         }
-
-
-
-
     }
 }

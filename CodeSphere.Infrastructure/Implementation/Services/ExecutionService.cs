@@ -3,7 +3,6 @@ using CodeSphere.Domain.Abstractions.Services;
 using CodeSphere.Domain.CustomExceptions;
 using CodeSphere.Domain.Models.Entities;
 using CodeSphere.Domain.Premitives;
-using CodeSphere.Domain.Responses;
 using CodeSphere.Domain.Responses.SubmissionResponses;
 using Docker.DotNet;
 using Docker.DotNet.Models;
@@ -21,6 +20,7 @@ namespace CodeSphere.Infrastructure.Implementation.Services
         private string errorFile;
         private string runTimeFile;
         private string runTimeErrorFile;
+        private string memoryFile;
         public ExecutionService(IFileService fileService, IUnitOfWork unitOfWork)
         {
             _dockerClient = new DockerClientConfiguration(new Uri("tcp://localhost:2375")).CreateClient();
@@ -30,11 +30,12 @@ namespace CodeSphere.Infrastructure.Implementation.Services
             errorFile = Path.Combine(_requestDirectory, "error.txt");
             runTimeFile = Path.Combine(_requestDirectory, "runtime.txt");
             runTimeErrorFile = Path.Combine(_requestDirectory, "runtime_errors.txt");
+            memoryFile = Path.Combine(_requestDirectory, "memory_usage.txt");
             this.fileService = fileService;
             this.unitOfWork = unitOfWork;
         }
 
-        public async Task<object> ExecuteCodeAsync(string code, Language language, List<Testcase> testCases, decimal runTimeLimit)
+        public async Task<object> ExecuteCodeAsync(string code, Language language, List<Testcase> testCases, decimal runTimeLimit, decimal memoryLimit)
         {
             string path = await fileService.CreateCodeFile(code, language, _requestDirectory);
             decimal maxRunTime = 0;
@@ -51,7 +52,7 @@ namespace CodeSphere.Infrastructure.Implementation.Services
 
                     await fileService.CreateTestCasesFile(testCases[i].Input, _requestDirectory);
 
-                    await ExecuteCodeInContainer(runTimeLimit);
+                    await ExecuteCodeInContainer(runTimeLimit, memoryLimit);
 
                     var result = await CalculateResult(testCases[i], runTimeLimit, code);
 
@@ -100,7 +101,6 @@ namespace CodeSphere.Infrastructure.Implementation.Services
             // Initialize the run result
             BaseSubmissionResponse response = default;
 
-            //"\nreal\t0m0.041s\nuser\t0m0.027s\nsys\t0m0.000s\n"
             if (!string.IsNullOrEmpty(error))
             {
                 return new CompilationErrorResponse
@@ -112,6 +112,7 @@ namespace CodeSphere.Infrastructure.Implementation.Services
 
                 };
             }
+
             if (!string.IsNullOrEmpty(runTimeError))
             {
                 return new RunTimeErrorResponse
@@ -120,19 +121,21 @@ namespace CodeSphere.Infrastructure.Implementation.Services
                     Message = runTimeError,
                     SubmissionResult = SubmissionResult.RunTimeError,
                     TestCaseNumber = testCase.Id,
-                    ExecutionTime = 0m
+                    ExecutionTime = Helper.ExtractExecutionTime(runTime)
                 };
             }
+
             if (runTime?.Contains("TIMELIMITEXCEEDED") == true)
             {
                 return new TimeLimitExceedResponse
                 {
                     TestCaseNumber = testCase.Id,
-                    ExecutionTime = 1m,
+                    ExecutionTime = runTimeLimit,
                     SubmissionResult = SubmissionResult.TimeLimitExceeded,
                     Code = code
                 };
             }
+
             if (output?.Length > 0)
             {
                 if (output != testCase.Output)
@@ -144,25 +147,16 @@ namespace CodeSphere.Infrastructure.Implementation.Services
                         ExpectedOutput = testCase.Output,
                         SubmissionResult = SubmissionResult.WrongAnswer,
                         Code = code,
-                        ExecutionTime = 0m
+                        ExecutionTime = Helper.ExtractExecutionTime(runTime)
                     };
                 }
             }
-
-
             return new AcceptedResponse
             {
                 Code = code,
-                ExecutionTime = 1m,
+                ExecutionTime = Helper.ExtractExecutionTime(runTime),
                 ExecutionMemory = 3m,
             };
-        }
-
-        private TestCaseRunResult SetResult(TestCaseRunResult runResult, string error, SubmissionResult result)
-        {
-            runResult.Error = error;
-            runResult.Result = result;
-            return runResult;
         }
         private async Task CreateAndStartContainer(Language language)
         {
@@ -191,10 +185,10 @@ namespace CodeSphere.Infrastructure.Implementation.Services
             _containerId = createContainerResponse.ID;
             await _dockerClient.Containers.StartContainerAsync(_containerId, new ContainerStartParameters());
         }
-        private async Task ExecuteCodeInContainer(decimal runTime)
+        private async Task ExecuteCodeInContainer(decimal timeLimit, decimal memoryLimit)
         {
 
-            string command = Helper.ExecuteCodeCommand(_containerId, runTime);
+            string command = Helper.CreateExecuteCodeCommand(_containerId, timeLimit, memoryLimit);
 
             // Start the process to execute the command
             using (var process = new System.Diagnostics.Process())

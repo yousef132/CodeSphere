@@ -1,7 +1,10 @@
 using CodeSphere.Application;
 using CodeSphere.Domain.Middleware;
+using CodeSphere.Domain.Models.Identity;
 using CodeSphere.Infrastructure;
+using CodeSphere.Infrastructure.Seeder;
 using CodeSphere.WebApi.Extentions;
+using Microsoft.AspNetCore.Identity;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -33,7 +36,15 @@ builder.Services.AddCors(opt =>
 });
 
 var app = builder.Build();
+DatabaseManagementService.MigrationInitialization(app);
+using (var scope = app.Services.CreateScope())
+{
+    var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
+    var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+    await RoleSeeder.SeedAsync(roleManager);
+    await UserSeeder.SeedAsync(userManager);
 
+}
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {

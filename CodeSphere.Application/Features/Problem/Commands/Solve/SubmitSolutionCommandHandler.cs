@@ -45,7 +45,7 @@ namespace CodeSphere.Application.Features.Problem.Commands.SolveProblem
                 codeContent = await reader.ReadToEndAsync();
             }
 
-            var result = await executionService.ExecuteCodeAsync(codeContent, request.Language, problemTestCases.ToList(), problem.RunTimeLimit);
+            var result = await executionService.ExecuteCodeAsync(codeContent, request.Language, problemTestCases.ToList(), problem.RunTimeLimit, problem.MemoryLimit);
 
             var submission = new Submit
             {
