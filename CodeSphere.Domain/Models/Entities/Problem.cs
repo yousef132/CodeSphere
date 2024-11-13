@@ -12,7 +12,8 @@ namespace CodeSphere.Domain.Models.Entities
         public Difficulty Difficulty { get; set; }
 
         public decimal RunTimeLimit { get; set; }
-        public decimal MemoryLimit { get; set; }
+        public MemoryLimit MemoryLimit { get; set; }
+
         public string Description { get; set; }
 
         [ForeignKey(nameof(ProblemSetterId))]

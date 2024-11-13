@@ -7,7 +7,7 @@ namespace CodeSphere.Application.Features.Testcases.Commands.Update
         public UpdateTestcaseCommandValidator()
         {
             RuleFor(x => x.TestcaseId)
-                .GreaterThan(0).WithMessage("TestcaseId is required.");
+                .NotEmpty().WithMessage("TestcaseId is required.");
 
             RuleFor(x => x.ProblemId)
                 .NotEmpty().WithMessage("ProblemId is required.");

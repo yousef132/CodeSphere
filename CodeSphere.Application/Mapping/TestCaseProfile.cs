@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
-using CodeSphere.Application.Features.Problem.Queries.GetProblemTestCasesById;
 using CodeSphere.Application.Features.TestCase.Commands.Create;
+using CodeSphere.Application.Features.Testcases.Queries.GetTestCasesByProblemId;
 using CodeSphere.Domain.Models.Entities;
 
 namespace CodeSphere.Application.Mapping
@@ -9,7 +9,7 @@ namespace CodeSphere.Application.Mapping
     {
         public TestCaseProfile()
         {
-            CreateMap<GetProblemTestCasesByIdQuery, Testcase>();
+            CreateMap<GetTestCasesByProblemIdQuerey, Testcase>();
             CreateMap<CreateTestcaseCommand, Testcase>();
         }
     }

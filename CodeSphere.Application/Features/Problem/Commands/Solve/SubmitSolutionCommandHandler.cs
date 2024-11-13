@@ -16,10 +16,7 @@ namespace CodeSphere.Application.Features.Problem.Commands.SolveProblem
         private readonly IMapper mapper;
         private readonly IExecutionService executionService;
 
-        public SubmitSolutionCommandHandler(IProblemRepository problemRepository,
-                                            IUnitOfWork unitOfWork,
-                                            IMapper mapper,
-                                            IExecutionService executionService)
+        public SubmitSolutionCommandHandler(IProblemRepository problemRepository, IUnitOfWork unitOfWork, IMapper mapper, IExecutionService executionService)
         {
             this.problemRepository = problemRepository;
             this.unitOfWork = unitOfWork;
@@ -33,7 +30,6 @@ namespace CodeSphere.Application.Features.Problem.Commands.SolveProblem
                 return await Response.FailureAsync("Problem Not Found", System.Net.HttpStatusCode.NotFound);
 
             var contest = await unitOfWork.Repository<Contest>().GetByIdAsync(request.ContestId);
-
             if (contest == null)
                 return await Response.FailureAsync("Contest Not Found", System.Net.HttpStatusCode.NotFound);
 
@@ -45,14 +41,14 @@ namespace CodeSphere.Application.Features.Problem.Commands.SolveProblem
                 codeContent = await reader.ReadToEndAsync();
             }
 
-            var result = await executionService.ExecuteCodeAsync(codeContent, request.Language, problemTestCases.ToList(), problem.RunTimeLimit, problem.MemoryLimit);
+            var result = await executionService.ExecuteCodeAsync(codeContent, request.Language, problemTestCases.ToList(), problem.RunTimeLimit, (decimal)problem.MemoryLimit);
 
             var submission = new Submit
             {
                 UserId = request.UserId,
                 SubmissionDate = DateTime.UtcNow,
                 ContestId = request.ContestId,
-                Language = request.Language,
+                Language = request.Language, //here 
                 Result = (result as BaseSubmissionResponse).SubmissionResult,
                 Error = (result as CompilationErrorResponse)?.Message ?? "",
                 ProblemId = request.ProblemId,

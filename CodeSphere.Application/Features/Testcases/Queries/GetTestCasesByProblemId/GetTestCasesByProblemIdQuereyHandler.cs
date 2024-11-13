@@ -5,24 +5,22 @@ using CodeSphere.Domain.Premitives;
 using MediatR;
 
 
-
-namespace CodeSphere.Application.Features.Problem.Queries.GetProblemTestCasesById
+namespace CodeSphere.Application.Features.Testcases.Queries.GetTestCasesByProblemId
 {
-    public class GetProblemTestCasesByIdQueryHandler : IRequestHandler<GetProblemTestCasesByIdQuery, Response>
+    public class GetTestCasesByProblemIdQuereyHandler : IRequestHandler<GetTestCasesByProblemIdQuerey, Response>
     {
         private readonly IMapper mapper;
         private readonly IProblemRepository _problemRepository;
         private readonly IUnitOfWork unitOfWork;
 
-        public GetProblemTestCasesByIdQueryHandler(IMapper mapper,
-                                                   IProblemRepository problemRepository,
-                                                   IUnitOfWork unitOfWork)
+        public GetTestCasesByProblemIdQuereyHandler(IMapper mapper, IProblemRepository problemRepository, IUnitOfWork unitOfWork)
         {
             this.mapper = mapper;
             _problemRepository = problemRepository;
             this.unitOfWork = unitOfWork;
         }
-        public async Task<Response> Handle(GetProblemTestCasesByIdQuery request, CancellationToken cancellationToken)
+
+        public async Task<Response> Handle(GetTestCasesByProblemIdQuerey request, CancellationToken cancellationToken)
         {
             var problem = await unitOfWork.Repository<Domain.Models.Entities.Problem>().GetByIdAsync(request.ProblemId);
             if (problem == null)
