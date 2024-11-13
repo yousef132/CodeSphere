@@ -6,7 +6,7 @@ namespace CodeSphere.Domain.Models.Entities
     public class UserContest
     {
         public string UserId { get; set; }
-        public Guid ContestId { get; set; }
+        public int ContestId { get; set; }
 
 
         [ForeignKey(nameof(UserId))]

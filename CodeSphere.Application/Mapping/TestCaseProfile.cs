@@ -1,17 +1,16 @@
 ﻿using AutoMapper;
 using CodeSphere.Application.Features.Problem.Queries.GetProblemTestCasesById;
+using CodeSphere.Application.Features.TestCase.Commands.Create;
 using CodeSphere.Domain.Models.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CodeSphere.Application.Mapping
 {
     public class TestCaseProfile : Profile
     {
-        public TestCaseProfile() =>
+        public TestCaseProfile()
+        {
             CreateMap<GetProblemTestCasesByIdQuery, Testcase>();
+            CreateMap<CreateTestcaseCommand, Testcase>();
+        }
     }
 }

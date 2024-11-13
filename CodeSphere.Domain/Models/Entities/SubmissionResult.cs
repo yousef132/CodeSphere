@@ -6,6 +6,13 @@
         WrongAnswer,
         TimeLimitExceeded,
         MemoryLimitExceeded,
-        CompilationError
+        CompilationError,
+        RunTimeError
+    }
+    public enum Difficulty
+    {
+        Easy,
+        Medium,
+        Hard
     }
 }

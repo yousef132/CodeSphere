@@ -10,19 +10,20 @@ namespace CodeSphere.Application.Features.Authentication.Queries.Login
 {
 	public class LoginQueryValidator : AbstractValidator<LoginQuery>
 	{
-        public LoginQueryValidator()
-        {
+		public LoginQueryValidator()
+		{
 			RuleFor(x => x.Email)
 				.NotEmpty().WithMessage("Email must be Not Empty")
 				.NotNull().WithMessage("Email must Not be Null")
 				.EmailAddress().WithMessage("EmailAddress must Not be Empty")
-				.MinimumLength(5).WithMessage("MinimumLength must be 5")
-				.MaximumLength(50).WithMessage("MaximumLength must be 50");
+				.Length(5, 50).WithMessage("Email must not be less than 5 and not more than 50.");
 
-			RuleFor(x=>x.Password).NotEmpty().WithMessage("Password must Not be Empty")
+
+			RuleFor(x => x.Password)
+				.NotEmpty().WithMessage("Password must Not be Empty")
 				.NotNull().WithMessage("Password must Not be Null")
-				.MinimumLength(5).WithMessage("MinimumLength must be 5 ")
-				.MaximumLength(50).WithMessage("MaximumLength must be 50 ");
+				.Length(5, 50).WithMessage("Password must not be less than 5 and not more than 50.");
+
 		}
-    }
+	}
 }

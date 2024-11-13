@@ -1,9 +1,14 @@
-﻿namespace CodeSphere.Domain.Premitives
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+
+namespace CodeSphere.Domain.Premitives
 {
     public abstract class BaseEntity
     {
-        protected BaseEntity(Guid id) => Id = id;
+        protected BaseEntity(int id) => Id = id;
         protected BaseEntity() { }
-        public Guid Id { get; protected set; }
+        [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public int Id { get; protected set; }
     }
 }

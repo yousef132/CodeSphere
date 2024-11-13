@@ -6,5 +6,9 @@ namespace CodeSphere.Application.Features.Problem.Commands.Create
     public sealed record CreateProblemCommand(
     string Name,
     string Description,
-    float Rate) : IRequest<Response>;
+    int ContestId,
+    string ProblemSetterId,
+    string Difficulty,
+    decimal RunTimeLimit,
+    decimal MemoryLimit) : IRequest<Response>;
 }

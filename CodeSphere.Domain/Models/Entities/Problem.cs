@@ -7,9 +7,12 @@ namespace CodeSphere.Domain.Models.Entities
     public class Problem : BaseEntity
     {
         public string ProblemSetterId { get; set; }
-        public Guid ContestId { get; set; }
+        public int ContestId { get; set; }
         public string Name { get; set; }
-        public string Difficulty { get; set; }
+        public Difficulty Difficulty { get; set; }
+
+        public decimal RunTimeLimit { get; set; }
+        public decimal MemoryLimit { get; set; }
         public string Description { get; set; }
 
         [ForeignKey(nameof(ProblemSetterId))]

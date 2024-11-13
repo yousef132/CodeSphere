@@ -7,6 +7,31 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Implementation\NewFolder1\**" />
+    <Compile Remove="Implementation\NewFolder\**" />
+    <Compile Remove="Implementation\Services\NewFolder1\**" />
+    <Compile Remove="Implementation\Services\NewFolder2\**" />
+    <Compile Remove="Implementation\Services\NewFolder3\**" />
+    <Compile Remove="Implementation\Services\NewFolder4\**" />
+    <Compile Remove="Implementation\Services\NewFolder\**" />
+    <EmbeddedResource Remove="Implementation\NewFolder1\**" />
+    <EmbeddedResource Remove="Implementation\NewFolder\**" />
+    <EmbeddedResource Remove="Implementation\Services\NewFolder1\**" />
+    <EmbeddedResource Remove="Implementation\Services\NewFolder2\**" />
+    <EmbeddedResource Remove="Implementation\Services\NewFolder3\**" />
+    <EmbeddedResource Remove="Implementation\Services\NewFolder4\**" />
+    <EmbeddedResource Remove="Implementation\Services\NewFolder\**" />
+    <None Remove="Implementation\NewFolder1\**" />
+    <None Remove="Implementation\NewFolder\**" />
+    <None Remove="Implementation\Services\NewFolder1\**" />
+    <None Remove="Implementation\Services\NewFolder2\**" />
+    <None Remove="Implementation\Services\NewFolder3\**" />
+    <None Remove="Implementation\Services\NewFolder4\**" />
+    <None Remove="Implementation\Services\NewFolder\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Docker.DotNet" Version="3.125.15" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.0">
       <PrivateAssets>all</PrivateAssets>
@@ -22,16 +47,6 @@
   <ItemGroup>
     <ProjectReference Include="..\CodeSphere.Application\CodeSphere.Application.csproj" />
     <ProjectReference Include="..\CodeSphere.Domain\CodeSphere.Domain.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Implementation\NewFolder1\" />
-    <Folder Include="Implementation\NewFolder\" />
-    <Folder Include="Implementation\Services\NewFolder1\" />
-    <Folder Include="Implementation\Services\NewFolder2\" />
-    <Folder Include="Implementation\Services\NewFolder3\" />
-    <Folder Include="Implementation\Services\NewFolder4\" />
-    <Folder Include="Implementation\Services\NewFolder\" />
   </ItemGroup>
 
 </Project>

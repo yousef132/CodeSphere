@@ -10,7 +10,7 @@ namespace CodeSphere.Domain.Models.Entities
 
         public string Path { get; set; }
         public string AuthorId { get; set; }
-        public Guid BlogId { get; set; }
+        public int BlogId { get; set; }
 
         public string Content { get; set; }
         public bool IsEdited { get; set; }

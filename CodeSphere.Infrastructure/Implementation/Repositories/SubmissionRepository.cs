@@ -1,12 +1,6 @@
 ﻿using CodeSphere.Domain.Abstractions.Repositores;
 using CodeSphere.Domain.Models.Entities;
 using CodeSphere.Infrastructure.Context;
-using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CodeSphere.Infrastructure.Implementation.Repositories
 {
@@ -18,9 +12,8 @@ namespace CodeSphere.Infrastructure.Implementation.Repositories
         {
             _context = context;
         }
-        public async Task<IEnumerable<Submit>> GetAllSubmissions(Guid problemId, string userId)
-        {
-            return await _context.Submits.Where(x => x.ProblemId == problemId && x.UserId == userId).ToListAsync(); 
-        }
+        public async Task<IQueryable<Submit>> GetAllSubmissions(int problemId, string userId)
+         => _context.Submits.Where(x => x.ProblemId == problemId && x.UserId == userId);
+
     }
 }
