@@ -1,4 +1,4 @@
-﻿namespace SchoolManagment.Data.Helper
+﻿namespace CodeSphere.Infrastructure.Seeder
 {
     public static class Policies
     {

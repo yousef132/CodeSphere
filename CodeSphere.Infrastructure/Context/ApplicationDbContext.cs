@@ -19,7 +19,6 @@ namespace CodeSphere.Infrastructure.Context
         public DbSet<Topic> Topics { get; set; }
         public DbSet<ProblemTopic> ProblemTopics { get; set; }
         public DbSet<Submit> Submits { get; set; }
-        public DbSet<Role> Roles { get; set; }
 
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) { }
 
