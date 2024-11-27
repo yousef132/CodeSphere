@@ -32,6 +32,7 @@ namespace CodeSphere.Infrastructure
             services.AddScoped(typeof(IProblemRepository), typeof(ProblemRepository));
             services.AddScoped(typeof(IFileService), typeof(FileService));
             services.AddScoped(typeof(IEmailService), typeof(EmailService));
+            services.AddScoped(typeof(IElasticSearchRepository), typeof(ElasticSearchRepository));
 
 
             #endregion
@@ -40,7 +41,7 @@ namespace CodeSphere.Infrastructure
             services.AddDbContext<ApplicationDbContext>(options =>
              {
                  //options.UseSqlServer(configuration.GetConnectionString("Remote"));
-                 options.UseSqlServer(configuration.GetConnectionString("DefaultConnection"));
+                 options.UseSqlServer(configuration.GetConnectionString("Remote"));
              });
             #endregion
 

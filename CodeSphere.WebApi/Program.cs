@@ -1,4 +1,5 @@
 using CodeSphere.Application;
+using CodeSphere.Domain.Abstractions.Repositores;
 using CodeSphere.Domain.Middleware;
 using CodeSphere.Domain.Models.Identity;
 using CodeSphere.Infrastructure;
@@ -22,6 +23,8 @@ builder.Services.AddSwaggerServices()
 builder.Services.AddApplication(builder.Configuration)
     .AddInfrastructure(builder.Configuration);
 
+
+
 var Cors = "_CORS";
 builder.Services.AddCors(opt =>
 {
@@ -36,13 +39,17 @@ builder.Services.AddCors(opt =>
 });
 
 var app = builder.Build();
-DatabaseManagementService.MigrationInitialization(app);
+
+app.MigrationInitialization();
+
 using (var scope = app.Services.CreateScope())
 {
     var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
+    var elasticSearch = scope.ServiceProvider.GetRequiredService<IElasticSearchRepository>();
     var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
     await RoleSeeder.SeedAsync(roleManager);
     await UserSeeder.SeedAsync(userManager);
+    await elasticSearch.InitializeIndexes();
 
 }
 // Configure the HTTP request pipeline.

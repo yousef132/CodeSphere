@@ -16,6 +16,7 @@ namespace CodeSphere.Domain.Models.Entities
 
         public string Description { get; set; }
 
+
         [ForeignKey(nameof(ProblemSetterId))]
         public ApplicationUser ProblemSetter { get; set; }
 

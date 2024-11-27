@@ -5,9 +5,9 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace CodeSphere.Infrastructure
 {
-    public class DatabaseManagementService
+    public static class DatabaseManagementService
     {
-        public static void MigrationInitialization(IApplicationBuilder app)
+        public static void MigrationInitialization(this IApplicationBuilder app)
         {
             using (var scope = app.ApplicationServices.CreateScope())
             {

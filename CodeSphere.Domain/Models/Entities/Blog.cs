@@ -8,6 +8,7 @@ namespace CodeSphere.Domain.Models.Entities
     {
         public string BlogCreatorId { get; set; }
         public string Content { get; set; }
+        public string Title { get; set; }
         public Contest Contest { get; set; }
 
         [ForeignKey(nameof(BlogCreatorId))]

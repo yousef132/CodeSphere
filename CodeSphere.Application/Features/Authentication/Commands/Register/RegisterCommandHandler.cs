@@ -20,8 +20,8 @@ namespace CodeSphere.Application.Features.Authentication.Commands.Register
 
         public RegisterCommandHandler(IUnitOfWork unitOfWork,
                                       IMapper mapper,
-                                      UserManager<ApplicationUser> userManager
-                                     , IAuthService authService,
+                                      UserManager<ApplicationUser> userManager,
+                                      IAuthService authService,
                                       IHttpContextAccessor httpContextAccessor,
                                       IEmailService emailService)
         {

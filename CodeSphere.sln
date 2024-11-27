@@ -5,17 +5,19 @@ VisualStudioVersion = 17.10.34804.81
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{3CD8E9B7-7DDA-4438-9AA6-70445A40EB05}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CodeSphere.Domain", "CodeSphere.Domain\CodeSphere.Domain.csproj", "{A443BD2F-625C-4FFE-96F9-17710B73B8DE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeSphere.Domain", "CodeSphere.Domain\CodeSphere.Domain.csproj", "{A443BD2F-625C-4FFE-96F9-17710B73B8DE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CodeSphere.Application", "CodeSphere.Application\CodeSphere.Application.csproj", "{DB48565F-023B-4912-B92A-3777162044B4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeSphere.Application", "CodeSphere.Application\CodeSphere.Application.csproj", "{DB48565F-023B-4912-B92A-3777162044B4}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Externals", "Externals", "{DC4C72C3-7AEC-4F48-8E26-734AD19F8AD1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CodeSphere.Infrastructure", "CodeSphere.Infrastructure\CodeSphere.Infrastructure.csproj", "{443D2988-23DF-4AA8-A769-EBF23A98A833}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeSphere.Infrastructure", "CodeSphere.Infrastructure\CodeSphere.Infrastructure.csproj", "{443D2988-23DF-4AA8-A769-EBF23A98A833}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CodeSphere.WebApi", "CodeSphere.WebApi\CodeSphere.WebApi.csproj", "{AC296016-40EE-41A1-8D25-08F0A2EC1217}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeSphere.WebApi", "CodeSphere.WebApi\CodeSphere.WebApi.csproj", "{AC296016-40EE-41A1-8D25-08F0A2EC1217}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Core", "Core", "{A41130E1-9CF5-4C14-AA82-5F9A5348E686}"
+EndProject
+Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-compose.dcproj", "{2F395D03-8241-4DE8-A677-0C2936C1E2FF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -39,6 +41,10 @@ Global
 		{AC296016-40EE-41A1-8D25-08F0A2EC1217}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AC296016-40EE-41A1-8D25-08F0A2EC1217}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AC296016-40EE-41A1-8D25-08F0A2EC1217}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2F395D03-8241-4DE8-A677-0C2936C1E2FF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2F395D03-8241-4DE8-A677-0C2936C1E2FF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2F395D03-8241-4DE8-A677-0C2936C1E2FF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2F395D03-8241-4DE8-A677-0C2936C1E2FF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

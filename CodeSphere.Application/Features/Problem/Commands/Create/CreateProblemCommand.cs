@@ -1,4 +1,5 @@
-﻿using CodeSphere.Domain.Premitives;
+﻿using CodeSphere.Domain.Models.Entities;
+using CodeSphere.Domain.Premitives;
 using MediatR;
 
 namespace CodeSphere.Application.Features.Problem.Commands.Create
@@ -8,7 +9,8 @@ namespace CodeSphere.Application.Features.Problem.Commands.Create
     string Description,
     int ContestId,
     string ProblemSetterId,
-    string Difficulty,
+    Difficulty Difficulty,
     decimal RunTimeLimit,
-    decimal MemoryLimit) : IRequest<Response>;
+    MemoryLimit MemoryLimit,
+    List<int> Topics) : IRequest<Response>;
 }

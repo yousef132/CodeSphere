@@ -1,0 +1,65 @@
+version: '3.4'
+
+services:
+  codesphere.webapi:
+    image: ${DOCKER_REGISTRY-}codespherewebapi
+    container_name: CodeSphere.Api
+    environment:
+     - ASPNETCORE_ENVIRONMENT=Development
+    build:
+      context: .
+      dockerfile: CodeSphere.WebApi/Dockerfile
+    ports:
+      - "8080:8080"  #Host Port : Container Port (http)
+      - "8081:8081"  #Host Port : Container Port (https)
+
+
+  codesphere.cach:
+    image: redis:latest
+    restart: always
+    ports:
+      - "6579:6579"
+
+
+      
+  elasticsearch:
+    container_name: elasticSearch
+    image: elasticsearch:8.15.0
+    ports:
+      - "9200:9200"
+    volumes:
+      - elasticsearch-data:/usr/share/elasticsearch/data
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+
+
+  kibana:
+    container_name: kibana
+    image: kibana:8.15.0
+    ports:
+      - "5601:5601"
+    depends_on:
+      - elasticsearch
+    environment:
+      - ELASTICSEARCH_URL=http://elasticsearch:9200
+
+
+
+volumes:
+  elasticsearch-data:
+
+
+# database service (if needed) but we have a seperated remote database
+#     sqlserver:
+# image: mcr.microsoft.com/mssql/server:2022-latest
+# container_name: demo-app-db
+# environment:
+#   MSSQL_SA_PASSWORD: Aa@123.123
+#   ACCEPT_EULA: "Y"
+# ports:
+#   - "9876:1433"  
+# volumes:
+#   - sqlserverdata:/var/opt/mssql 
+# volumes:
+#   sqlserverdata:
