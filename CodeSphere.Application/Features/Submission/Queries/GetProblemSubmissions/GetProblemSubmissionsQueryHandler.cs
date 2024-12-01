@@ -26,7 +26,7 @@ namespace CodeSphere.Application.Features.Submission.Queries.GetProblemSubmissio
             if (submissions.IsNullOrEmpty())
                 return await Response.SuccessAsync(null, "Not Submissions", HttpStatusCode.NoContent);
 
-            var mappedSubmissions = _mapper.Map<IQueryable<Submit>, IQueryable<GetProblemSubmissionsResponse>>(submissions);
+            var mappedSubmissions = _mapper.Map<IQueryable<Submit>, IQueryable<GetProblemSubmissionsResponse>>(submissions);  // why IQueryable? and not IEnumerable?
 
             return await Response.SuccessAsync(mappedSubmissions, "Submissions fetched successfully", HttpStatusCode.Found);
         }

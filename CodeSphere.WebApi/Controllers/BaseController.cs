@@ -42,7 +42,7 @@ namespace CodeSphere.WebApi.Controllers
 
         [Authorize]
         [ApiExplorerSettings(IgnoreApi = true)]
-        internal string GetCurrentUserEmail()
+        internal string GetCurrentUserId()
             => User.FindFirstValue(ClaimTypes.NameIdentifier);
     }
 }

@@ -6,7 +6,7 @@ namespace CodeSphere.Domain.Responses.ElasticSearchResponses
     {
         public int Id { get; set; }
         public string Name { get; set; }
-        public Difficulty Difficulty { get; set; }
-        public List<string> Topics { get; set; }
+        public int Difficulty { get; set; }
+        public List<int> Topics { get; set; }
     }
 }

@@ -18,10 +18,10 @@ namespace CodeSphere.Application.Features.Problem.Queries.GetAll
     public class GetAllQueryHandler : IRequestHandler<GetAllQuery, Response>
     {
         private readonly IUnitOfWork _unitOfWork;
-        private readonly Mapper _mapper;
+        private readonly IMapper _mapper;
 
 
-        public GetAllQueryHandler(IUnitOfWork unitOfWork, Mapper mapper)
+        public GetAllQueryHandler(IUnitOfWork unitOfWork, IMapper mapper)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
@@ -29,8 +29,25 @@ namespace CodeSphere.Application.Features.Problem.Queries.GetAll
 
         public async Task<Response> Handle(GetAllQuery request, CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            var problems = await _unitOfWork.ElasticSearchRepository.SearchProblemsAsync(request.ProblemName, request.TopicsIds, (int)request.Difficulty);
 
+            if(problems.IsNullOrEmpty())
+            {
+                return await Response.FailureAsync("No Problems Found", HttpStatusCode.NotFound);
+            }
+
+            var responses = new List<GetAllQueryResponse>();
+
+            foreach (var problem in problems)
+            {
+                var submission =  _unitOfWork.SubmissionRepository.GetSolvedSubmissions(problem.Id, request.UserId);
+                var x = _mapper.Map<GetAllQueryResponse>(problem);
+                x.IsSolved = !submission.IsNullOrEmpty();
+                responses.Add(x);
+            }
+
+            return await Response.SuccessAsync(responses, "Problems Found", HttpStatusCode.OK);
         }
+
     }
 }
