@@ -1,4 +1,5 @@
-﻿using CodeSphere.Domain.Premitives;
+﻿using CodeSphere.Domain.Models.Entities;
+using CodeSphere.Domain.Premitives;
 using MediatR;
 using System;
 using System.Collections.Generic;
@@ -8,5 +9,20 @@ using System.Threading.Tasks;
 
 namespace CodeSphere.Application.Features.Problem.Queries.GetAll
 {
-    public record GetAllQuery() : IRequest<Response>;
+    public class GetAllQuery : IRequest<Response>
+    {
+        public string UserId { get; set; }
+        public List<int> TopicsIds { get; set; }
+        public string ProblemName { get; set; }
+        public Difficulty? Difficulty { get; set; }
+
+        public GetAllQuery(string userId, List<int> topicsIds, string problemName, Difficulty? difficulty)
+        {
+            UserId = userId;
+            TopicsIds = topicsIds;
+            ProblemName = problemName;
+            Difficulty = difficulty;
+        }
+    }
+
 }

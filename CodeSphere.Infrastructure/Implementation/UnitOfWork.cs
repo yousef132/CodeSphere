@@ -11,12 +11,26 @@ namespace CodeSphere.Infrastructure.Implementation
     {
         private readonly ApplicationDbContext context;
         private Hashtable _repositories;
-        public UnitOfWork(ApplicationDbContext context)
+        public IElasticSearchRepository ElasticSearchRepository { get; }
+
+        public IProblemRepository ProblemRepository { get; }
+        public ISubmissionRepository SubmissionRepository { get; }
+
+        public UnitOfWork(ApplicationDbContext context,
+            IElasticSearchRepository elasticSearchRepository,
+            IProblemRepository problemRepository,
+            ISubmissionRepository submissionRepository)
         {
             this.context = context;
             _repositories = new Hashtable();
+            ElasticSearchRepository = elasticSearchRepository;
+            ProblemRepository = problemRepository;
+            SubmissionRepository = submissionRepository;
 
         }
+        
+
+
         public Task<int> CompleteAsync()
             => context.SaveChangesAsync();
 
