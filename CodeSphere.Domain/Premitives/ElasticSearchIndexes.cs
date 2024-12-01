@@ -2,7 +2,7 @@
 {
     public class ElasticSearchIndexes
     {
-        public const string Problems = "Problems";
+        public const string Problems = "problems";
         public const string Blogs = "Blogs";
     }
 }
