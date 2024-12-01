@@ -3,6 +3,8 @@ using CodeSphere.Domain.Premitives;
 using CodeSphere.Infrastructure.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
+using Org.BouncyCastle.Asn1;
+using System.Linq.Expressions;
 
 namespace CodeSphere.Infrastructure.Implementation.Repositories
 {
@@ -40,6 +42,13 @@ namespace CodeSphere.Infrastructure.Implementation.Repositories
            => context.Set<T>().RemoveRange(entities);
 
         public async Task<T> GetByIdAsync(int id) => await context.Set<T>().FindAsync(id);
+
+        public async Task<IEnumerable<T>> GetAllAsync() => await context.Set<T>().ToListAsync();
+
+        public async Task<IEnumerable<T>> GetWhereAsync(Expression<Func<T, bool>> predicate)
+        {
+            return await context.Set<T>().Where(predicate).ToListAsync();
+        }
 
 
         public IQueryable<T> GetTableAsTracked() => context.Set<T>().AsQueryable();

@@ -1,5 +1,6 @@
 ﻿using CodeSphere.Domain.Premitives;
 using Microsoft.EntityFrameworkCore.Storage;
+using System.Linq.Expressions;
 
 namespace CodeSphere.Domain.Abstractions.Repositores
 {
@@ -9,6 +10,9 @@ namespace CodeSphere.Domain.Abstractions.Repositores
         Task DeleteRangeAsync(ICollection<T> entities);
         Task DeleteAsync(T entity);
         Task<T> GetByIdAsync(int id);
+        Task<IEnumerable<T>> GetAllAsync();
+
+        Task<IEnumerable<T>> GetWhereAsync(Expression<Func<T, bool>> predicate)
 
         Task SaveChangesAsync();
 

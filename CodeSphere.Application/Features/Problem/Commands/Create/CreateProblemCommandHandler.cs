@@ -43,7 +43,7 @@ namespace CodeSphere.Application.Features.Problem.Commands.Create
                 Topics = new List<string>() // TODO : Will be  Filled with problem topics
             };
 
-            var result = await elasticSearchRepository.IndexDocumentAsync(document, ElasticSearchIndexes.Problems);
+            var result = await elasticSearchRepository.IndexDocumentAsync(document, "problems");
 
             if (!result)
                 return await Response.FailureAsync("failed to index problem", HttpStatusCode.Created);
