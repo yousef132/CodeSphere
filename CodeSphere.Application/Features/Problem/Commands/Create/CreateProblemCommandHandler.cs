@@ -37,10 +37,10 @@ namespace CodeSphere.Application.Features.Problem.Commands.Create
 
             var document = new ProblemDocument
             {
-                Difficulty = mappedProblem.Difficulty,
+                Difficulty = (int)mappedProblem.Difficulty,
                 Id = mappedProblem.Id,
                 Name = mappedProblem.Name,
-                Topics = new List<string>() // TODO : Will be  Filled with problem topics
+                Topics = request.Topics
             };
 
             var result = await elasticSearchRepository.IndexDocumentAsync(document, "problems");

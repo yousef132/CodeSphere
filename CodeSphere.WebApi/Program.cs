@@ -38,6 +38,7 @@ builder.Services.AddCors(opt =>
     );
 });
 
+
 var app = builder.Build();
 
 app.MigrationInitialization();
