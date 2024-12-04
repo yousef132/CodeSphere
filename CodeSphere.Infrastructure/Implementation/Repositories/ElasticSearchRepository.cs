@@ -1,5 +1,5 @@
 ﻿using CodeSphere.Application.Helpers;
-using CodeSphere.Domain.Abstractions.Repositores;
+using CodeSphere.Domain.Abstractions.Repositories;
 using CodeSphere.Domain.Premitives;
 using CodeSphere.Domain.Responses.ElasticSearchResponses;
 using Microsoft.Extensions.Options;

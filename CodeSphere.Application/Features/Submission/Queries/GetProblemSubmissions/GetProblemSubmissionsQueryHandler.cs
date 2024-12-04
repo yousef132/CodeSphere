@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using CodeSphere.Domain.Abstractions.Repositores;
+using CodeSphere.Domain.Abstractions.Repositories;
 using CodeSphere.Domain.Models.Entities;
 using CodeSphere.Domain.Premitives;
 using MediatR;

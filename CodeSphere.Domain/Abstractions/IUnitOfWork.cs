@@ -1,4 +1,4 @@
-﻿using CodeSphere.Domain.Abstractions.Repositores;
+﻿using CodeSphere.Domain.Abstractions.Repositories;
 using CodeSphere.Domain.Premitives;
 
 namespace CodeSphere.Domain.Abstractions

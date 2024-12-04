@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using CodeSphere.Domain.Abstractions;
-using CodeSphere.Domain.Abstractions.Repositores;
+using CodeSphere.Domain.Abstractions.Repositories;
 using CodeSphere.Domain.Models.Entities;
 using CodeSphere.Domain.Premitives;
 using MediatR;
@@ -15,7 +15,7 @@ using System.Threading.Tasks;
 
 namespace CodeSphere.Application.Features.Problem.Queries.GetAll
 {
-    public class GetAllQueryHandler : IRequestHandler<GetAllQuery, Response>
+    public class GetAllQueryHandler : IRequestHandler<GetAllProblemsQuery, Response>
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
@@ -27,9 +27,9 @@ namespace CodeSphere.Application.Features.Problem.Queries.GetAll
             _mapper = mapper;
         }
 
-        public async Task<Response> Handle(GetAllQuery request, CancellationToken cancellationToken)
+        public async Task<Response> Handle(GetAllProblemsQuery request, CancellationToken cancellationToken)
         {
-            var problems = await _unitOfWork.ElasticSearchRepository.SearchProblemsAsync(request.ProblemName, request.TopicsIds, request.Difficulty);
+            var problems = await _unitOfWork.ElasticSearchRepository.SearchProblemsAsync(request.ProblemName, request.TopicsIds,(int) request.Difficulty);
             
             if(problems.IsNullOrEmpty())
             {

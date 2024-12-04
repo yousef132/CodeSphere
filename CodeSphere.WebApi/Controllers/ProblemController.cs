@@ -2,8 +2,10 @@
 using CodeSphere.Application.Features.Problem.Commands.Delete;
 using CodeSphere.Application.Features.Problem.Commands.SolveProblem;
 using CodeSphere.Application.Features.Problem.Queries.GetAll;
+using CodeSphere.Application.Features.Problem.Queries.GetById;
 using CodeSphere.Application.Features.Submission.Queries.GetProblemSubmissions;
-using CodeSphere.Domain.Abstractions.Repositores;
+using CodeSphere.Domain.Abstractions.Repositories;
+using CodeSphere.Domain.Models.Entities;
 using CodeSphere.Domain.Premitives;
 using CodeSphere.Domain.Responses.ElasticSearchResponses;
 using Microsoft.AspNetCore.Authorization;
@@ -41,17 +43,21 @@ namespace CodeSphere.WebApi.Controllers
 
         [Authorize]
         [HttpPost("problems")]
-        public async Task<ActionResult<Response>> GetProblemsAsync([FromBody]GetAllQuery query)
+        public async Task<ActionResult<Response>> GetProblemsAsync([FromBody]GetAllProblemsQuery query)
         {
             query.UserId = GetCurrentUserId();
             return ResponseResult(await mediator.Send(query));
         }
 
 
-        [HttpGet("{name}")]
-        public async Task<IActionResult> GetProblemAsync([FromRoute]string name)
-        {
-            return Ok(await _elasticSearchRepository.SearchProblemsAsync(name));
-        }
-    }
+        //[HttpGet("{name}")]
+        //public async Task<IActionResult> GetProblemAsync([FromRoute]string name)
+        //{
+        //    return Ok(await _elasticSearchRepository.SearchProblemsAsync(name));
+        //}
+
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetProblemDetails([FromRoute] int id)
+            => ResponseResult(await mediator.Send(new GetByIdQuery (id)));
+	}
 }

@@ -1,6 +1,6 @@
 ﻿using CodeSphere.Domain.Models.Entities;
 
-namespace CodeSphere.Domain.Abstractions.Repositores
+namespace CodeSphere.Domain.Abstractions.Repositories
 {
     public interface ISubmissionRepository
     {

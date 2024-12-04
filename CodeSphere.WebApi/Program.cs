@@ -1,5 +1,5 @@
 using CodeSphere.Application;
-using CodeSphere.Domain.Abstractions.Repositores;
+using CodeSphere.Domain.Abstractions.Repositories;
 using CodeSphere.Domain.Middleware;
 using CodeSphere.Domain.Models.Identity;
 using CodeSphere.Infrastructure;

@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore.Storage;
 using System.Linq.Expressions;
 
-namespace CodeSphere.Domain.Abstractions.Repositores
+namespace CodeSphere.Domain.Abstractions.Repositories
 {
     public interface IGenericRepository<T> where T : BaseEntity
     {

@@ -1,5 +1,5 @@
 ﻿using CodeSphere.Domain.Abstractions;
-using CodeSphere.Domain.Abstractions.Repositores;
+using CodeSphere.Domain.Abstractions.Repositories;
 using CodeSphere.Domain.Premitives;
 using CodeSphere.Infrastructure.Context;
 using CodeSphere.Infrastructure.Implementation.Repositories;
