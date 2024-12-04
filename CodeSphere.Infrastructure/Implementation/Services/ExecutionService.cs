@@ -35,6 +35,28 @@ namespace CodeSphere.Infrastructure.Implementation.Services
             this.unitOfWork = unitOfWork;
         }
 
+
+        public async Task<object> ExecuteCodeAsync(string code, Language language, Testcase testCase, decimal runTimeLimit, decimal memoryLimit)
+        {
+            string path = await fileService.CreateCodeFile(code, language, _requestDirectory);
+            decimal maxRunTime = 0;
+            await CreateAndStartContainer(language);
+
+            await fileService.CreateTestCasesFile(testCase.Input, _requestDirectory);
+
+            await ExecuteCodeInContainer(runTimeLimit, memoryLimit);
+
+            var result = await CalculateResult(testCase, runTimeLimit, code);
+
+            if (result.SubmissionResult != SubmissionResult.Accepted)
+                return result;
+
+
+            maxRunTime = Math.Max(maxRunTime, result.ExecutionTime);
+            return new object();
+        }
+
+
         public async Task<object> ExecuteCodeAsync(string code, Language language, List<Testcase> testCases, decimal runTimeLimit, decimal memoryLimit)
         {
             string path = await fileService.CreateCodeFile(code, language, _requestDirectory);
@@ -47,8 +69,8 @@ namespace CodeSphere.Infrastructure.Implementation.Services
                 {
                     // for each testcase run the code against it and capture the output
                     // of the program and compare it with expected output
-                    testCases[i].Input = testCases[i].Input.Replace("\\n", "\n");
-                    testCases[i].Output = testCases[i].Output.Replace("\\n", "\n");
+                    //testCases[i].Input = testCases[i].Input.Replace("\\n", "\n");
+                    //testCases[i].Output = testCases[i].Output.Replace("\\n", "\n");
 
                     await fileService.CreateTestCasesFile(testCases[i].Input, _requestDirectory);
 
@@ -138,7 +160,7 @@ namespace CodeSphere.Infrastructure.Implementation.Services
 
             if (output?.Length > 0)
             {
-                if (output != testCase.Output)
+                if (output.TrimEnd('\n') != testCase.Output.TrimEnd('\n'))
                 {
                     return new WrongAnswerResponse
                     {
@@ -167,7 +189,7 @@ namespace CodeSphere.Infrastructure.Implementation.Services
                 Language.cs => Helper.CSharpCompiler,
                 _ => throw new ArgumentException("Unsupported language")
             };
-
+            string s = Helper.ScriptFilePath;
             var createContainerResponse = await _dockerClient.Containers.CreateContainerAsync(new CreateContainerParameters
             {
                 HostConfig = new HostConfig

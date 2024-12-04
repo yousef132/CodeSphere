@@ -1,4 +1,5 @@
-﻿using CodeSphere.Domain.Responses.ElasticSearchResponses;
+﻿using CodeSphere.Domain.Models.Entities;
+using CodeSphere.Domain.Responses.ElasticSearchResponses;
 
 namespace CodeSphere.Domain.Abstractions.Repositories
 {
@@ -9,7 +10,7 @@ namespace CodeSphere.Domain.Abstractions.Repositories
 
         Task<bool> BulkIndexDocumentsAsync<T>(IEnumerable<T> documents, string indexName) where T : class;
 
-        Task<IEnumerable<ProblemDocument>> SearchProblemsAsync(string? searchText, List<int>? topics, int? difficulty);
+        Task<IEnumerable<ProblemDocument>> SearchProblemsAsync(string? searchText, List<int>? topics, Difficulty? difficulty);
         Task<IEnumerable<ProblemDocument>> SearchProblemsAsync(string searchText);
 
 
