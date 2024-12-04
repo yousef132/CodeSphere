@@ -4,7 +4,7 @@ namespace CodeSphere.Domain.Premitives
 {
     public static class Helper
     {
-        public const string ScriptFilePath = @"D:\\Graduation Project\\Project\\CodeSphere\\CodeSphere\\CodeSphere.Domain\\Premitives\\run_code.sh";
+        public static string ScriptFilePath;
         public const string PythonCompiler = "python:3.8-slim";
         public const string CppCompiler = "gcc:latest";
         public const string CSharpCompiler = "mcr.microsoft.com/dotnet/sdk:5.0";
@@ -23,7 +23,37 @@ namespace CodeSphere.Domain.Premitives
 
             return $"docker exec {containerId} /usr/bin/bash /run_code.sh {runTimeLimit} {runMemoryLimit}";
         }
+        static Helper()
+        {
+            ScriptFilePath = SetScriptFilePath();
+        }
+        public static string SetScriptFilePath()
+        {
+            string currentDirectory = Directory.GetCurrentDirectory();
+            DirectoryInfo directoryInfo = new DirectoryInfo(currentDirectory);
 
+            // Navigate up to the solution root
+            while (directoryInfo != null && !DirectoryContainsFile(directoryInfo.FullName, "*.sln"))
+            {
+                directoryInfo = directoryInfo.Parent;
+            }
+
+            if (directoryInfo == null)
+            {
+                throw new Exception("Solution root not found.");
+            }
+
+            // Combine solution path with the Infrastructure project path
+            string infrastructurePath = Path.Combine(directoryInfo.FullName, "CodeSphere.Domain", "Premitives", "run_code.sh");
+
+
+            return infrastructurePath;
+
+        }
+        private static bool DirectoryContainsFile(string directoryPath, string searchPattern)
+        {
+            return Directory.GetFiles(directoryPath, searchPattern).Length > 0;
+        }
         public static decimal ExtractExecutionTime(string time)
         {
             //"\nreal\t0m0.041s\nuser\t0m0.027s\nsys\t0m0.000s\n"

@@ -28,6 +28,13 @@ namespace CodeSphere.Application.Features.Problem.Commands.Create
             if (contest == null)
                 return await Response.FailureAsync("Contest Not Found!!", System.Net.HttpStatusCode.NotFound);
 
+            Topic currentTopic = default;
+            foreach (var topic in request.Topics)
+            {
+                currentTopic = await unitOfWork.Repository<Topic>().GetByIdAsync(topic);
+                if (currentTopic == null)
+                    return await Response.FailureAsync($"Topic {topic} Not Found !!", System.Net.HttpStatusCode.NotFound);
+            }
 
 
             var mappedProblem = mapper.Map<Domain.Models.Entities.Problem>(request);
@@ -37,7 +44,7 @@ namespace CodeSphere.Application.Features.Problem.Commands.Create
 
             var document = new ProblemDocument
             {
-                Difficulty = (int)mappedProblem.Difficulty,
+                Difficulty = mappedProblem.Difficulty,
                 Id = mappedProblem.Id,
                 Name = mappedProblem.Name,
                 Topics = request.Topics

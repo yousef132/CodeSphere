@@ -1,5 +1,6 @@
 ﻿using CodeSphere.Application.Helpers;
 using CodeSphere.Domain.Abstractions.Repositories;
+using CodeSphere.Domain.Models.Entities;
 using CodeSphere.Domain.Premitives;
 using CodeSphere.Domain.Responses.ElasticSearchResponses;
 using Microsoft.Extensions.Options;
@@ -35,13 +36,13 @@ namespace CodeSphere.Infrastructure.Implementation.Repositories
             return response.IsValid;
         }
 
-        public async Task<IEnumerable<ProblemDocument>> SearchProblemsAsync(string? searchText, List<int>? topics, int? difficulty)
+        public async Task<IEnumerable<ProblemDocument>> SearchProblemsAsync(string? searchText, List<int>? topics, Difficulty? difficulty)
         {
 
             var fuzzySearchResponse = _elasticClient.Search<ProblemDocument>(s => s
                                  .Index(ElasticSearchIndexes.Problems)
                                  .From(0)
-                                 .Size(1)
+                                 .Size(100)
                                  .Query(q => q
                                      .Bool(b => b
                                          .Must(
