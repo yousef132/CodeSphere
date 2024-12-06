@@ -7,6 +7,7 @@ using CodeSphere.Application.Features.Problem.Queries.GetById;
 using CodeSphere.Application.Features.Submission.Queries.GetProblemSubmissions;
 using CodeSphere.Domain.Abstractions.Repositories;
 using CodeSphere.Domain.Premitives;
+using CodeSphere.WebApi.Filters;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -28,9 +29,15 @@ namespace CodeSphere.WebApi.Controllers
          => ResponseResult(await mediator.Send(command));
 
         [HttpPost("solve")]
+        [RateLimitingFilter(5)]
+
         public async Task<ActionResult<Response>> SolveProblemAsync([FromForm] SubmitSolutionCommand command)
          => ResponseResult(await mediator.Send(command));
+
+
+
         [HttpPost("run")]
+        [RateLimitingFilter(5)]
         public async Task<ActionResult<Response>> RunProblemTestcasesAsync([FromForm] RunCodeCommand command)
          => ResponseResult(await mediator.Send(command));
 
