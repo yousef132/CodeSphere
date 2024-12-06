@@ -24,6 +24,8 @@ builder.Services.Configure<FormOptions>(options =>
     options.MultipartBodyLengthLimit = 5 * 1024 * 1024;
 });
 
+builder.Services.AddHttpClient();
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddApplication(builder.Configuration)
     .AddInfrastructure(builder.Configuration);

@@ -1,9 +1,4 @@
 ﻿using CodeSphere.Domain.Models.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CodeSphere.Application.Features.Problem.Queries.GetAll
 {
@@ -12,7 +7,7 @@ namespace CodeSphere.Application.Features.Problem.Queries.GetAll
         public int Id { get; set; }
         public string Name { get; set; } = string.Empty;
         public Difficulty Difficulty { get; set; }
-        public List<int> Topics { get; set; } = new List<int>();
+        public List<int> Topics { get; set; } = new();
         public bool IsSolved { get; set; }
     }
 }

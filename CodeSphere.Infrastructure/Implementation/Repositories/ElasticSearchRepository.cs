@@ -12,7 +12,9 @@ namespace CodeSphere.Infrastructure.Implementation.Repositories
     {
         private readonly ElasticClient _elasticClient;
         private readonly ElasticSetting elasticSetting;
-        public ElasticSearchRepository(IOptions<ElasticSetting> options)
+        private readonly HttpClient httpClient;
+
+        public ElasticSearchRepository(IOptions<ElasticSetting> options, HttpClient httpClient)
         {
             this.elasticSetting = options.Value;
 
@@ -20,6 +22,7 @@ namespace CodeSphere.Infrastructure.Implementation.Repositories
                 .DefaultIndex(elasticSetting.DefaultIndex);
 
             this._elasticClient = new ElasticClient(settings);
+            this.httpClient = httpClient;
         }
 
         public async Task<bool> IndexDocumentAsync<T>(T document, string indexName) where T : class
@@ -38,6 +41,7 @@ namespace CodeSphere.Infrastructure.Implementation.Repositories
 
         public async Task<IEnumerable<ProblemDocument>> SearchProblemsAsync(string? searchText, List<int>? topics, Difficulty? difficulty)
         {
+            #region nest
 
             var fuzzySearchResponse = _elasticClient.Search<ProblemDocument>(s => s
                                  .Index(ElasticSearchIndexes.Problems)
@@ -67,6 +71,56 @@ namespace CodeSphere.Infrastructure.Implementation.Repositories
                              );
 
             return fuzzySearchResponse.Hits.Select(hit => hit.Source);
+            #endregion
+
+            #region api call
+
+            //var queryJson = $@"
+            //              {{
+            //                  ""size"": 1000,
+            //                  ""query"": {{
+            //                      ""bool"": {{
+            //                          ""must"": [
+            //                              {(string.IsNullOrEmpty(searchText) ? "" : $@"
+            //                              {{
+            //                                  ""match"": {{
+            //                                      ""Name"": {{
+            //                                          ""query"": ""{searchText}"",
+            //                                          ""fuzziness"": 2
+            //                                      }}
+            //                                  }}
+            //                              }}")}
+            //                          ],
+            //                          ""filter"": [
+            //                              {(topics != null && topics.Any() ? $@"
+            //                              {{
+            //                                  ""terms"": {{
+            //                                      ""Topics"": [{string.Join(",", topics)}]
+            //                                  }}
+            //                              }}" : "")}
+            //                              {(difficulty != null ? $@"
+            //                              {{
+            //                                  ""term"": {{
+            //                                      ""Difficulty"": ""{difficulty}""
+            //                                  }}
+            //                              }}" : "")}
+            //                          ]
+            //                      }}
+            //                  }}
+            //              }}";
+
+            //var content = new StringContent(queryJson, Encoding.UTF8, "application/json");
+            //var response = await httpClient.PostAsync(elasticSetting.Url + "/problems/_search", content);
+            //response.EnsureSuccessStatusCode();
+
+            //// Parse the response using the updated class structure
+            //var responseString = await response.Content.ReadAsStringAsync();
+            //var searchResponse = JsonConvert.DeserializeObject<ElasticSearchResponse<ProblemDocument>>(responseString);
+
+            //// Return the documents (ProblemDocument) from the hits
+            //return searchResponse?.Hits?.Hits?.Select(h => h._source) ?? Enumerable.Empty<ProblemDocument>();
+            #endregion
+
 
         }
 
