@@ -72,21 +72,20 @@ namespace CodeSphere.Infrastructure.Implementation.Repositories
 
         public async Task<IEnumerable<ProblemDocument>> SearchProblemsAsync(string searchText)
         {
-
             var fuzzySearchResponse = _elasticClient.Search<ProblemDocument>(s => s
-                                 .Index(ElasticSearchIndexes.Problems)
-                                 .Query(q => q
-                                     .Bool(b => b
-                                         .Must(
-                                             m => m.Match(mq => mq
-                                                 .Field(f => f.Name) // Fuzzy search on Name
-                                                 .Query(searchText)
-                                                 .Fuzziness(Nest.Fuzziness.EditDistance(2))
-                                             )
-                                         )
-                                     )
-                                 )
-                             );
+                                                 .Index(ElasticSearchIndexes.Problems)
+                                                 .Query(q => q
+                                                     .Bool(b => b
+                                                         .Must(
+                                                             m => m.Match(mq => mq
+                                                                 .Field(f => f.Name) // Fuzzy search on Name
+                                                                 .Query(searchText)
+                                                                 .Fuzziness(Nest.Fuzziness.EditDistance(2))
+                                                             )
+                                                         )
+                                                     )
+                                                 )
+                                             );
 
             return fuzzySearchResponse.Hits.Select(hit => hit.Source);
 

@@ -41,5 +41,15 @@ namespace CodeSphere.Infrastructure.Implementation.Services
             await System.IO.File.WriteAllTextAsync(testCasesPath, code);
             return testCasesPath;
         }
+
+        public async Task<string> ReadFile(IFormFile file)
+        {
+            string content;
+            using (var reader = new StreamReader(file.OpenReadStream()))
+            {
+                content = await reader.ReadToEndAsync();
+            }
+            return content;
+        }
     }
 }

@@ -1,34 +1,66 @@
-﻿using CodeSphere.Domain.Abstractions;
+﻿using CodeSphere.Domain.Models.Entities;
 using CodeSphere.Domain.Premitives;
+using CodeSphere.Domain.Requests;
+using FluentValidation;
 using MediatR;
+using Microsoft.AspNetCore.Http;
+using System.Text.Json;
 
 namespace CodeSphere.Application.Features.Problem.Commands.Run
 {
     public class RunCodeCommand : IRequest<Response>
     {
-        public List<string> TestCases { get; set; }
-
-        public string UserId { get; set; }
-
+        public Language Language { get; set; }
+        public IFormFile Code { get; set; }
         public int ProblemId { get; set; }
+        public string CustomTestcasesJson { get; set; }
     }
 
-    public class RunCodeCommandHandler : IRequestHandler<RunCodeCommand, Response>
+
+    public class RunCodeCommandValidator : AbstractValidator<RunCodeCommand>
     {
-        private readonly IUnitOfWork unitOfWork;
-
-        public RunCodeCommandHandler(IUnitOfWork unitOfWork)
+        public RunCodeCommandValidator()
         {
-            this.unitOfWork = unitOfWork;
+            RuleFor(x => x.Language)
+                .IsInEnum()
+                .WithMessage("Invalid language value. Must be a defined enum.");
+
+            // Validate Code
+            RuleFor(x => x.Code)
+                .NotNull()
+                .WithMessage("Code file is required.")
+                .Must(file => file.Length > 0)
+                .WithMessage("Code file cannot be empty.");
+
+            // Validate ProblemId
+            RuleFor(x => x.ProblemId)
+                .NotEmpty().NotNull()
+                .GreaterThan(0)
+                .WithMessage("ProblemId must be greater than 0.");
+
+            // Validate CustomTestcasesJson
+            RuleFor(x => x.CustomTestcasesJson)
+                .NotEmpty()
+                .WithMessage("CustomTestcasesJson is required.")
+                .Must(BeValidJsonArray)
+                .WithMessage("CustomTestcasesJson must be a valid JSON array.");
         }
-        public async Task<Response> Handle(RunCodeCommand request, CancellationToken cancellationToken)
+        private bool BeValidJsonArray(string json)
         {
-            var problem = await unitOfWork.Repository<Domain.Models.Entities.Problem>().GetByIdAsync(request.ProblemId);
-            if (problem == null)
-                return await Response.FailureAsync("Problem Not Found");
+            if (string.IsNullOrWhiteSpace(json))
+                return false;
 
-
-            return await Response.SuccessAsync("success for now");
+            try
+            {
+                var testcases = JsonSerializer.Deserialize<List<CustomTestcaseDto>>(json);
+                return testcases != null;
+            }
+            catch
+            {
+                return false;
+            }
         }
     }
+
+
 }

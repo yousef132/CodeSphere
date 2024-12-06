@@ -15,13 +15,19 @@ namespace CodeSphere.Application.Features.Problem.Commands.SolveProblem
         private readonly IUnitOfWork unitOfWork;
         private readonly IMapper mapper;
         private readonly IExecutionService executionService;
+        private readonly IFileService fileService;
 
-        public SubmitSolutionCommandHandler(IProblemRepository problemRepository, IUnitOfWork unitOfWork, IMapper mapper, IExecutionService executionService)
+        public SubmitSolutionCommandHandler(IProblemRepository problemRepository,
+                                             IUnitOfWork unitOfWork,
+                                             IMapper mapper,
+                                             IExecutionService executionService,
+                                             IFileService fileService)
         {
             this.problemRepository = problemRepository;
             this.unitOfWork = unitOfWork;
             this.mapper = mapper;
             this.executionService = executionService;
+            this.fileService = fileService;
         }
         public async Task<Response> Handle(SubmitSolutionCommand request, CancellationToken cancellationToken)
         {
@@ -35,24 +41,23 @@ namespace CodeSphere.Application.Features.Problem.Commands.SolveProblem
 
             var problemTestCases = problemRepository.GetTestCasesByProblemId(request.ProblemId);
 
-            string codeContent;
-            using (var reader = new StreamReader(request.Code.OpenReadStream()))
-            {
-                codeContent = await reader.ReadToEndAsync();
-            }
+            string codeContent = await fileService.ReadFile(request.Code);
+
 
             var result = await executionService.ExecuteCodeAsync(codeContent, request.Language, problemTestCases.ToList(), problem.RunTimeLimit, (decimal)problem.MemoryLimit);
 
+            var baseSubmission = (result as BaseSubmissionResponse);
+            var compilationError = (result as CompilationErrorResponse);
             var submission = new Submit
             {
                 UserId = request.UserId,
                 SubmissionDate = DateTime.UtcNow,
                 ContestId = request.ContestId,
-                Language = request.Language, //here 
-                Result = (result as BaseSubmissionResponse).SubmissionResult,
+                Language = request.Language,
+                Result = baseSubmission.SubmissionResult,
                 Error = (result as CompilationErrorResponse)?.Message ?? "",
                 ProblemId = request.ProblemId,
-                SubmitTime = (result as BaseSubmissionResponse).ExecutionTime,
+                SubmitTime = baseSubmission.ExecutionTime,
                 Code = codeContent,
                 SubmitMemory = 1m
             };

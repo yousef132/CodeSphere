@@ -30,4 +30,5 @@ namespace CodeSphere.Domain.Models.Entities
 
         public ICollection<Submit> Submissions { get; set; }
     }
+
 }
