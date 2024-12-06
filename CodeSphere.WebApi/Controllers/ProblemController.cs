@@ -65,7 +65,7 @@ namespace CodeSphere.WebApi.Controllers
         //}
 
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetProblemDetails([FromRoute] int id)
-            => ResponseResult(await mediator.Send(new GetByIdQuery(id)));
+        public async Task<IActionResult> GetProblemDetails([FromRoute] int id, string userId)
+            => ResponseResult(await mediator.Send(new GetByIdQuery(id, userId)));
     }
 }

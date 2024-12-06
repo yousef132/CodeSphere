@@ -28,16 +28,27 @@ namespace CodeSphere.Application.Features.Problem.Queries.GetById
 			var getSpecificProblem = await _unitOfWork.ProblemRepository
 			.GetProblemDetailsAsync(request.ProblemId, cancellationToken);
 
+
 			// Check if Problem was not Found
 			if (getSpecificProblem is null)
 				return await Response.FailureAsync("Problem not Found", HttpStatusCode.NotFound);
+		
+			
+			getSpecificProblem.Testcases = getSpecificProblem.Testcases?.Take(3).ToList() ?? [];
 
+			// Map to the response 
 			var response = _mapper.Map<GetByIdQueryResponse>(getSpecificProblem);
 
+			// Populate Accepted and Submissions counts
 			response.Accepted = _unitOfWork.ProblemRepository.GetAcceptedProblemCount(request.ProblemId);
 
 			response.Submissions = _unitOfWork.ProblemRepository.GetSubmissionsProblemCount(request.ProblemId);
 
+			// Check if the user has solved the problem
+			response.IsSolved = _unitOfWork.ProblemRepository.CheckUserSolvedProblem(
+				request.ProblemId, request.UserId, cancellationToken);
+
+			// Return the success response
 			return await Response.SuccessAsync(response, "Problem Found", HttpStatusCode.OK);	
 		}
 	}

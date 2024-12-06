@@ -19,6 +19,7 @@ namespace CodeSphere.Application.Features.Problem.Queries.GetById
         public decimal Submissions { get; set; }
 		public decimal AcceptanceRate => Submissions > 0 ? Accepted / Submissions * 100 : 0;
 
+		public bool IsSolved { get; set; }
 
 	}
 }

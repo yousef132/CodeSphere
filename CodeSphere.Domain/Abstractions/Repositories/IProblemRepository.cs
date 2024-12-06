@@ -11,5 +11,7 @@ namespace CodeSphere.Domain.Abstractions.Repositories
         int GetAcceptedProblemCount(int problemId, CancellationToken cancellationToken = default);
         int GetSubmissionsProblemCount(int problemId, CancellationToken cancellationToken = default);
 
+        public bool CheckUserSolvedProblem(int problemId, string userId, CancellationToken cancellationToken = default);
+
 	}
 }

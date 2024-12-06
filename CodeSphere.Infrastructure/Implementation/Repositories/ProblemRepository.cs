@@ -14,11 +14,8 @@ namespace CodeSphere.Infrastructure.Implementation.Repositories
         }
 
 		public async Task<Problem?> GetProblemDetailsAsync(int problemId, CancellationToken cancellationToken = default)
-		=> await _context.Set<Problem>().Include(x => x.Testcases).Take(3).Include(y => y.ProblemTopics).ThenInclude(x=>x.Topic).FirstOrDefaultAsync(x=>x.Id == problemId);
+		=> await _context.Set<Problem>().Include(x => x.Testcases).Include(y => y.ProblemTopics).ThenInclude(x=>x.Topic).FirstOrDefaultAsync(x=>x.Id == problemId);
 		
-		
-		
-	
 		
 		public int GetAcceptedProblemCount(int problemId, CancellationToken cancellationToken = default)
 		=> _context.Set<Submit>().Where(P => P.ProblemId == problemId && P.Result == SubmissionResult.Accepted).Count();	
@@ -26,9 +23,15 @@ namespace CodeSphere.Infrastructure.Implementation.Repositories
 
 
 		public int GetSubmissionsProblemCount(int problemId, CancellationToken cancellationToken = default)
-				=> _context.Set<Submit>().Where(P => P.ProblemId == problemId).Count();
+		=> _context.Set<Submit>().Where(P => P.ProblemId == problemId).Count();
+
+		public bool CheckUserSolvedProblem(int problemId, string userId, CancellationToken cancellationToken = default)
+		=>_context.Set<Submit>().Any(P => P.ProblemId == problemId && P.UserId == userId && P.Result == SubmissionResult.Accepted);
+
+		
+
 		public IQueryable<Testcase> GetTestCasesByProblemId(int problemId)
-           => _context.Set<Testcase>().Where(x => x.ProblemId == problemId);
+        => _context.Set<Testcase>().Where(x => x.ProblemId == problemId);
 
 	}
 }
