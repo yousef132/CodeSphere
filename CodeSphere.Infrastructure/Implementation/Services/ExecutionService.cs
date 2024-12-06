@@ -3,6 +3,7 @@ using CodeSphere.Domain.Abstractions.Services;
 using CodeSphere.Domain.CustomExceptions;
 using CodeSphere.Domain.Models.Entities;
 using CodeSphere.Domain.Premitives;
+using CodeSphere.Domain.Requests;
 using CodeSphere.Domain.Responses.SubmissionResponses;
 using Docker.DotNet;
 using Docker.DotNet.Models;
@@ -36,24 +37,45 @@ namespace CodeSphere.Infrastructure.Implementation.Services
         }
 
 
-        public async Task<object> ExecuteCodeAsync(string code, Language language, Testcase testCase, decimal runTimeLimit, decimal memoryLimit)
+        public async Task<object> ExecuteCodeAsync(string code, Language language, List<CustomTestcaseDto> testcases, decimal runTimeLimit, decimal memoryLimit)
         {
             string path = await fileService.CreateCodeFile(code, language, _requestDirectory);
-            decimal maxRunTime = 0;
-            await CreateAndStartContainer(language);
+            List<object> results = new();
+            try
+            {
+                // create container 
+                await CreateAndStartContainer(language);
+                for (int i = 0; i < testcases.Count; i++)
+                {
 
-            await fileService.CreateTestCasesFile(testCase.Input, _requestDirectory);
+                    await fileService.CreateTestCasesFile(testcases[i].Input, _requestDirectory);
 
-            await ExecuteCodeInContainer(runTimeLimit, memoryLimit);
+                    await ExecuteCodeInContainer(runTimeLimit, memoryLimit);
 
-            var result = await CalculateResult(testCase, runTimeLimit, code);
+                    var result = await CalculateResult(testcases[i], runTimeLimit, code);
 
-            if (result.SubmissionResult != SubmissionResult.Accepted)
-                return result;
+                    results.Add(result);
+                }
+                return results;
+            }
+            catch (Exception ex)
+            {
+                throw new CodeExecutionException("Error while running testcases !!!");
+            }
+            finally
+            {
+                if (Directory.Exists(_requestDirectory))
+                {
+                    Directory.Delete(_requestDirectory, true);
+                }
+
+                if (_containerId != null)
+                {
+                    await _dockerClient.Containers.RemoveContainerAsync(_containerId, new ContainerRemoveParameters { Force = true });
+                }
+            }
 
 
-            maxRunTime = Math.Max(maxRunTime, result.ExecutionTime);
-            return new object();
         }
 
 
@@ -67,10 +89,7 @@ namespace CodeSphere.Infrastructure.Implementation.Services
                 await CreateAndStartContainer(language);
                 for (int i = 0; i < testCases.Count; i++)
                 {
-                    // for each testcase run the code against it and capture the output
-                    // of the program and compare it with expected output
-                    //testCases[i].Input = testCases[i].Input.Replace("\\n", "\n");
-                    //testCases[i].Output = testCases[i].Output.Replace("\\n", "\n");
+
 
                     await fileService.CreateTestCasesFile(testCases[i].Input, _requestDirectory);
 
@@ -83,7 +102,6 @@ namespace CodeSphere.Infrastructure.Implementation.Services
 
 
                     maxRunTime = Math.Max(maxRunTime, result.ExecutionTime);
-
 
                 }
             }
@@ -131,7 +149,6 @@ namespace CodeSphere.Infrastructure.Implementation.Services
                     SubmissionResult = SubmissionResult.CompilationError,
                     Code = code,
                     ExecutionTime = 0m
-
                 };
             }
 
@@ -167,6 +184,71 @@ namespace CodeSphere.Infrastructure.Implementation.Services
                         TestCaseNumber = testCase.Id,
                         ActualOutput = output,
                         ExpectedOutput = testCase.Output,
+                        SubmissionResult = SubmissionResult.WrongAnswer,
+                        Code = code,
+                        ExecutionTime = Helper.ExtractExecutionTime(runTime)
+                    };
+                }
+            }
+            return new AcceptedResponse
+            {
+                Code = code,
+                ExecutionTime = Helper.ExtractExecutionTime(runTime),
+                ExecutionMemory = 3m,
+            };
+        }
+
+
+        private async Task<BaseSubmissionResponse> CalculateResult(CustomTestcaseDto testcaseDto, decimal runTimeLimit, string code)
+        {
+            string output = await fileService.ReadFileAsync(outputFile);
+            string error = await fileService.ReadFileAsync(errorFile);
+            string runTime = await fileService.ReadFileAsync(runTimeFile);
+            string runTimeError = await fileService.ReadFileAsync(runTimeErrorFile);
+
+            // Initialize the run result
+            BaseSubmissionResponse response = default;
+
+            if (!string.IsNullOrEmpty(error))
+            {
+                return new CompilationErrorResponse
+                {
+                    Message = error,
+                    SubmissionResult = SubmissionResult.CompilationError,
+                    Code = code,
+                    ExecutionTime = 0m
+                };
+            }
+
+            if (!string.IsNullOrEmpty(runTimeError))
+            {
+                return new RunTimeErrorResponse
+                {
+                    Code = code,
+                    Message = runTimeError,
+                    SubmissionResult = SubmissionResult.RunTimeError,
+                    ExecutionTime = Helper.ExtractExecutionTime(runTime)
+                };
+            }
+
+            if (runTime?.Contains("TIMELIMITEXCEEDED") == true)
+            {
+                return new TimeLimitExceedResponse
+                {
+                    ExecutionTime = runTimeLimit,
+                    SubmissionResult = SubmissionResult.TimeLimitExceeded,
+                    Code = code
+                };
+            }
+
+            if (output?.Length > 0)
+            {
+                if (output.TrimEnd('\n') != testcaseDto.ExcpectedOutput.TrimEnd('\n'))
+                {
+                    return new WrongAnswerResponse
+                    {
+                        ActualOutput = output,
+                        ExpectedOutput = testcaseDto.ExcpectedOutput,
                         SubmissionResult = SubmissionResult.WrongAnswer,
                         Code = code,
                         ExecutionTime = Helper.ExtractExecutionTime(runTime)

@@ -5,11 +5,12 @@ namespace CodeSphere.Domain.Abstractions.Services
 {
     public interface IFileService
     {
-        public bool CheckFileExtension(IFormFile file, Language language);
+        bool CheckFileExtension(IFormFile file, Language language);
 
-        public Task<string> ReadFileAsync(string filePath);
+        Task<string> ReadFile(IFormFile file);
+        Task<string> ReadFileAsync(string filePath);
 
-        public Task<string> CreateTestCasesFile(string testCase, string requestDirectory);
-        public Task<string> CreateCodeFile(string code, Language language, string requestDirectory);
+        Task<string> CreateTestCasesFile(string testCase, string requestDirectory);
+        Task<string> CreateCodeFile(string code, Language language, string requestDirectory);
     }
 }

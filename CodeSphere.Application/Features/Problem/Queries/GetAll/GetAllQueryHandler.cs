@@ -11,22 +11,17 @@ namespace CodeSphere.Application.Features.Problem.Queries.GetAll
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
-
-
         public GetAllQueryHandler(IUnitOfWork unitOfWork, IMapper mapper)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
         }
-
         public async Task<Response> Handle(GetAllProblemsQuery request, CancellationToken cancellationToken)
         {
             var problems = await _unitOfWork.ElasticSearchRepository.SearchProblemsAsync(request.ProblemName, request.TopicsIds, request.Difficulty);
 
             if (problems.IsNullOrEmpty())
-            {
                 return await Response.FailureAsync("No Problems Found", HttpStatusCode.NotFound);
-            }
 
             var responses = new List<GetAllQueryResponse>();
 
