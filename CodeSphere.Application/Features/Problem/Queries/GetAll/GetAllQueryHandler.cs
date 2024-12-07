@@ -1,10 +1,11 @@
 ﻿using AutoMapper;
 using CodeSphere.Domain.Abstractions;
-using CodeSphere.Domain.Models.Entities;
 using CodeSphere.Domain.Premitives;
 using MediatR;
+using Microsoft.AspNetCore.Http;
 using Microsoft.IdentityModel.Tokens;
 using System.Net;
+using System.Security.Claims;
 
 namespace CodeSphere.Application.Features.Problem.Queries.GetAll
 {
@@ -12,10 +13,16 @@ namespace CodeSphere.Application.Features.Problem.Queries.GetAll
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
-        public GetAllQueryHandler(IUnitOfWork unitOfWork, IMapper mapper)
+        private readonly IHttpContextAccessor contextAccessor;
+        private string UserId;
+
+        public GetAllQueryHandler(IUnitOfWork unitOfWork, IMapper mapper, IHttpContextAccessor contextAccessor)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
+            this.contextAccessor = contextAccessor;
+            var user = contextAccessor.HttpContext?.User;
+            UserId = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
         }
         public async Task<Response> Handle(GetAllProblemsQuery request, CancellationToken cancellationToken)
         {
@@ -25,13 +32,12 @@ namespace CodeSphere.Application.Features.Problem.Queries.GetAll
                 return await Response.FailureAsync("No Problems Found", HttpStatusCode.NotFound);
 
             var responses = new List<GetAllQueryResponse>();
-            var submissions = await _unitOfWork.Repository<Submit>().GetAllAsync();
+            var submissions = _unitOfWork.SubmissionRepository.GetUserSolvedProblems(UserId);
 
             foreach (var problem in problems)
             {
-                var submission = submissions.Where(s => s.ProblemId == problem.Id && s.Result == SubmissionResult.Accepted && s.UserId == request.UserId);
                 var mappedSubmission = _mapper.Map<GetAllQueryResponse>(problem);
-                mappedSubmission.IsSolved = !submission.IsNullOrEmpty();
+                mappedSubmission.IsSolved = submissions.Any(s => s.ProblemId == problem.Id);
                 responses.Add(mappedSubmission);
             }
 

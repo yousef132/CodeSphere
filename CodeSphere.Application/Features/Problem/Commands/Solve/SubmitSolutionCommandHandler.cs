@@ -6,6 +6,8 @@ using CodeSphere.Domain.Models.Entities;
 using CodeSphere.Domain.Premitives;
 using CodeSphere.Domain.Responses.SubmissionResponses;
 using MediatR;
+using Microsoft.AspNetCore.Http;
+using System.Security.Claims;
 
 namespace CodeSphere.Application.Features.Problem.Commands.SolveProblem
 {
@@ -16,18 +18,25 @@ namespace CodeSphere.Application.Features.Problem.Commands.SolveProblem
         private readonly IMapper mapper;
         private readonly IExecutionService executionService;
         private readonly IFileService fileService;
+        private readonly IHttpContextAccessor contextAccessor;
+        private string UserId;
 
         public SubmitSolutionCommandHandler(IProblemRepository problemRepository,
                                              IUnitOfWork unitOfWork,
                                              IMapper mapper,
                                              IExecutionService executionService,
-                                             IFileService fileService)
+                                             IFileService fileService,
+                                             IHttpContextAccessor contextAccessor)
         {
             this.problemRepository = problemRepository;
             this.unitOfWork = unitOfWork;
             this.mapper = mapper;
             this.executionService = executionService;
             this.fileService = fileService;
+            this.contextAccessor = contextAccessor;
+
+            var user = contextAccessor.HttpContext?.User;
+            UserId = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
         }
         public async Task<Response> Handle(SubmitSolutionCommand request, CancellationToken cancellationToken)
         {
@@ -50,7 +59,7 @@ namespace CodeSphere.Application.Features.Problem.Commands.SolveProblem
             var compilationError = (result as CompilationErrorResponse);
             var submission = new Submit
             {
-                UserId = request.UserId,
+                UserId = UserId,
                 SubmissionDate = DateTime.UtcNow,
                 ContestId = request.ContestId,
                 Language = request.Language,
@@ -68,5 +77,7 @@ namespace CodeSphere.Application.Features.Problem.Commands.SolveProblem
             // save submission result in database
             return await Response.SuccessAsync(result, "Submitted Successfully", System.Net.HttpStatusCode.Created);
         }
+
+
     }
 }

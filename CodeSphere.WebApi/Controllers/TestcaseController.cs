@@ -3,10 +3,14 @@ using CodeSphere.Application.Features.Testcases.Commands.Delete;
 using CodeSphere.Application.Features.Testcases.Commands.Update;
 using CodeSphere.Application.Features.Testcases.Queries.GetTestCasesByProblemId;
 using CodeSphere.Domain.Premitives;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CodeSphere.WebApi.Controllers
 {
+
+    [Authorize(Roles = Roles.Admin)]
+
     public class TestcaseController : BaseController
     {
         [HttpPost]

@@ -30,7 +30,6 @@ namespace CodeSphere.Application.Features.Problem.Commands.SolveProblem
                 .Must((model) => fileService.CheckFileExtension(model.Code, model.Language))
                 .WithMessage("Unsupported language!");
 
-            RuleFor(x => x.UserId).NotEmpty().NotNull();
             RuleFor(x => x.ProblemId).NotEmpty().NotNull();
             RuleFor(x => x.ContestId).NotEmpty().NotNull();
 

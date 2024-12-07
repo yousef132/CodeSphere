@@ -19,6 +19,9 @@ namespace CodeSphere.Infrastructure.Implementation.Repositories
         {
             return _context.Submits.Where(x => x.ProblemId == problemId && x.UserId == userId && x.Result == SubmissionResult.Accepted);
         }
+
+        public IQueryable<Submit> GetUserSolvedProblems(string userId)
+            => _context.Submits.Where(s => s.UserId == userId && s.Result == SubmissionResult.Accepted);
     }
 
 }

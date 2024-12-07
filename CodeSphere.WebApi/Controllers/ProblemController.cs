@@ -4,7 +4,6 @@ using CodeSphere.Application.Features.Problem.Commands.Run;
 using CodeSphere.Application.Features.Problem.Commands.SolveProblem;
 using CodeSphere.Application.Features.Problem.Queries.GetAll;
 using CodeSphere.Application.Features.Problem.Queries.GetById;
-using CodeSphere.Application.Features.Submission.Queries.GetProblemSubmissions;
 using CodeSphere.Domain.Abstractions.Repositories;
 using CodeSphere.Domain.Premitives;
 using CodeSphere.WebApi.Filters;
@@ -25,11 +24,14 @@ namespace CodeSphere.WebApi.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = Roles.Admin)]
+
         public async Task<ActionResult<Response>> CreateProblemAsync([FromBody] CreateProblemCommand command)
          => ResponseResult(await mediator.Send(command));
 
         [HttpPost("solve")]
         [RateLimitingFilter(5)]
+        [Authorize]
 
         public async Task<ActionResult<Response>> SolveProblemAsync([FromForm] SubmitSolutionCommand command)
          => ResponseResult(await mediator.Send(command));
@@ -41,9 +43,10 @@ namespace CodeSphere.WebApi.Controllers
         public async Task<ActionResult<Response>> RunProblemTestcasesAsync([FromForm] RunCodeCommand command)
          => ResponseResult(await mediator.Send(command));
 
-        
+
 
         [HttpDelete("{problemId}")]
+        [Authorize(Roles = Roles.Admin)]
         public async Task<ActionResult<Response>> DeleteProblemAsync([FromRoute] int problemId)
                      => ResponseResult(await mediator.Send(new DeleteProblemCommand(problemId)));
 
@@ -51,7 +54,6 @@ namespace CodeSphere.WebApi.Controllers
         [HttpPost("problems")]
         public async Task<ActionResult<Response>> GetProblemsAsync([FromBody] GetAllProblemsQuery query)
         {
-            query.UserId = GetCurrentUserId();
             return ResponseResult(await mediator.Send(query));
         }
 

@@ -89,8 +89,6 @@ namespace CodeSphere.Infrastructure.Implementation.Services
                 await CreateAndStartContainer(language);
                 for (int i = 0; i < testCases.Count; i++)
                 {
-
-
                     await fileService.CreateTestCasesFile(testCases[i].Input, _requestDirectory);
 
                     await ExecuteCodeInContainer(runTimeLimit, memoryLimit);
@@ -100,9 +98,7 @@ namespace CodeSphere.Infrastructure.Implementation.Services
                     if (result.SubmissionResult != SubmissionResult.Accepted)
                         return result;
 
-
                     maxRunTime = Math.Max(maxRunTime, result.ExecutionTime);
-
                 }
             }
             catch (Exception ex)
@@ -243,12 +239,12 @@ namespace CodeSphere.Infrastructure.Implementation.Services
 
             if (output?.Length > 0)
             {
-                if (output.TrimEnd('\n') != testcaseDto.ExcpectedOutput.TrimEnd('\n'))
+                if (output.TrimEnd('\n') != testcaseDto.ExpectedOutput.TrimEnd('\n'))
                 {
                     return new WrongAnswerResponse
                     {
                         ActualOutput = output,
-                        ExpectedOutput = testcaseDto.ExcpectedOutput,
+                        ExpectedOutput = testcaseDto.ExpectedOutput,
                         SubmissionResult = SubmissionResult.WrongAnswer,
                         Code = code,
                         ExecutionTime = Helper.ExtractExecutionTime(runTime)

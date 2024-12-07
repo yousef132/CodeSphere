@@ -4,11 +4,7 @@ using CodeSphere.Domain.Models.Entities;
 using CodeSphere.Domain.Premitives;
 using MediatR;
 using Microsoft.AspNetCore.Http;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Security.Claims;
 
 namespace CodeSphere.Application.Features.Submission.Queries.GetSubmissionData
 {
@@ -16,26 +12,26 @@ namespace CodeSphere.Application.Features.Submission.Queries.GetSubmissionData
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
-
-        public GetSubmissionDataQueryHandler(IUnitOfWork unitOfWork, IMapper mapper)
+        private readonly IHttpContextAccessor contextAccessor;
+        private string UserId;
+        public GetSubmissionDataQueryHandler(IUnitOfWork unitOfWork, IMapper mapper, IHttpContextAccessor contextAccessor)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
+            this.contextAccessor = contextAccessor;
+            var user = contextAccessor.HttpContext?.User;
+            UserId = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
         }
 
         public async Task<Response> Handle(GetSubmissionDataQuery request, CancellationToken cancellationToken)
         {
-            var sub = await _unitOfWork.Repository<Submit>().GetByIdAsync(request.SubmissionId);
-            if (sub == null)
-            {
-                return await Response.FailureAsync("Submission not found" , System.Net.HttpStatusCode.NotFound);
-            }
-            if(sub.UserId != request.UserId)
-            {
+            var submission = await _unitOfWork.Repository<Submit>().GetByIdAsync(request.SubmissionId);
+            if (submission == null)
+                return await Response.FailureAsync("Submission not found", System.Net.HttpStatusCode.NotFound);
+            if (submission.UserId != UserId)
                 return await Response.FailureAsync("You are not authorized to view this submission", System.Net.HttpStatusCode.Unauthorized);
-            }
-            
-            var mappedSub = _mapper.Map<GetSubmissionDataQueryResponse>(sub);
+
+            var mappedSub = _mapper.Map<GetSubmissionDataQueryResponse>(submission);
             return await Response.SuccessAsync(mappedSub, "Submission fetched successfully", System.Net.HttpStatusCode.OK);
         }
     }
