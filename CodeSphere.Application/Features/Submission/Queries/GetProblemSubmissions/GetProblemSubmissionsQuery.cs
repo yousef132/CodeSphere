@@ -3,8 +3,9 @@ using MediatR;
 
 namespace CodeSphere.Application.Features.Submission.Queries.GetProblemSubmissions
 {
-    public sealed record GetProblemSubmissionsQuery(
-         int ProblemId,
-         string UserId
-     ) : IRequest<Response>;
+    public class GetProblemSubmissionsQuery : IRequest<Response>
+    {
+        public int ProblemId { get; set; }
+        public string UserId { get; set; }
+    }
 }

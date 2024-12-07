@@ -41,9 +41,7 @@ namespace CodeSphere.WebApi.Controllers
         public async Task<ActionResult<Response>> RunProblemTestcasesAsync([FromForm] RunCodeCommand command)
          => ResponseResult(await mediator.Send(command));
 
-        [HttpGet("all-submissions")]
-        public async Task<ActionResult<Response>> GetAllSubmissions([FromQuery] GetProblemSubmissionsQuery query)
-         => ResponseResult(await mediator.Send(query));
+        
 
         [HttpDelete("{problemId}")]
         public async Task<ActionResult<Response>> DeleteProblemAsync([FromRoute] int problemId)

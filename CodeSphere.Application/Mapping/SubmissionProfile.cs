@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using CodeSphere.Application.Features.Submission.Queries.GetProblemSubmissions;
+using CodeSphere.Application.Features.Submission.Queries.GetSubmissionData;
 using CodeSphere.Domain.Models.Entities;
 using System;
 using System.Collections.Generic;
@@ -14,6 +15,7 @@ namespace CodeSphere.Application.Mapping
         public SubmissionProfile()
         {
             CreateMap<Submit, GetProblemSubmissionsQuery>();
+            CreateMap<Submit, GetSubmissionDataQueryResponse>();
         }
     }
 }
