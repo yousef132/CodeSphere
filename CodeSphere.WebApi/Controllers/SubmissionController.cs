@@ -1,4 +1,5 @@
-﻿using CodeSphere.Application.Features.Submission.Queries.GetSubmissionData;
+﻿using CodeSphere.Application.Features.Submission.Queries.GetProblemSubmissions;
+using CodeSphere.Application.Features.Submission.Queries.GetSubmissionData;
 using CodeSphere.Domain.Premitives;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -16,5 +17,12 @@ namespace CodeSphere.WebApi.Controllers
                 SubmissionId = id ,
                 UserId = User.FindFirstValue(ClaimTypes.NameIdentifier)
             }));
+
+        [HttpGet("submissions/{id}")]
+        public async Task<ActionResult<Response>> GetAllSubmissions([FromRoute]int id)
+         => ResponseResult(await mediator.Send(new GetProblemSubmissionsQuery {
+             ProblemId = id ,
+             UserId = User.FindFirstValue(ClaimTypes.NameIdentifier)
+         }));
     }
 }

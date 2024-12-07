@@ -9,10 +9,9 @@ namespace CodeSphere.Application.Features.Submission.Queries.GetProblemSubmissio
 {
     public class GetProblemSubmissionsResponse
     {
-        public decimal SubmitTime { get; set; }
+        public decimal SubmitTime { get; set; }  // run time of the submission 
         public decimal SubmitMemory { get; set; }
         public SubmissionResult Result { get; set; }
-        public string Code { get; set; }
         public DateTime SubmissionDate { get; set; }
         public Language Language { get; set; }
     }
