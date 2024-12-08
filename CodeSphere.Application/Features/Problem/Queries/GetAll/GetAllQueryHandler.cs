@@ -31,17 +31,19 @@ namespace CodeSphere.Application.Features.Problem.Queries.GetAll
             if (problems.IsNullOrEmpty())
                 return await Response.FailureAsync("No Problems Found", HttpStatusCode.NotFound);
 
-            var responses = new List<GetAllQueryResponse>();
-            var submissions = _unitOfWork.SubmissionRepository.GetUserSolvedProblems(UserId);
+            var mappedProblems = _mapper.Map<IReadOnlyList<GetAllQueryResponse>>(problems);
 
-            foreach (var problem in problems)
+
+            if (!string.IsNullOrEmpty(UserId))
             {
-                var mappedSubmission = _mapper.Map<GetAllQueryResponse>(problem);
-                mappedSubmission.IsSolved = submissions.Any(s => s.ProblemId == problem.Id);
-                responses.Add(mappedSubmission);
+                var submissions = _unitOfWork.SubmissionRepository.GetUserAcceptedSubmissions(UserId); // get all accepted submissions for this user
+                foreach (var problem in mappedProblems)
+                {
+                    problem.IsSolved = submissions.Any(s => s.ProblemId == problem.Id);
+                }
             }
+            return await Response.SuccessAsync(mappedProblems, "Problems Found", HttpStatusCode.OK);
 
-            return await Response.SuccessAsync(responses, "Problems Found", HttpStatusCode.OK);
         }
 
     }

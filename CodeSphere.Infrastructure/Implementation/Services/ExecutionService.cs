@@ -171,21 +171,21 @@ namespace CodeSphere.Infrastructure.Implementation.Services
                 };
             }
 
-            if (output?.Length > 0)
+            //if (output?.Length > 0)
+            //{
+            if (output.TrimEnd('\n') != testCase.Output.TrimEnd('\n'))
             {
-                if (output.TrimEnd('\n') != testCase.Output.TrimEnd('\n'))
+                return new WrongAnswerResponse
                 {
-                    return new WrongAnswerResponse
-                    {
-                        TestCaseNumber = testCase.Id,
-                        ActualOutput = output,
-                        ExpectedOutput = testCase.Output,
-                        SubmissionResult = SubmissionResult.WrongAnswer,
-                        Code = code,
-                        ExecutionTime = Helper.ExtractExecutionTime(runTime)
-                    };
-                }
+                    TestCaseNumber = testCase.Id,
+                    ActualOutput = output,
+                    ExpectedOutput = testCase.Output,
+                    SubmissionResult = SubmissionResult.WrongAnswer,
+                    Code = code,
+                    ExecutionTime = Helper.ExtractExecutionTime(runTime)
+                };
             }
+            // }
             return new AcceptedResponse
             {
                 Code = code,
@@ -237,20 +237,20 @@ namespace CodeSphere.Infrastructure.Implementation.Services
                 };
             }
 
-            if (output?.Length > 0)
+            // if (output?.Length > 0)
+            // {
+            if (output.TrimEnd('\n') != testcaseDto.ExpectedOutput.TrimEnd('\n'))
             {
-                if (output.TrimEnd('\n') != testcaseDto.ExpectedOutput.TrimEnd('\n'))
+                return new WrongAnswerResponse
                 {
-                    return new WrongAnswerResponse
-                    {
-                        ActualOutput = output,
-                        ExpectedOutput = testcaseDto.ExpectedOutput,
-                        SubmissionResult = SubmissionResult.WrongAnswer,
-                        Code = code,
-                        ExecutionTime = Helper.ExtractExecutionTime(runTime)
-                    };
-                }
+                    ActualOutput = output,
+                    ExpectedOutput = testcaseDto.ExpectedOutput,
+                    SubmissionResult = SubmissionResult.WrongAnswer,
+                    Code = code,
+                    ExecutionTime = Helper.ExtractExecutionTime(runTime)
+                };
             }
+            //  }
             return new AcceptedResponse
             {
                 Code = code,

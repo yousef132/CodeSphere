@@ -50,7 +50,7 @@ namespace CodeSphere.WebApi.Controllers
         public async Task<ActionResult<Response>> DeleteProblemAsync([FromRoute] int problemId)
                      => ResponseResult(await mediator.Send(new DeleteProblemCommand(problemId)));
 
-        [Authorize]
+        //[Authorize]
         [HttpPost("problems")]
         public async Task<ActionResult<Response>> GetProblemsAsync([FromBody] GetAllProblemsQuery query)
         {
@@ -65,7 +65,7 @@ namespace CodeSphere.WebApi.Controllers
         //}
 
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetProblemDetails([FromRoute] int id, string userId)
-            => ResponseResult(await mediator.Send(new GetByIdQuery(id, userId)));
+        public async Task<IActionResult> GetProblemDetails([FromRoute] int id)
+            => ResponseResult(await mediator.Send(new GetByIdQuery(id)));
     }
 }

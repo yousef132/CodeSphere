@@ -47,9 +47,12 @@ namespace CodeSphere.Application.Features.Problem.Queries.GetById
 
             response.Submissions = _unitOfWork.ProblemRepository.GetSubmissionsProblemCount(request.ProblemId);
 
-            // Check if the user has solved the problem
-            response.IsSolved = _unitOfWork.ProblemRepository.CheckUserSolvedProblem(
-                request.ProblemId, UserId, cancellationToken);
+            if (!string.IsNullOrEmpty(UserId))
+            {
+                // Check if the user has solved the problem
+                response.IsSolved = _unitOfWork.ProblemRepository.CheckUserSolvedProblem(
+                    request.ProblemId, UserId, cancellationToken);
+            }
 
             // Return the success response
             return await Response.SuccessAsync(response, "Problem Found", HttpStatusCode.OK);

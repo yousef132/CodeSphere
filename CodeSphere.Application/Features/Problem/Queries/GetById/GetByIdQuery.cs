@@ -7,7 +7,7 @@ namespace CodeSphere.Application.Features.Problem.Queries.GetById
     {
         public int ProblemId { get; set; }
 
-        public GetByIdQuery(int problemId, string userId)
+        public GetByIdQuery(int problemId)
         {
             ProblemId = problemId;
         }
