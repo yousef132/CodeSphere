@@ -15,7 +15,7 @@ namespace CodeSphere.Application.Mapping
             CreateMap<Problem, CreateProblemCommandResponse>();
             CreateMap<ProblemDocument, GetAllQueryResponse>();
             CreateMap<Problem, GetByIdQueryResponse>()
-                .ForMember(d => d.TasteCases, O => O.MapFrom(S => S.Testcases))
+                .ForMember(d => d.TestCases, O => O.MapFrom(S => S.Testcases))
                 .ForMember(d => d.Topics, O => O.MapFrom(S => S.ProblemTopics));
 
 
