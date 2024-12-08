@@ -8,5 +8,5 @@ namespace CodeSphere.Application.Features.Testcases.Commands.Update
         int TestcaseId,
         int ProblemId,
         string Input,
-        string Output) : IRequest<Response>;
+        string expectedOutput) : IRequest<Response>;
 }

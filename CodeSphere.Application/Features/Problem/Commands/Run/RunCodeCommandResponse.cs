@@ -2,15 +2,15 @@
 {
     public class RunCodeCommandResponse
     {
-        public RunCodeCommandResponse(string input, string output, bool passed)
+        public RunCodeCommandResponse(string input, string expectedOutput, bool passed)
         {
             Input = input;
-            Output = output;
+            this.expectedOutput = expectedOutput;
             Passed = passed;
         }
 
         public string Input { get; set; }
-        public string Output { get; set; }
+        public string expectedOutput { get; set; }
         public bool Passed { get; set; }
 
     }

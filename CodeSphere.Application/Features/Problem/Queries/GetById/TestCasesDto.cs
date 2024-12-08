@@ -3,7 +3,7 @@
 	public class TestCasesDto
 	{
 		public string Input { get; set; }
-		public string Output { get; set; }
+		public string ExpectedOutput { get; set; }
 
 	}
 }

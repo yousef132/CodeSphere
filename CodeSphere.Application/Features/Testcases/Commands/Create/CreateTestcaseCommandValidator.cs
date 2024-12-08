@@ -13,7 +13,7 @@ namespace CodeSphere.Application.Features.Testcase.Commands.Create
                 .NotEmpty().WithMessage("Input is required.")
                 .MinimumLength(1).WithMessage("Input must be at least 1 character long.");
 
-            RuleFor(x => x.Output)
+            RuleFor(x => x.expectedOutput)
                 .NotEmpty().WithMessage("Expected output is required.")
                 .MinimumLength(1).WithMessage("Output must be at least 1 character long.");
         }
