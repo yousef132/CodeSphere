@@ -36,11 +36,9 @@ namespace CodeSphere.Application.Features.Problem.Queries.GetAll
 
             if (!string.IsNullOrEmpty(UserId))
             {
-                var submissions = _unitOfWork.SubmissionRepository.GetUserAcceptedSubmissions(UserId); // get all accepted submissions for this user
+                var submissions = await _unitOfWork.SubmissionRepository.GetUserAcceptedSubmissionIdsAsync(UserId); // get all accepted submissions for this user
                 foreach (var problem in mappedProblems)
-                {
-                    problem.IsSolved = submissions.Any(s => s.ProblemId == problem.Id);
-                }
+                    problem.IsSolved = submissions.Contains(problem.Id);
             }
             return await Response.SuccessAsync(mappedProblems, "Problems Found", HttpStatusCode.OK);
 

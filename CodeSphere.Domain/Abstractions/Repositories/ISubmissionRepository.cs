@@ -6,7 +6,7 @@ namespace CodeSphere.Domain.Abstractions.Repositories
     {
         Task<IQueryable<Submit>> GetAllSubmissions(int problemId, string userId);
         IQueryable<Submit> GetSolvedSubmissions(int problemId, string userId);
-        IQueryable<Submit> GetUserAcceptedSubmissions(string userId);
+        Task<HashSet<int>> GetUserAcceptedSubmissionIdsAsync(string userId);
 
     }
 
