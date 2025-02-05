@@ -26,13 +26,16 @@ namespace CodeSphere.Application.Mapping
 
 
 
-			CreateMap<Testcase, TestCasesDto>();
+            CreateMap<Testcase, TestCasesDto>()
+                .ForMember(d => d.ExpectedOutput, O => O.MapFrom(S => S.Output));
 
 
-								
 
 
 
-		}
-	}
+
+
+
+        }
+    }
 }
