@@ -39,14 +39,14 @@ namespace CodeSphere.Infrastructure.Implementation.Repositories
             return response.IsValid;
         }
 
-        public async Task<IEnumerable<ProblemDocument>> SearchProblemsAsync(string? searchText, List<int>? topics, Difficulty? difficulty)
+        public async Task<IEnumerable<ProblemDocument>> SearchProblemsAsync(string? searchText, List<int>? topics, Difficulty? difficulty, int pageNumber = 1, int pageSize = 10)
         {
             #region nest
 
             var fuzzySearchResponse = _elasticClient.Search<ProblemDocument>(s => s
                                  .Index(ElasticSearchIndexes.Problems)
-                                 .From(0)
-                                 .Size(100)
+                                 .From((pageNumber - 1) * pageSize)
+                                 .Size(pageSize)
                                  .Query(q => q
                                      .Bool(b => b
                                          .Must(

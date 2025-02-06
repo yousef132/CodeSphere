@@ -26,7 +26,7 @@ namespace CodeSphere.Application.Features.Problem.Queries.GetAll
         }
         public async Task<Response> Handle(GetAllProblemsQuery request, CancellationToken cancellationToken)
         {
-            var problems = await _unitOfWork.ElasticSearchRepository.SearchProblemsAsync(request.ProblemName, request.TopicsIds, request.Difficulty);
+            var problems = await _unitOfWork.ElasticSearchRepository.SearchProblemsAsync(request.ProblemName, request.TopicsIds, request.Difficulty, request.PageNumber, request.PageSize);
 
             if (problems.IsNullOrEmpty())
                 return await Response.FailureAsync("No Problems Found", HttpStatusCode.NotFound);
