@@ -156,7 +156,7 @@ namespace CodeSphere.Infrastructure.Implementation.Services
                     Message = runTimeError,
                     SubmissionResult = SubmissionResult.RunTimeError,
                     TestCaseNumber = testCase.Id,
-                    ExecutionTime = Helper.ExtractExecutionTime(runTime)
+                    ExecutionTime = 0
                 };
             }
 
