@@ -93,7 +93,7 @@ namespace CodeSphere.Infrastructure.Implementation.Services
 
                     await ExecuteCodeInContainer(runTimeLimit, memoryLimit);
 
-                    var result = await CalculateResult(testCases[i], runTimeLimit, code);
+                    var result = await CalculateResult(testCases[i], runTimeLimit, code, i + 1);
 
                     if (result.SubmissionResult != SubmissionResult.Accepted)
                         return result;
@@ -122,12 +122,11 @@ namespace CodeSphere.Infrastructure.Implementation.Services
             return new AcceptedResponse
             {
                 ExecutionTime = maxRunTime,
-                Code = code,
             };
 
         }
         //TODO : use strategy patter instead of this function
-        private async Task<BaseSubmissionResponse> CalculateResult(Testcase testCase, decimal runTimeLimit, string code)
+        private async Task<BaseSubmissionResponse> CalculateResult(Testcase testCase, decimal runTimeLimit, string code, int testcaseNumber)
         {
             string output = await fileService.ReadFileAsync(outputFile);
             string error = await fileService.ReadFileAsync(errorFile);
@@ -143,7 +142,6 @@ namespace CodeSphere.Infrastructure.Implementation.Services
                 {
                     Message = error,
                     SubmissionResult = SubmissionResult.CompilationError,
-                    Code = code,
                     ExecutionTime = 0m
                 };
             }
@@ -152,10 +150,9 @@ namespace CodeSphere.Infrastructure.Implementation.Services
             {
                 return new RunTimeErrorResponse
                 {
-                    Code = code,
                     Message = runTimeError,
                     SubmissionResult = SubmissionResult.RunTimeError,
-                    TestCaseNumber = testCase.Id,
+                    NumberOfPassedTestCases = testcaseNumber - 1,
                     ExecutionTime = 0
                 };
             }
@@ -164,10 +161,9 @@ namespace CodeSphere.Infrastructure.Implementation.Services
             {
                 return new TimeLimitExceedResponse
                 {
-                    TestCaseNumber = testCase.Id,
+                    NumberOfPassedTestCases = testcaseNumber - 1,
                     ExecutionTime = runTimeLimit,
-                    SubmissionResult = SubmissionResult.TimeLimitExceeded,
-                    Code = code
+                    SubmissionResult = SubmissionResult.TimeLimitExceeded
                 };
             }
 
@@ -177,18 +173,17 @@ namespace CodeSphere.Infrastructure.Implementation.Services
             {
                 return new WrongAnswerResponse
                 {
-                    TestCaseNumber = testCase.Id,
+                    NumberOfPassedTestCases = testcaseNumber - 1,
                     ActualOutput = output,
                     ExpectedOutput = testCase.Output,
                     SubmissionResult = SubmissionResult.WrongAnswer,
-                    Code = code,
                     ExecutionTime = Helper.ExtractExecutionTime(runTime)
                 };
             }
             // }
             return new AcceptedResponse
             {
-                Code = code,
+                NumberOfPassedTestCases = testcaseNumber,
                 ExecutionTime = Helper.ExtractExecutionTime(runTime),
                 ExecutionMemory = 3m,
             };
@@ -211,7 +206,6 @@ namespace CodeSphere.Infrastructure.Implementation.Services
                 {
                     Message = error,
                     SubmissionResult = SubmissionResult.CompilationError,
-                    Code = code,
                     ExecutionTime = 0m
                 };
             }
@@ -220,7 +214,6 @@ namespace CodeSphere.Infrastructure.Implementation.Services
             {
                 return new RunTimeErrorResponse
                 {
-                    Code = code,
                     Message = runTimeError,
                     SubmissionResult = SubmissionResult.RunTimeError,
                     ExecutionTime = Helper.ExtractExecutionTime(runTime)
@@ -233,7 +226,6 @@ namespace CodeSphere.Infrastructure.Implementation.Services
                 {
                     ExecutionTime = runTimeLimit,
                     SubmissionResult = SubmissionResult.TimeLimitExceeded,
-                    Code = code
                 };
             }
 
@@ -246,14 +238,12 @@ namespace CodeSphere.Infrastructure.Implementation.Services
                     ActualOutput = output,
                     ExpectedOutput = testcaseDto.ExpectedOutput,
                     SubmissionResult = SubmissionResult.WrongAnswer,
-                    Code = code,
                     ExecutionTime = Helper.ExtractExecutionTime(runTime)
                 };
             }
             //  }
             return new AcceptedResponse
             {
-                Code = code,
                 ExecutionTime = Helper.ExtractExecutionTime(runTime),
                 ExecutionMemory = 3m,
             };
