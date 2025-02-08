@@ -1,0 +1,15 @@
+﻿using CodeSphere.Application.Features.Topic.Queries.GetAll;
+using CodeSphere.Domain.Premitives;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+
+namespace CodeSphere.WebApi.Controllers
+{
+    public class TopicController : BaseController
+    {
+        [HttpGet]
+        public async Task<ActionResult<Response>> GetTopics() 
+            => Ok(await mediator.Send(new GetAllTopicsQuery()));
+
+    }
+}
