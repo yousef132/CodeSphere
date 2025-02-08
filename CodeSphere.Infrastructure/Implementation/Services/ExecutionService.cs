@@ -152,9 +152,9 @@ namespace CodeSphere.Infrastructure.Implementation.Services
                 {
                     Message = runTimeError,
                     SubmissionResult = SubmissionResult.RunTimeError,
+                    Input = input,
                     NumberOfPassedTestCases = testcaseNumber - 1,
-                    ExecutionTime = 0,
-                    Input = input
+                    ExecutionTime = 0
                 };
             }
 
@@ -162,10 +162,10 @@ namespace CodeSphere.Infrastructure.Implementation.Services
             {
                 return new TimeLimitExceedResponse
                 {
+                    Input = input,
                     NumberOfPassedTestCases = testcaseNumber - 1,
                     ExecutionTime = runTimeLimit,
-                    SubmissionResult = SubmissionResult.TimeLimitExceeded,
-                    Input = input
+                    SubmissionResult = SubmissionResult.TimeLimitExceeded
                 };
             }
 
@@ -177,10 +177,10 @@ namespace CodeSphere.Infrastructure.Implementation.Services
                 {
                     NumberOfPassedTestCases = testcaseNumber - 1,
                     ActualOutput = output,
+                    Input = input,
                     ExpectedOutput = testCase.Output,
                     SubmissionResult = SubmissionResult.WrongAnswer,
-                    ExecutionTime = Helper.ExtractExecutionTime(runTime),
-                    Input = input
+                    ExecutionTime = Helper.ExtractExecutionTime(runTime)
                 };
             }
             // }
