@@ -9,5 +9,6 @@ namespace CodeSphere.Domain.Responses.SubmissionResponses
         public DateTime SubmissionDate { get; set; } = DateTime.UtcNow;
         public SubmissionResult SubmissionResult { get; set; } = SubmissionResult.Accepted;
         public int NumberOfPassedTestCases { get; set; }
+        public string Input { get; set; } = string.Empty;
     }
 }
