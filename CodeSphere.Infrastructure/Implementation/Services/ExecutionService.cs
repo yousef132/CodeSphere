@@ -93,7 +93,7 @@ namespace CodeSphere.Infrastructure.Implementation.Services
 
                     await ExecuteCodeInContainer(runTimeLimit, memoryLimit);
 
-                    var result = await CalculateResult(testCases[i], runTimeLimit, code);
+                    var result = await CalculateResult(testCases[i], runTimeLimit, code, i + 1);
 
                     if (result.SubmissionResult != SubmissionResult.Accepted)
                         return result;
@@ -127,7 +127,7 @@ namespace CodeSphere.Infrastructure.Implementation.Services
 
         }
         //TODO : use strategy patter instead of this function
-        private async Task<BaseSubmissionResponse> CalculateResult(Testcase testCase, decimal runTimeLimit, string code)
+        private async Task<BaseSubmissionResponse> CalculateResult(Testcase testCase, decimal runTimeLimit, string code, int testcaseNumber)
         {
             string output = await fileService.ReadFileAsync(outputFile);
             string error = await fileService.ReadFileAsync(errorFile);
@@ -155,7 +155,7 @@ namespace CodeSphere.Infrastructure.Implementation.Services
                     Code = code,
                     Message = runTimeError,
                     SubmissionResult = SubmissionResult.RunTimeError,
-                    TestCaseNumber = testCase.Id,
+                    NumberOfPassedTestCases = testcaseNumber - 1,
                     ExecutionTime = 0
                 };
             }
@@ -164,7 +164,7 @@ namespace CodeSphere.Infrastructure.Implementation.Services
             {
                 return new TimeLimitExceedResponse
                 {
-                    TestCaseNumber = testCase.Id,
+                    NumberOfPassedTestCases = testcaseNumber - 1,
                     ExecutionTime = runTimeLimit,
                     SubmissionResult = SubmissionResult.TimeLimitExceeded,
                     Code = code
@@ -177,7 +177,7 @@ namespace CodeSphere.Infrastructure.Implementation.Services
             {
                 return new WrongAnswerResponse
                 {
-                    TestCaseNumber = testCase.Id,
+                    NumberOfPassedTestCases = testcaseNumber - 1,
                     ActualOutput = output,
                     ExpectedOutput = testCase.Output,
                     SubmissionResult = SubmissionResult.WrongAnswer,
@@ -188,6 +188,7 @@ namespace CodeSphere.Infrastructure.Implementation.Services
             // }
             return new AcceptedResponse
             {
+                NumberOfPassedTestCases = testcaseNumber,
                 Code = code,
                 ExecutionTime = Helper.ExtractExecutionTime(runTime),
                 ExecutionMemory = 3m,
