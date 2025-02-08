@@ -93,7 +93,7 @@ namespace CodeSphere.Infrastructure.Implementation.Services
 
                     await ExecuteCodeInContainer(runTimeLimit, memoryLimit);
 
-                    var result = await CalculateResult(testCases[i], runTimeLimit, code, i + 1);
+                    var result = await CalculateResult(testCases[i], runTimeLimit, code, i + 1, testCases[i].Input);
 
                     if (result.SubmissionResult != SubmissionResult.Accepted)
                         return result;
@@ -126,7 +126,7 @@ namespace CodeSphere.Infrastructure.Implementation.Services
 
         }
         //TODO : use strategy patter instead of this function
-        private async Task<BaseSubmissionResponse> CalculateResult(Testcase testCase, decimal runTimeLimit, string code, int testcaseNumber)
+        private async Task<BaseSubmissionResponse> CalculateResult(Testcase testCase, decimal runTimeLimit, string code, int testcaseNumber, string input)
         {
             string output = await fileService.ReadFileAsync(outputFile);
             string error = await fileService.ReadFileAsync(errorFile);
@@ -152,6 +152,7 @@ namespace CodeSphere.Infrastructure.Implementation.Services
                 {
                     Message = runTimeError,
                     SubmissionResult = SubmissionResult.RunTimeError,
+                    Input = input,
                     NumberOfPassedTestCases = testcaseNumber - 1,
                     ExecutionTime = 0
                 };
@@ -161,6 +162,7 @@ namespace CodeSphere.Infrastructure.Implementation.Services
             {
                 return new TimeLimitExceedResponse
                 {
+                    Input = input,
                     NumberOfPassedTestCases = testcaseNumber - 1,
                     ExecutionTime = runTimeLimit,
                     SubmissionResult = SubmissionResult.TimeLimitExceeded
@@ -175,6 +177,7 @@ namespace CodeSphere.Infrastructure.Implementation.Services
                 {
                     NumberOfPassedTestCases = testcaseNumber - 1,
                     ActualOutput = output,
+                    Input = input,
                     ExpectedOutput = testCase.Output,
                     SubmissionResult = SubmissionResult.WrongAnswer,
                     ExecutionTime = Helper.ExtractExecutionTime(runTime)
