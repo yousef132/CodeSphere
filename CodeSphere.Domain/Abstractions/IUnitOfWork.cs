@@ -9,6 +9,7 @@ namespace CodeSphere.Domain.Abstractions
         IElasticSearchRepository ElasticSearchRepository { get; }
         IProblemRepository ProblemRepository { get; }
         ISubmissionRepository SubmissionRepository { get; }
+        ITopicRepository TopicRepository { get; }
         Task<int> CompleteAsync();
     }
 }

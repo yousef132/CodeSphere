@@ -3,6 +3,7 @@ using CodeSphere.Domain.Abstractions;
 using CodeSphere.Domain.Premitives;
 using MediatR;
 using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Net;
 using System.Security.Claims;
@@ -16,6 +17,7 @@ namespace CodeSphere.Application.Features.Problem.Queries.GetAll
         private readonly IHttpContextAccessor contextAccessor;
         private string UserId;
 
+
         public GetAllQueryHandler(IUnitOfWork unitOfWork, IMapper mapper, IHttpContextAccessor contextAccessor)
         {
             _unitOfWork = unitOfWork;
@@ -26,7 +28,11 @@ namespace CodeSphere.Application.Features.Problem.Queries.GetAll
         }
         public async Task<Response> Handle(GetAllProblemsQuery request, CancellationToken cancellationToken)
         {
-            var problems = await _unitOfWork.ElasticSearchRepository.SearchProblemsAsync(request.ProblemName, request.TopicsIds, request.Difficulty, request.PageNumber, request.PageSize);
+            var topicsIds = await _unitOfWork.TopicRepository
+                .GetTopicIDsByNamesAsync(request.TopicsNames);
+
+
+            var problems = await _unitOfWork.ElasticSearchRepository.SearchProblemsAsync(request.ProblemName, topicsIds, request.Difficulty, request.PageNumber, request.PageSize);
 
             if (problems.IsNullOrEmpty())
                 return await Response.FailureAsync("No Problems Found", HttpStatusCode.NotFound);
