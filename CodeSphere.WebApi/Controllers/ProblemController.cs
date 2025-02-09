@@ -53,7 +53,7 @@ namespace CodeSphere.WebApi.Controllers
 
         [HttpGet]
         public async Task<ActionResult<Response>> GetProblemsAsync(
-            [FromQuery] List<int>? topicsIds,
+            [FromQuery] List<string>? topicsIds,
             [FromQuery] string? problemName,
             [FromQuery] Difficulty? difficulty,
             [FromQuery] int pageNumber = 1,

@@ -13,6 +13,8 @@ namespace CodeSphere.Domain.Abstractions.Repositories
         Task<IEnumerable<T>> GetAllAsync();
 
         Task<IEnumerable<T>> GetWhereAsync(Expression<Func<T, bool>> predicate);
+        IQueryable<T> Where(Expression<Func<T, bool>> predicate);
+        IQueryable<TResult> Select<TResult>(Expression<Func<T, TResult>> selector);
 
         Task SaveChangesAsync();
 

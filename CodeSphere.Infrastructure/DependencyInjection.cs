@@ -33,6 +33,7 @@ namespace CodeSphere.Infrastructure
             services.AddScoped(typeof(IFileService), typeof(FileService));
             services.AddScoped(typeof(IEmailService), typeof(EmailService));
             services.AddScoped(typeof(IElasticSearchRepository), typeof(ElasticSearchRepository));
+            services.AddScoped(typeof(ITopicRepository), typeof(TopicRepository));
 
 
             #endregion

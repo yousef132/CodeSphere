@@ -15,18 +15,19 @@ namespace CodeSphere.Infrastructure.Implementation
 
         public IProblemRepository ProblemRepository { get; }
         public ISubmissionRepository SubmissionRepository { get; }
-
+        public ITopicRepository TopicRepository { get; }
         public UnitOfWork(ApplicationDbContext context,
             IElasticSearchRepository elasticSearchRepository,
             IProblemRepository problemRepository,
-            ISubmissionRepository submissionRepository)
+            ISubmissionRepository submissionRepository,
+            ITopicRepository topicRepository)
         {
             this.context = context;
             _repositories = new Hashtable();
             ElasticSearchRepository = elasticSearchRepository;
             ProblemRepository = problemRepository;
             SubmissionRepository = submissionRepository;
-
+            TopicRepository = topicRepository;
         }
         
 

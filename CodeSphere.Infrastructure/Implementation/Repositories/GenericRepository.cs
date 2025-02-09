@@ -50,6 +50,16 @@ namespace CodeSphere.Infrastructure.Implementation.Repositories
             return await context.Set<T>().Where(predicate).ToListAsync();
         }
 
+        public IQueryable<T> Where(Expression<Func<T, bool>> predicate)  // this allow further chaining (e.g., Select(), OrderBy(), etc.) before execution.
+        {
+            return context.Set<T>().Where(predicate);
+        }
+
+        public IQueryable<TResult> Select<TResult>(Expression<Func<T, TResult>> selector)
+        {
+            return context.Set<T>().Select(selector);
+        }
+
 
         public IQueryable<T> GetTableAsTracked() => context.Set<T>().AsQueryable();
 
