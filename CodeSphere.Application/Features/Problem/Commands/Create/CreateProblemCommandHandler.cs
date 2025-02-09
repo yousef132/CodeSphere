@@ -28,10 +28,10 @@ namespace CodeSphere.Application.Features.Problem.Commands.Create
             if (contest == null)
                 return await Response.FailureAsync("Contest Not Found!!", System.Net.HttpStatusCode.NotFound);
 
-            Topic currentTopic = default;
+            Domain.Models.Entities.Topic currentTopic = default;
             foreach (var topic in request.Topics)
             {
-                currentTopic = await unitOfWork.Repository<Topic>().GetByIdAsync(topic);
+                currentTopic = await unitOfWork.Repository<Domain.Models.Entities.Topic>().GetByIdAsync(topic);
                 if (currentTopic == null)
                     return await Response.FailureAsync($"Topic {topic} Not Found !!", System.Net.HttpStatusCode.NotFound);
             }

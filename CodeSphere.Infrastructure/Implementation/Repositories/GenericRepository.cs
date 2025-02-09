@@ -63,6 +63,9 @@ namespace CodeSphere.Infrastructure.Implementation.Repositories
         public async Task UpdateRangeAsync(ICollection<T> entities)
             => context.Set<T>().UpdateRange(entities);
 
+        public async Task<bool> AnyAsync(Expression<Func<T, bool>> predicate)
+            => await context.Set<T>().AnyAsync(predicate);
+
         #endregion
     }
 }
