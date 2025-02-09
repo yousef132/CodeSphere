@@ -24,6 +24,7 @@ namespace CodeSphere.Domain.Abstractions.Repositories
         Task AddAsync(T entity);
         Task AddRangeAsync(ICollection<T> entities);
         Task UpdateAsync(T entity);
+        Task<bool> AnyAsync(Expression<Func<T, bool>> predicate);
 
         Task UpdateRangeAsync(ICollection<T> entities);
         void Commit();
