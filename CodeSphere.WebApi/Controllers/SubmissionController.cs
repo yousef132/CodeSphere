@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace CodeSphere.WebApi.Controllers
 {
     [Authorize]
-
+    [Route("Submissions")]
     public class SubmissionController : BaseController
     {
         [HttpGet("{id}")]
@@ -15,7 +15,7 @@ namespace CodeSphere.WebApi.Controllers
         public async Task<ActionResult<Response>> GetSubmissionData([FromRoute] int id)
             => ResponseResult(await mediator.Send(new GetSubmissionDataQuery(id)));
 
-        [HttpGet("submissions/{id}")]
+        [HttpGet("Problem/{id}")]
 
         public async Task<ActionResult<Response>> GetAllSubmissions([FromRoute] int id)
          => ResponseResult(await mediator.Send(new GetProblemSubmissionsQuery(id)));

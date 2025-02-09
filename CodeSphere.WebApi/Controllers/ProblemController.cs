@@ -13,7 +13,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace CodeSphere.WebApi.Controllers
 {
-
+    [Route("Problems")]
     public class ProblemController : BaseController
     {
 
@@ -53,13 +53,13 @@ namespace CodeSphere.WebApi.Controllers
 
         [HttpGet]
         public async Task<ActionResult<Response>> GetProblemsAsync(
-            [FromQuery] List<string>? topicsIds,
+            [FromQuery] List<string>? TopicsNames,
             [FromQuery] string? problemName,
             [FromQuery] Difficulty? difficulty,
             [FromQuery] int pageNumber = 1,
             [FromQuery] int pageSize = 10)
         {
-            var query = new GetAllProblemsQuery(null, topicsIds, problemName, difficulty, pageNumber, pageSize);
+            var query = new GetAllProblemsQuery(null, TopicsNames, problemName, difficulty, pageNumber, pageSize);
             return ResponseResult(await mediator.Send(query));
         }
 
