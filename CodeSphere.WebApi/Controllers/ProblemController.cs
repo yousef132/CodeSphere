@@ -5,6 +5,7 @@ using CodeSphere.Application.Features.Problem.Commands.SolveProblem;
 using CodeSphere.Application.Features.Problem.Queries.GetAll;
 using CodeSphere.Application.Features.Problem.Queries.GetById;
 using CodeSphere.Domain.Abstractions.Repositories;
+using CodeSphere.Domain.Models.Entities;
 using CodeSphere.Domain.Premitives;
 using CodeSphere.WebApi.Filters;
 using Microsoft.AspNetCore.Authorization;
@@ -50,12 +51,18 @@ namespace CodeSphere.WebApi.Controllers
         public async Task<ActionResult<Response>> DeleteProblemAsync([FromRoute] int problemId)
                      => ResponseResult(await mediator.Send(new DeleteProblemCommand(problemId)));
 
-        //[Authorize]
-        [HttpPost("problems")]
-        public async Task<ActionResult<Response>> GetProblemsAsync([FromBody] GetAllProblemsQuery query)
+        [HttpGet]
+        public async Task<ActionResult<Response>> GetProblemsAsync(
+            [FromQuery] List<int>? topicsIds,
+            [FromQuery] string? problemName,
+            [FromQuery] Difficulty? difficulty,
+            [FromQuery] int pageNumber = 1,
+            [FromQuery] int pageSize = 10)
         {
+            var query = new GetAllProblemsQuery(null, topicsIds, problemName, difficulty, pageNumber, pageSize);
             return ResponseResult(await mediator.Send(query));
         }
+
 
 
         //[HttpGet("{name}")]
