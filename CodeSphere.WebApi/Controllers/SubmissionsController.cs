@@ -7,8 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace CodeSphere.WebApi.Controllers
 {
     [Authorize]
-    [Route("Submissions")]
-    public class SubmissionController : BaseController
+    public class SubmissionsController : BaseController
     {
         [HttpGet("{id}")]
 
