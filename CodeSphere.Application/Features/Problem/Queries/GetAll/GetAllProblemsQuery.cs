@@ -15,22 +15,22 @@ namespace CodeSphere.Application.Features.Problem.Queries.GetAll
         
         
         // status : AC , Attempted, Not Attempted
-         public string? Status { get; set; }
+         public Domain.Models.Entities.Status? Status { get; set; }
 
         // sortBy : Name, Difficulty, acceptanceRate, 
-        public string? SortBy { get; set; }
+        public SortBy? SortBy { get; set; }
 
         // order : asc, desc
-        public string? Order { get; set; }
+        public Order? Order { get; set; }
         public GetAllProblemsQuery(string? userId,
             List<string>? topicsNames,
             string? problemName,
             Difficulty? difficulty,
             int pageNumber,
             int pageSize,
-            string status,
-            string sortBy,
-            string? order)
+            Domain.Models.Entities.Status? status,
+            SortBy? sortBy,
+            Order? order)
         {
             // UserId = userId;
             TopicsNames = topicsNames;

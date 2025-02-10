@@ -56,10 +56,21 @@ namespace CodeSphere.WebApi.Controllers
             [FromQuery] List<string>? TopicsNames,
             [FromQuery] string? problemName,
             [FromQuery] Difficulty? difficulty,
-            [FromQuery] int pageNumber = 1,
-            [FromQuery] int pageSize = 10)
+            [FromQuery] Domain.Models.Entities.Status? status,
+            [FromQuery] SortBy? sortBy,
+            [FromQuery] Order? order,
+            [FromQuery] int pageNumber,
+            [FromQuery] int pageSize)
         {
-            var query = new GetAllProblemsQuery(null, TopicsNames, problemName, difficulty, pageNumber, pageSize);
+            var query = new GetAllProblemsQuery(null,
+                TopicsNames,
+                problemName,
+                difficulty,
+                pageNumber,
+                pageSize,
+                status,
+                sortBy,
+                order);
             return ResponseResult(await mediator.Send(query));
         }
 
