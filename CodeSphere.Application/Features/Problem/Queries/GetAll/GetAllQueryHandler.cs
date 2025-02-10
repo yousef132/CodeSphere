@@ -48,14 +48,39 @@ namespace CodeSphere.Application.Features.Problem.Queries.GetAll
             var mappedProblems = _mapper.Map<IReadOnlyList<GetAllQueryResponse>>(problems);
 
 
-            if (!string.IsNullOrEmpty(UserId))
+            var status = request.Status;
+            if (status is not null)
             {
-                var submissions = await _unitOfWork.SubmissionRepository.GetUserAcceptedSubmissionIdsAsync(UserId); // get all accepted submissions for this user
-                foreach (var problem in mappedProblems)
-                    problem.IsSolved = submissions.Contains(problem.Id);
+                var allSubmissions = await _unitOfWork.SubmissionRepository.GetUserSubmissionsAsync(UserId);
+                if (status == ProblemStatus.Solved)
+                {
+                    mappedProblems = mappedProblems
+                        .Where(p => allSubmissions.Any(s => s.Key == p.Id && s.Value == SubmissionResult.Accepted))
+                        .ToList();
+                } 
+                else if (status == ProblemStatus.Attempted)
+                {
+                    mappedProblems = mappedProblems
+                        .Where(p => !allSubmissions.Any(s => s.Key == p.Id))
+                        .ToList();
+                }
+                else
+                {
+                    mappedProblems = mappedProblems
+                        .Where(p => allSubmissions.Any(s => s.Key == p.Id && s.Value != SubmissionResult.Accepted))
+                        .ToList();
+                }
             }
 
-            return await Response.SuccessAsync(mappedProblems, "Problems Found", HttpStatusCode.OK);
+            if (!string.IsNullOrEmpty(UserId))
+            {
+                var acceptedSubmissions = await _unitOfWork.SubmissionRepository.GetUserAcceptedSubmissionIdsAsync(UserId); // get all accepted submissions for this user
+                foreach (var problem in mappedProblems)
+                    problem.IsSolved = acceptedSubmissions.Contains(problem.Id);
+            }
+
+            int totalNumberOfpages = Math.Max(1, mappedProblems.Count / request.PageSize);
+            return await Response.SuccessAsync(new { totalNumberOfpages, mappedProblems}, "Problems Found", HttpStatusCode.OK);
 
         }
 

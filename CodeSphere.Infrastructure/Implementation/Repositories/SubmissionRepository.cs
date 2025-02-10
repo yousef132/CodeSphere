@@ -1,5 +1,6 @@
 ﻿using CodeSphere.Domain.Abstractions.Repositories;
 using CodeSphere.Domain.Models.Entities;
+using CodeSphere.Domain.Premitives;
 using CodeSphere.Infrastructure.Context;
 using Microsoft.EntityFrameworkCore;
 
@@ -28,6 +29,30 @@ namespace CodeSphere.Infrastructure.Implementation.Repositories
                         .Select(s => s.ProblemId).ToListAsync();
 
             return new HashSet<int>(problemIds);
+        }
+
+        public async Task<Dictionary<int, SubmissionResult>> GetUserSubmissionsAsync(string userId)
+        {
+
+            // problemId: Status
+
+
+            var submissions = await _context.Submits
+            .Where(s => s.UserId == userId)
+            .ToListAsync();
+
+            var result = new Dictionary<int, SubmissionResult>();
+
+            foreach (var submission in submissions)
+            {
+                if (!result.ContainsKey(submission.ProblemId) || submission.Result == SubmissionResult.Accepted)
+                {
+                    result[submission.ProblemId] = submission.Result;
+                }
+            }
+
+            return result;
+
         }
     }
 
