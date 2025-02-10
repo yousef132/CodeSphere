@@ -13,13 +13,13 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace CodeSphere.WebApi.Controllers
 {
-    [Route("Problems")]
-    public class ProblemController : BaseController
+    
+    public class ProblemsController : BaseController
     {
 
         private readonly IElasticSearchRepository _elasticSearchRepository;
 
-        public ProblemController(IElasticSearchRepository elasticSearchRepository)
+        public ProblemsController(IElasticSearchRepository elasticSearchRepository)
         {
             _elasticSearchRepository = elasticSearchRepository;
         }
@@ -56,11 +56,11 @@ namespace CodeSphere.WebApi.Controllers
             [FromQuery] List<string>? TopicsNames,
             [FromQuery] string? problemName,
             [FromQuery] Difficulty? difficulty,
-            [FromQuery] Domain.Models.Entities.Status? status,
-            [FromQuery] SortBy? sortBy,
-            [FromQuery] Order? order,
-            [FromQuery] int pageNumber,
-            [FromQuery] int pageSize)
+            [FromQuery] Domain.Models.Entities.ProblemStatus? status,
+            [FromQuery] SortBy sortBy = SortBy.Name,
+            [FromQuery] Order order = Order.Ascending,
+            [FromQuery] int pageNumber = 1,
+            [FromQuery] int pageSize = 10)
         {
             var query = new GetAllProblemsQuery(null,
                 TopicsNames,

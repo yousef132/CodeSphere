@@ -6,8 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace CodeSphere.WebApi.Controllers
 {
-    [Route("Topics")]
-    public class TopicController : BaseController
+    public class TopicsController : BaseController
     {
         [HttpGet]
         public async Task<ActionResult<Response>> GetTopics() 

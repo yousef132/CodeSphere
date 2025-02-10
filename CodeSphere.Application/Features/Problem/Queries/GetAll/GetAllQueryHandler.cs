@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using CodeSphere.Domain.Abstractions;
+using CodeSphere.Domain.Models.Entities;
 using CodeSphere.Domain.Premitives;
 using MediatR;
 using Microsoft.AspNetCore.Http;
@@ -32,7 +33,14 @@ namespace CodeSphere.Application.Features.Problem.Queries.GetAll
                 .GetTopicIDsByNamesAsync(request.TopicsNames);
 
 
-            var problems = await _unitOfWork.ElasticSearchRepository.SearchProblemsAsync(request.ProblemName, topicsIds, request.Difficulty, request.PageNumber, request.PageSize);
+            var problems = await _unitOfWork.ElasticSearchRepository.SearchProblemsAsync(
+                request.ProblemName,
+                topicsIds,
+                request.Difficulty,
+                request.SortBy,
+                request.Order,
+                request.PageNumber,
+                request.PageSize);
 
             if (problems.IsNullOrEmpty())
                 return await Response.FailureAsync("No Problems Found", HttpStatusCode.NotFound);
@@ -46,6 +54,7 @@ namespace CodeSphere.Application.Features.Problem.Queries.GetAll
                 foreach (var problem in mappedProblems)
                     problem.IsSolved = submissions.Contains(problem.Id);
             }
+
             return await Response.SuccessAsync(mappedProblems, "Problems Found", HttpStatusCode.OK);
 
         }

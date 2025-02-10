@@ -9,7 +9,7 @@ namespace CodeSphere.Domain.Models.Entities
     /// <summary>
     /// status of the problem (solved, attemped, todo)
     /// </summary>
-    public enum Status
+    public enum ProblemStatus
     {
         Solved,
         Attempted,

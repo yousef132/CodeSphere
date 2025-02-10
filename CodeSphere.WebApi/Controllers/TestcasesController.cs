@@ -11,7 +11,7 @@ namespace CodeSphere.WebApi.Controllers
 
     [Authorize(Roles = Roles.Admin)]
 
-    public class TestcaseController : BaseController
+    public class TestcasesController : BaseController
     {
         [HttpPost]
         public async Task<ActionResult<Response>> CreateTestcaseAsync(CreateTestcaseCommand command)
