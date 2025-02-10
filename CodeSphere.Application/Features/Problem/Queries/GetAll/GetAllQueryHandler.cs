@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using CodeSphere.Domain.Abstractions;
+using CodeSphere.Domain.Models.Entities;
 using CodeSphere.Domain.Premitives;
 using MediatR;
 using Microsoft.AspNetCore.Http;
@@ -32,7 +33,14 @@ namespace CodeSphere.Application.Features.Problem.Queries.GetAll
                 .GetTopicIDsByNamesAsync(request.TopicsNames);
 
 
-            var problems = await _unitOfWork.ElasticSearchRepository.SearchProblemsAsync(request.ProblemName, topicsIds, request.Difficulty, request.PageNumber, request.PageSize);
+            var problems = await _unitOfWork.ElasticSearchRepository.SearchProblemsAsync(
+                request.ProblemName,
+                topicsIds,
+                request.Difficulty,
+                request.SortBy,
+                request.Order,
+                request.PageNumber,
+                request.PageSize);
 
             if (problems.IsNullOrEmpty())
                 return await Response.FailureAsync("No Problems Found", HttpStatusCode.NotFound);
@@ -40,13 +48,39 @@ namespace CodeSphere.Application.Features.Problem.Queries.GetAll
             var mappedProblems = _mapper.Map<IReadOnlyList<GetAllQueryResponse>>(problems);
 
 
+            var status = request.Status;
+            if (status is not null)
+            {
+                var allSubmissions = await _unitOfWork.SubmissionRepository.GetUserSubmissionsAsync(UserId);
+                if (status == ProblemStatus.Solved)
+                {
+                    mappedProblems = mappedProblems
+                        .Where(p => allSubmissions.Any(s => s.Key == p.Id && s.Value == SubmissionResult.Accepted))
+                        .ToList();
+                } 
+                else if (status == ProblemStatus.Attempted)
+                {
+                    mappedProblems = mappedProblems
+                        .Where(p => !allSubmissions.Any(s => s.Key == p.Id))
+                        .ToList();
+                }
+                else
+                {
+                    mappedProblems = mappedProblems
+                        .Where(p => allSubmissions.Any(s => s.Key == p.Id && s.Value != SubmissionResult.Accepted))
+                        .ToList();
+                }
+            }
+
             if (!string.IsNullOrEmpty(UserId))
             {
-                var submissions = await _unitOfWork.SubmissionRepository.GetUserAcceptedSubmissionIdsAsync(UserId); // get all accepted submissions for this user
+                var acceptedSubmissions = await _unitOfWork.SubmissionRepository.GetUserAcceptedSubmissionIdsAsync(UserId); // get all accepted submissions for this user
                 foreach (var problem in mappedProblems)
-                    problem.IsSolved = submissions.Contains(problem.Id);
+                    problem.IsSolved = acceptedSubmissions.Contains(problem.Id);
             }
-            return await Response.SuccessAsync(mappedProblems, "Problems Found", HttpStatusCode.OK);
+
+            int totalNumberOfpages = Math.Max(1, mappedProblems.Count / request.PageSize);
+            return await Response.SuccessAsync(new { totalNumberOfpages, mappedProblems}, "Problems Found", HttpStatusCode.OK);
 
         }
 

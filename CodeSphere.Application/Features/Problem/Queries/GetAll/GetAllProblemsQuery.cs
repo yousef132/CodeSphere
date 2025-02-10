@@ -12,8 +12,25 @@ namespace CodeSphere.Application.Features.Problem.Queries.GetAll
         public Difficulty? Difficulty { get; set; }
         public int PageNumber { get; set; }
         public int PageSize { get; set; }
+        
+        
+        // status : AC , Attempted, Not Attempted
+         public Domain.Models.Entities.ProblemStatus? Status { get; set; }
 
-        public GetAllProblemsQuery(string? userId, List<string>? topicsNames, string? problemName, Difficulty? difficulty, int pageNumber, int pageSize)
+        // sortBy : Name, Difficulty, acceptanceRate, 
+        public SortBy SortBy { get; set; }
+
+        // order : asc, desc
+        public Order Order { get; set; }
+        public GetAllProblemsQuery(string? userId,
+            List<string>? topicsNames,
+            string? problemName,
+            Difficulty? difficulty,
+            int pageNumber,
+            int pageSize,
+            Domain.Models.Entities.ProblemStatus? status,
+            SortBy sortBy,
+            Order order)
         {
             // UserId = userId;
             TopicsNames = topicsNames;
@@ -21,6 +38,9 @@ namespace CodeSphere.Application.Features.Problem.Queries.GetAll
             Difficulty = difficulty;
             PageNumber = pageNumber;
             PageSize = pageSize;
+            Status = status;
+            SortBy = sortBy;
+            Order = order;
         }
     }
 

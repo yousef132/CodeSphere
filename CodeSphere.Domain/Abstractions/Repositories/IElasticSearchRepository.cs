@@ -10,7 +10,14 @@ namespace CodeSphere.Domain.Abstractions.Repositories
 
         Task<bool> BulkIndexDocumentsAsync<T>(IEnumerable<T> documents, string indexName) where T : class;
 
-        Task<IEnumerable<ProblemDocument>> SearchProblemsAsync(string? searchText, List<int>? topics, Difficulty? difficulty, int pageNumber, int pageSize);
+        Task<IEnumerable<ProblemDocument>> SearchProblemsAsync(
+            string? searchText,
+            List<int>? topics,
+            Difficulty? difficulty,
+            SortBy sortBy,
+            Order order,
+            int pageNumber,
+            int pageSize);
         Task<IEnumerable<ProblemDocument>> SearchProblemsAsync(string searchText);
 
 

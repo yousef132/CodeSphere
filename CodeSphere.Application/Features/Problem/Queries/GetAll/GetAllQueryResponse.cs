@@ -9,5 +9,6 @@ namespace CodeSphere.Application.Features.Problem.Queries.GetAll
         public Difficulty Difficulty { get; set; }
         public List<string> Topics { get; set; } = new();
         public bool IsSolved { get; set; }
+        public decimal AcceptanceRate { get; set; }
     }
 }
