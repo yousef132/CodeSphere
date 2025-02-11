@@ -39,7 +39,7 @@ namespace CodeSphere.Infrastructure.Implementation.Repositories
             return response.IsValid;
         }
 
-        public async Task<IEnumerable<ProblemDocument>> SearchProblemsAsync(
+        public async Task<(IEnumerable<ProblemDocument>, int)> SearchProblemsAsync(
             string? searchText,
             List<int>? topics,
             Difficulty? difficulty,
@@ -78,12 +78,13 @@ namespace CodeSphere.Infrastructure.Implementation.Repositories
                                         order == Order.Ascending
                                             ? srt.Ascending(ElasticHelper.GetSortField(sortBy))
                                             : srt.Descending(ElasticHelper.GetSortField(sortBy))
-                                    )
-                                    .From((pageNumber - 1) * pageSize) 
-                                    .Size(pageSize)
+                                 )
+                                 .From((pageNumber - 1) * pageSize) 
+                                 .Size(pageSize)
                              );
 
-            return fuzzySearchResponse.Hits.Select(hit => hit.Source);
+            int TotalNumberOfPages = (int)Math.Ceiling((double)fuzzySearchResponse.Total / pageSize);
+            return (fuzzySearchResponse.Hits.Select(hit => hit.Source) , TotalNumberOfPages);
             #endregion
 
             #region api call
