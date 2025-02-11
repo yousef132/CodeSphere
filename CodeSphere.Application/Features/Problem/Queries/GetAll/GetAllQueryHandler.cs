@@ -33,7 +33,7 @@ namespace CodeSphere.Application.Features.Problem.Queries.GetAll
                 .GetTopicIDsByNamesAsync(request.TopicsNames);
 
 
-            var problems = await _unitOfWork.ElasticSearchRepository.SearchProblemsAsync(
+            var (problems, totalNumberOfPages) = await _unitOfWork.ElasticSearchRepository.SearchProblemsAsync(
                 request.ProblemName,
                 topicsIds,
                 request.Difficulty,
@@ -61,15 +61,17 @@ namespace CodeSphere.Application.Features.Problem.Queries.GetAll
                 else if (status == ProblemStatus.Attempted)
                 {
                     mappedProblems = mappedProblems
-                        .Where(p => !allSubmissions.Any(s => s.Key == p.Id))
+                        .Where(p => allSubmissions.Any(s => s.Key == p.Id && s.Value != SubmissionResult.Accepted))
                         .ToList();
                 }
                 else
                 {
                     mappedProblems = mappedProblems
-                        .Where(p => allSubmissions.Any(s => s.Key == p.Id && s.Value != SubmissionResult.Accepted))
+                        .Where(p => !allSubmissions.Any(s => s.Key == p.Id))
                         .ToList();
                 }
+
+                return await Response.SuccessAsync(new { mappedProblems, totalNumberOfPages }, "Problems Found", HttpStatusCode.OK);
             }
 
             if (!string.IsNullOrEmpty(UserId))
@@ -79,8 +81,7 @@ namespace CodeSphere.Application.Features.Problem.Queries.GetAll
                     problem.IsSolved = acceptedSubmissions.Contains(problem.Id);
             }
 
-            int totalNumberOfpages = Math.Max(1, mappedProblems.Count / request.PageSize);
-            return await Response.SuccessAsync(new { totalNumberOfpages, mappedProblems}, "Problems Found", HttpStatusCode.OK);
+            return await Response.SuccessAsync(new { mappedProblems, totalNumberOfPages }   , "Problems Found", HttpStatusCode.OK);
 
         }
 
