@@ -68,7 +68,7 @@ namespace CodeSphere.Application.Features.Problem.Commands.SolveProblem
                 ProblemId = request.ProblemId,
                 SubmitTime = baseSubmission.ExecutionTime,
                 Code = codeContent,
-                SubmitMemory = 1m
+                SubmitMemory = baseSubmission.ExecutionMemory
             };
 
             await unitOfWork.Repository<Submit>().AddAsync(submission);

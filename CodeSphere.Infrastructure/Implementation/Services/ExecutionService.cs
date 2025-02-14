@@ -45,6 +45,9 @@ namespace CodeSphere.Infrastructure.Implementation.Services
             {
                 // create container 
                 await CreateAndStartContainer(language);
+
+                await Task.Delay(10000);
+
                 for (int i = 0; i < testcases.Count; i++)
                 {
 
@@ -82,7 +85,8 @@ namespace CodeSphere.Infrastructure.Implementation.Services
         public async Task<object> ExecuteCodeAsync(string code, Language language, List<Testcase> testCases, decimal runTimeLimit, decimal memoryLimit)
         {
             string path = await fileService.CreateCodeFile(code, language, _requestDirectory);
-            decimal maxRunTime = 0;
+            decimal maxRunTime = 0m;
+            decimal maxMemory = 0m;
             try
             {
                 // create container 
@@ -102,6 +106,7 @@ namespace CodeSphere.Infrastructure.Implementation.Services
                         return result;
 
                     maxRunTime = Math.Max(maxRunTime, result.ExecutionTime);
+                    maxMemory = Math.Max(maxMemory, result.ExecutionMemory);
                 }
             }
             catch (Exception ex)
@@ -125,6 +130,7 @@ namespace CodeSphere.Infrastructure.Implementation.Services
             return new AcceptedResponse
             {
                 ExecutionTime = maxRunTime,
+                ExecutionMemory = maxMemory
             };
 
         }
