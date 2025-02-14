@@ -2,6 +2,5 @@
 {
     public class TimeLimitExceedResponse : BaseSubmissionResponse
     {
-        public decimal ExecutionTime { get; set ; }
     }
 }

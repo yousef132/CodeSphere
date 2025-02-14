@@ -31,7 +31,7 @@ namespace CodeSphere.Infrastructure.Implementation.Services
             errorFile = Path.Combine(_requestDirectory, "error.txt");
             runTimeFile = Path.Combine(_requestDirectory, "runtime.txt");
             runTimeErrorFile = Path.Combine(_requestDirectory, "runtime_errors.txt");
-            memoryFile = Path.Combine(_requestDirectory, "memory_usage.txt");
+            memoryFile = Path.Combine(_requestDirectory, "memory.txt");
             this.fileService = fileService;
             this.unitOfWork = unitOfWork;
         }
@@ -45,6 +45,9 @@ namespace CodeSphere.Infrastructure.Implementation.Services
             {
                 // create container 
                 await CreateAndStartContainer(language);
+
+                await Task.Delay(10000);
+
                 for (int i = 0; i < testcases.Count; i++)
                 {
 
@@ -82,11 +85,15 @@ namespace CodeSphere.Infrastructure.Implementation.Services
         public async Task<object> ExecuteCodeAsync(string code, Language language, List<Testcase> testCases, decimal runTimeLimit, decimal memoryLimit)
         {
             string path = await fileService.CreateCodeFile(code, language, _requestDirectory);
-            decimal maxRunTime = 0;
+            decimal maxRunTime = 0m;
+            decimal maxMemory = 0m;
             try
             {
                 // create container 
                 await CreateAndStartContainer(language);
+
+                await Task.Delay(10000);
+
                 for (int i = 0; i < testCases.Count; i++)
                 {
                     await fileService.CreateTestCasesFile(testCases[i].Input, _requestDirectory);
@@ -99,6 +106,7 @@ namespace CodeSphere.Infrastructure.Implementation.Services
                         return result;
 
                     maxRunTime = Math.Max(maxRunTime, result.ExecutionTime);
+                    maxMemory = Math.Max(maxMemory, result.ExecutionMemory);
                 }
             }
             catch (Exception ex)
@@ -122,6 +130,7 @@ namespace CodeSphere.Infrastructure.Implementation.Services
             return new AcceptedResponse
             {
                 ExecutionTime = maxRunTime,
+                ExecutionMemory = maxMemory
             };
 
         }
@@ -132,6 +141,7 @@ namespace CodeSphere.Infrastructure.Implementation.Services
             string error = await fileService.ReadFileAsync(errorFile);
             string runTime = await fileService.ReadFileAsync(runTimeFile);
             string runTimeError = await fileService.ReadFileAsync(runTimeErrorFile);
+            string memory = await fileService.ReadFileAsync(memoryFile);
 
             // Initialize the run result
             BaseSubmissionResponse response = default;
@@ -188,7 +198,7 @@ namespace CodeSphere.Infrastructure.Implementation.Services
             {
                 NumberOfPassedTestCases = testcaseNumber,
                 ExecutionTime = Helper.ExtractExecutionTime(runTime),
-                ExecutionMemory = 3m,
+                ExecutionMemory = Helper.ExtractExecutionMemory(memory)
             };
         }
 
@@ -260,24 +270,28 @@ namespace CodeSphere.Infrastructure.Implementation.Services
                 Language.cs => Helper.CSharpCompiler,
                 _ => throw new ArgumentException("Unsupported language")
             };
+
             string s = Helper.ScriptFilePath;
+
             var createContainerResponse = await _dockerClient.Containers.CreateContainerAsync(new CreateContainerParameters
             {
                 HostConfig = new HostConfig
                 {
                     Binds = new[] { $"{_requestDirectory}:/code", $"{Helper.ScriptFilePath}:/run_code.sh" },
-                    NetworkMode = "none",
+                    NetworkMode = "bridge",
                     Memory = 256 * 1024 * 1024,
                     AutoRemove = false
                 },
                 Name = "code_container",
                 Image = image,
-                Cmd = new[] { "tail", "-f", "/dev/null" },
+                Cmd = new[] { "sh", "-c", "apt-get update && apt-get install -y time && tail -f /dev/null" }, // Install time package
 
             });
+
             _containerId = createContainerResponse.ID;
             await _dockerClient.Containers.StartContainerAsync(_containerId, new ContainerStartParameters());
         }
+
         private async Task ExecuteCodeInContainer(decimal timeLimit, decimal memoryLimit)
         {
 
