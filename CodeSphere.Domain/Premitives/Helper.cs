@@ -76,8 +76,32 @@ namespace CodeSphere.Domain.Premitives
             Match match = Regex.Match(time, @"real\t\d+m([\d.]+)s");
             string seconds = match.Groups[1].Value;
 
-            return decimal.Parse(seconds);
+            if (Decimal.TryParse(seconds, out decimal result))
+            {
+                return result;
+            }
+            else
+            {
+                return 0;
+            }
         }
 
+        public static decimal ExtractExecutionMemory(string memory)
+        {
+            // the string will be like "Memory Usage: 12345 KB"
+
+            // get the number part in rgex 
+            Match match = Regex.Match(memory, @"\d+");
+            string memoryInKB = match.Value;
+
+            if (Decimal.TryParse(memoryInKB, out decimal result))
+            {
+                return result;
+            }
+            else
+            {
+                return 0;
+            }
+        }
     }
 }
