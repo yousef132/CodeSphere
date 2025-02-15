@@ -71,6 +71,8 @@ namespace CodeSphere.Application.Features.Problem.Queries.GetAll
                         .ToList();
                 }
 
+                totalNumberOfPages = (int)Math.Ceiling(mappedProblems.Count / (double)request.PageSize);
+
                 return await Response.SuccessAsync(new { mappedProblems, totalNumberOfPages }, "Problems Found", HttpStatusCode.OK);
             }
 
