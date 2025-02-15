@@ -14,5 +14,6 @@ namespace CodeSphere.Application.Features.Submission.Queries.GetProblemSubmissio
         public SubmissionResult Result { get; set; }
         public DateTime SubmissionDate { get; set; }
         public Language Language { get; set; }
+        public int Id { get; set; }
     }
 }
