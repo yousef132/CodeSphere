@@ -52,10 +52,11 @@ namespace CodeSphere.Application.Features.Problem.Commands.SolveProblem
 
             string codeContent = await fileService.ReadFile(request.Code);
 
+            //codeContent, request.Language, problemTestCases.ToList(), problem.RunTimeLimit, (decimal)problem.MemoryLimit
+            var result = await executionService.ExecuteCodeAsync(codeContent, request.Language, problemTestCases.ToList(), problem.RunTimeLimit);
 
-            var result = await executionService.ExecuteCodeAsync(codeContent, request.Language, problemTestCases.ToList(), problem.RunTimeLimit, (decimal)problem.MemoryLimit);
-
-            var baseSubmission = (result as BaseSubmissionResponse);
+            var baseSubmissionResponse = (result as BaseSubmissionResponse);
+            var acceptedSubmission = (result as AcceptedResponse);
             var compilationError = (result as CompilationErrorResponse);
             var submission = new Submit
             {
@@ -63,12 +64,12 @@ namespace CodeSphere.Application.Features.Problem.Commands.SolveProblem
                 SubmissionDate = DateTime.UtcNow,
                 ContestId = request.ContestId,
                 Language = request.Language,
-                Result = baseSubmission.SubmissionResult,
+                Result = baseSubmissionResponse.SubmissionResult,
                 Error = (result as CompilationErrorResponse)?.Message ?? "",
                 ProblemId = request.ProblemId,
-                SubmitTime = baseSubmission.ExecutionTime,
+                SubmitTime = acceptedSubmission?.ExecutionTime ?? null,
                 Code = codeContent,
-                SubmitMemory = baseSubmission.ExecutionMemory
+                SubmitMemory = 0m
             };
 
             await unitOfWork.Repository<Submit>().AddAsync(submission);

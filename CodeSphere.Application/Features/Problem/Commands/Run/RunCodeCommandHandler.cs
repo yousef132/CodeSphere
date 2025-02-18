@@ -34,8 +34,7 @@ namespace CodeSphere.Application.Features.Problem.Commands.Run
                          codeContent,
                          request.Language,
                          customTestcases,
-                         problem.RunTimeLimit,
-                         (int)problem.MemoryLimit);
+                         problem.RunTimeLimit);
 
             return await Response.SuccessAsync(result, "Testcases run successfully !!");
         }
