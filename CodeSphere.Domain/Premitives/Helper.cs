@@ -16,12 +16,12 @@ namespace CodeSphere.Domain.Premitives
         //    // Prepare the docker exec command to run the script inside the container
         //    return $"docker exec {containerId} /usr/bin/bash /run_code.sh {runTimeLimit} {runMemoryLimit}";
         //}
-        public static string CreateExecuteCodeCommand(string containerId, decimal timeLimit, decimal memoryLimit)
+        public static string CreateExecuteCodeCommand(string containerId, decimal timeLimit)
         {
             string runTimeLimit = $"{timeLimit}s";
-            string runMemoryLimit = $"{Math.Round(memoryLimit)}mb";  // Round to nearest integer to avoid any decimals
+            //string runMemoryLimit = $"{Math.Round(memoryLimit)}mb";  // Round to nearest integer to avoid any decimals
 
-            return $"docker exec {containerId} /usr/bin/bash /run_code.sh {runTimeLimit} {runMemoryLimit}";
+            return $"docker exec {containerId} /usr/bin/bash /run_code.sh {runTimeLimit}";
         }
         static Helper()
         {

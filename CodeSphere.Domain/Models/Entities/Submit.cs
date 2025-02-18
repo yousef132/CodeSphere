@@ -11,9 +11,9 @@ namespace CodeSphere.Domain.Models.Entities
         public int? ContestId { get; set; }
         public string? Error { get; set; }
         // the code execution time
-        public decimal SubmitTime { get; set; }
+        public decimal? SubmitTime { get; set; }
         // the code execution memory
-        public decimal SubmitMemory { get; set; }
+        public decimal? SubmitMemory { get; set; }
         public SubmissionResult Result { get; set; }
         public string Code { get; set; }
         public DateTime SubmissionDate { get; set; } = DateTime.UtcNow;

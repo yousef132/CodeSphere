@@ -21,7 +21,6 @@ namespace CodeSphere.Infrastructure.Implementation.Services
         private string errorFile;
         private string runTimeFile;
         private string runTimeErrorFile;
-        private string memoryFile;
         public ExecutionService(IFileService fileService, IUnitOfWork unitOfWork)
         {
             _dockerClient = new DockerClientConfiguration(new Uri("tcp://localhost:2375")).CreateClient();
@@ -31,13 +30,12 @@ namespace CodeSphere.Infrastructure.Implementation.Services
             errorFile = Path.Combine(_requestDirectory, "error.txt");
             runTimeFile = Path.Combine(_requestDirectory, "runtime.txt");
             runTimeErrorFile = Path.Combine(_requestDirectory, "runtime_errors.txt");
-            memoryFile = Path.Combine(_requestDirectory, "memory.txt");
             this.fileService = fileService;
             this.unitOfWork = unitOfWork;
         }
 
 
-        public async Task<object> ExecuteCodeAsync(string code, Language language, List<CustomTestcaseDto> testcases, decimal runTimeLimit, decimal memoryLimit)
+        public async Task<object> ExecuteCodeAsync(string code, Language language, List<CustomTestcaseDto> testcases, decimal runTimeLimit)
         {
             string path = await fileService.CreateCodeFile(code, language, _requestDirectory);
             List<object> results = new();
@@ -46,16 +44,15 @@ namespace CodeSphere.Infrastructure.Implementation.Services
                 // create container 
                 await CreateAndStartContainer(language);
 
-                //await Task.Delay(10000);
 
                 for (int i = 0; i < testcases.Count; i++)
                 {
 
                     await fileService.CreateTestCasesFile(testcases[i].Input, _requestDirectory);
 
-                    await ExecuteCodeInContainer(runTimeLimit, memoryLimit);
+                    await ExecuteCodeInContainer(runTimeLimit);
 
-                    var result = await CalculateResult(testcases[i], runTimeLimit, code);
+                    object result = await CalculateResult(testcases[i], i + 1, runTimeLimit, code, testcases.Count);
 
                     results.Add(result);
                 }
@@ -77,36 +74,105 @@ namespace CodeSphere.Infrastructure.Implementation.Services
                     await _dockerClient.Containers.RemoveContainerAsync(_containerId, new ContainerRemoveParameters { Force = true });
                 }
             }
+        }
 
+
+
+        private async Task<object> CalculateResult(CustomTestcaseDto testcaseDto, int testcaseNumber, decimal runTimeLimit, string code, int totalTestcases)
+        {
+            string output = await fileService.ReadFileAsync(outputFile);
+            string error = await fileService.ReadFileAsync(errorFile);
+            string runTime = await fileService.ReadFileAsync(runTimeFile);
+            string runTimeError = await fileService.ReadFileAsync(runTimeErrorFile);
+
+
+            BaseSubmissionResponse response = default;
+
+            if (!string.IsNullOrEmpty(error))
+            {
+                return new CompilationErrorResponse
+                {
+                    Message = error,
+                    SubmissionResult = SubmissionResult.CompilationError,
+                    NumberOfPassedTestCases = 0,
+                    TotalTestcases = totalTestcases
+                };
+
+            }
+
+            if (!string.IsNullOrEmpty(runTimeError))
+            {
+                return new RunTimeErrorResponse
+                {
+                    Message = runTimeError,
+                    SubmissionResult = SubmissionResult.RunTimeError,
+                    Input = testcaseDto.Input,
+                    TotalTestcases = totalTestcases,
+                    NumberOfPassedTestCases = testcaseNumber - 1,
+                    ExpectedOutput = testcaseDto.ExpectedOutput
+
+                };
+            }
+
+
+            if (runTime?.Contains("TIMELIMITEXCEEDED") == true)
+            {
+                return new TimeLimitExceedResponse
+                {
+                    Input = testcaseDto.Input,
+                    NumberOfPassedTestCases = testcaseNumber - 1,
+                    TotalTestcases = totalTestcases,
+                    SubmissionResult = SubmissionResult.TimeLimitExceeded,
+                    ExpectedOutput = testcaseDto.ExpectedOutput,
+
+                };
+            }
+
+            if (output.TrimEnd('\n') != testcaseDto.ExpectedOutput.TrimEnd('\n'))
+            {
+                return new WrongAnswerResponse
+                {
+                    NumberOfPassedTestCases = testcaseNumber - 1,
+                    TotalTestcases = totalTestcases,
+                    ActualOutput = output,
+                    Input = testcaseDto.Input,
+                    ExpectedOutput = testcaseDto.ExpectedOutput,
+                    SubmissionResult = SubmissionResult.WrongAnswer,
+                };
+            }
+
+            return new AcceptedResponse
+            {
+                NumberOfPassedTestCases = testcaseNumber,
+                ExecutionTime = Helper.ExtractExecutionTime(runTime),
+                TotalTestcases = totalTestcases,
+            };
 
         }
 
 
-        public async Task<object> ExecuteCodeAsync(string code, Language language, List<Testcase> testCases, decimal runTimeLimit, decimal memoryLimit)
+        public async Task<object> ExecuteCodeAsync(string code, Language language, List<Testcase> testCases, decimal runTimeLimit)
         {
             string path = await fileService.CreateCodeFile(code, language, _requestDirectory);
             decimal maxRunTime = 0m;
-            decimal maxMemory = 0m;
             try
             {
-                // create container 
                 await CreateAndStartContainer(language);
-
-                //await Task.Delay(10000);
 
                 for (int i = 0; i < testCases.Count; i++)
                 {
                     await fileService.CreateTestCasesFile(testCases[i].Input, _requestDirectory);
 
-                    await ExecuteCodeInContainer(runTimeLimit, memoryLimit);
+                    await ExecuteCodeInContainer(runTimeLimit);
 
-                    var result = await CalculateResult(testCases[i], runTimeLimit, code, i + 1, testCases[i].Input);
+                    var result = await CalculateResult(testCases[i], runTimeLimit, code, i + 1, testCases.Count);
 
-                    if (result.SubmissionResult != SubmissionResult.Accepted)
+                    BaseSubmissionResponse baseResponse = result as BaseSubmissionResponse;
+                    if (baseResponse.SubmissionResult != SubmissionResult.Accepted)
                         return result;
 
-                    maxRunTime = Math.Max(maxRunTime, result.ExecutionTime);
-                    maxMemory = Math.Max(maxMemory, result.ExecutionMemory);
+                    AcceptedResponse response = new(baseResponse);
+                    maxRunTime = Math.Max(maxRunTime, response.ExecutionTime);
                 }
             }
             catch (Exception ex)
@@ -130,20 +196,24 @@ namespace CodeSphere.Infrastructure.Implementation.Services
             return new AcceptedResponse
             {
                 ExecutionTime = maxRunTime,
-                ExecutionMemory = maxMemory
+                NumberOfPassedTestCases = testCases.Count,
+                TotalTestcases = testCases.Count
             };
 
         }
+
+
+
         //TODO : use strategy patter instead of this function
-        private async Task<BaseSubmissionResponse> CalculateResult(Testcase testCase, decimal runTimeLimit, string code, int testcaseNumber, string input)
+        private async Task<object> CalculateResult(Testcase testCase, decimal runTimeLimit, string code, int testcaseNumber, int totalTestcases)
         {
+
             string output = await fileService.ReadFileAsync(outputFile);
             string error = await fileService.ReadFileAsync(errorFile);
             string runTime = await fileService.ReadFileAsync(runTimeFile);
             string runTimeError = await fileService.ReadFileAsync(runTimeErrorFile);
-            //string memory = await fileService.ReadFileAsync(memoryFile);
 
-            // Initialize the run result
+
             BaseSubmissionResponse response = default;
 
             if (!string.IsNullOrEmpty(error))
@@ -152,8 +222,10 @@ namespace CodeSphere.Infrastructure.Implementation.Services
                 {
                     Message = error,
                     SubmissionResult = SubmissionResult.CompilationError,
-                    ExecutionTime = 0m
+                    NumberOfPassedTestCases = 0,
+                    TotalTestcases = totalTestcases
                 };
+
             }
 
             if (!string.IsNullOrEmpty(runTimeError))
@@ -162,106 +234,51 @@ namespace CodeSphere.Infrastructure.Implementation.Services
                 {
                     Message = runTimeError,
                     SubmissionResult = SubmissionResult.RunTimeError,
-                    Input = input,
+                    Input = testCase.Input,
+                    TotalTestcases = totalTestcases,
                     NumberOfPassedTestCases = testcaseNumber - 1,
-                    ExecutionTime = 0
+                    ExpectedOutput = testCase.Output
+
                 };
             }
+
 
             if (runTime?.Contains("TIMELIMITEXCEEDED") == true)
             {
                 return new TimeLimitExceedResponse
                 {
-                    Input = input,
+                    Input = testCase.Input,
                     NumberOfPassedTestCases = testcaseNumber - 1,
-                    ExecutionTime = runTimeLimit,
-                    SubmissionResult = SubmissionResult.TimeLimitExceeded
+                    TotalTestcases = totalTestcases,
+                    SubmissionResult = SubmissionResult.TimeLimitExceeded,
+                    ExpectedOutput = testCase.Output,
+
                 };
             }
 
-            //if (output?.Length > 0)
-            //{
             if (output.TrimEnd('\n') != testCase.Output.TrimEnd('\n'))
             {
                 return new WrongAnswerResponse
                 {
                     NumberOfPassedTestCases = testcaseNumber - 1,
+                    TotalTestcases = totalTestcases,
                     ActualOutput = output,
-                    Input = input,
+                    Input = testCase.Input,
                     ExpectedOutput = testCase.Output,
                     SubmissionResult = SubmissionResult.WrongAnswer,
-                    ExecutionTime = Helper.ExtractExecutionTime(runTime)
                 };
             }
-            // }
+
             return new AcceptedResponse
             {
                 NumberOfPassedTestCases = testcaseNumber,
                 ExecutionTime = Helper.ExtractExecutionTime(runTime),
-                //ExecutionMemory = Helper.ExtractExecutionMemory(memory)
-                ExecutionMemory = 3m 
+                TotalTestcases = totalTestcases,
             };
         }
 
 
-        private async Task<BaseSubmissionResponse> CalculateResult(CustomTestcaseDto testcaseDto, decimal runTimeLimit, string code)
-        {
-            string output = await fileService.ReadFileAsync(outputFile);
-            string error = await fileService.ReadFileAsync(errorFile);
-            string runTime = await fileService.ReadFileAsync(runTimeFile);
-            string runTimeError = await fileService.ReadFileAsync(runTimeErrorFile);
 
-            // Initialize the run result
-            BaseSubmissionResponse response = default;
-
-            if (!string.IsNullOrEmpty(error))
-            {
-                return new CompilationErrorResponse
-                {
-                    Message = error,
-                    SubmissionResult = SubmissionResult.CompilationError,
-                    ExecutionTime = 0m
-                };
-            }
-
-            if (!string.IsNullOrEmpty(runTimeError))
-            {
-                return new RunTimeErrorResponse
-                {
-                    Message = runTimeError,
-                    SubmissionResult = SubmissionResult.RunTimeError,
-                    ExecutionTime = Helper.ExtractExecutionTime(runTime)
-                };
-            }
-
-            if (runTime?.Contains("TIMELIMITEXCEEDED") == true)
-            {
-                return new TimeLimitExceedResponse
-                {
-                    ExecutionTime = runTimeLimit,
-                    SubmissionResult = SubmissionResult.TimeLimitExceeded,
-                };
-            }
-
-            // if (output?.Length > 0)
-            // {
-            if (output.TrimEnd('\n') != testcaseDto.ExpectedOutput.TrimEnd('\n'))
-            {
-                return new WrongAnswerResponse
-                {
-                    ActualOutput = output,
-                    ExpectedOutput = testcaseDto.ExpectedOutput,
-                    SubmissionResult = SubmissionResult.WrongAnswer,
-                    ExecutionTime = Helper.ExtractExecutionTime(runTime)
-                };
-            }
-            //  }
-            return new AcceptedResponse
-            {
-                ExecutionTime = Helper.ExtractExecutionTime(runTime),
-                ExecutionMemory = 3m,
-            };
-        }
         private async Task CreateAndStartContainer(Language language)
         {
             var image = language switch
@@ -293,10 +310,10 @@ namespace CodeSphere.Infrastructure.Implementation.Services
             await _dockerClient.Containers.StartContainerAsync(_containerId, new ContainerStartParameters());
         }
 
-        private async Task ExecuteCodeInContainer(decimal timeLimit, decimal memoryLimit)
+        private async Task ExecuteCodeInContainer(decimal timeLimit)
         {
 
-            string command = Helper.CreateExecuteCodeCommand(_containerId, timeLimit, memoryLimit);
+            string command = Helper.CreateExecuteCodeCommand(_containerId, timeLimit);
 
             // Start the process to execute the command
             using (var process = new System.Diagnostics.Process())
@@ -323,6 +340,7 @@ namespace CodeSphere.Infrastructure.Implementation.Services
                 }
             }
         }
+
 
     }
 }

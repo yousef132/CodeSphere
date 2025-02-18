@@ -24,6 +24,13 @@ services:
     networks:
       - elk
 
+  codesphere.cach:
+    image: redis:latest
+    restart: always
+    ports:
+      - '6579:6579'
+    
+
 networks:
   elk:
     driver: bridge
