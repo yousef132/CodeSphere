@@ -46,7 +46,7 @@ namespace CodeSphere.Infrastructure.Implementation.Services
                 // create container 
                 await CreateAndStartContainer(language);
 
-                await Task.Delay(10000);
+                //await Task.Delay(10000);
 
                 for (int i = 0; i < testcases.Count; i++)
                 {
@@ -92,7 +92,7 @@ namespace CodeSphere.Infrastructure.Implementation.Services
                 // create container 
                 await CreateAndStartContainer(language);
 
-                await Task.Delay(10000);
+                //await Task.Delay(10000);
 
                 for (int i = 0; i < testCases.Count; i++)
                 {
@@ -141,7 +141,7 @@ namespace CodeSphere.Infrastructure.Implementation.Services
             string error = await fileService.ReadFileAsync(errorFile);
             string runTime = await fileService.ReadFileAsync(runTimeFile);
             string runTimeError = await fileService.ReadFileAsync(runTimeErrorFile);
-            string memory = await fileService.ReadFileAsync(memoryFile);
+            //string memory = await fileService.ReadFileAsync(memoryFile);
 
             // Initialize the run result
             BaseSubmissionResponse response = default;
@@ -198,7 +198,8 @@ namespace CodeSphere.Infrastructure.Implementation.Services
             {
                 NumberOfPassedTestCases = testcaseNumber,
                 ExecutionTime = Helper.ExtractExecutionTime(runTime),
-                ExecutionMemory = Helper.ExtractExecutionMemory(memory)
+                //ExecutionMemory = Helper.ExtractExecutionMemory(memory)
+                ExecutionMemory = 3m 
             };
         }
 
