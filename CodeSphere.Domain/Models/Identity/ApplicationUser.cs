@@ -6,7 +6,7 @@ namespace CodeSphere.Domain.Models.Identity
 {
     public class ApplicationUser : IdentityUser
     {
-        public Status RankName { get; set; } = Status.UnRanked; // ex: pupil
+        public UserStatus RankName { get; set; } = UserStatus.UnRanked; // ex: pupil
         public string? ImagePath { get; set; }
         public short Rating { get; set; } = 0; // ex: 1200 
 

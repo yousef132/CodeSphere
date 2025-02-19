@@ -12,6 +12,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
+using StackExchange.Redis;
 using System.Text;
 
 
@@ -31,10 +32,22 @@ namespace CodeSphere.Infrastructure
             services.AddScoped(typeof(ISubmissionRepository), typeof(SubmissionRepository));
             services.AddScoped(typeof(IProblemRepository), typeof(ProblemRepository));
             services.AddScoped(typeof(IFileService), typeof(FileService));
+            services.AddScoped(typeof(IContestRepository), typeof(ContestRepository));
+            services.AddScoped(typeof(IResponseCacheService), typeof(ResponseCacheService));
             services.AddScoped(typeof(IEmailService), typeof(EmailService));
             services.AddScoped(typeof(IElasticSearchRepository), typeof(ElasticSearchRepository));
             services.AddScoped(typeof(ITopicRepository), typeof(TopicRepository));
+            services.AddSingleton<IConnectionMultiplexer>(config =>
+            {
+                //var configs = ConfigurationOptions.Parse(configuration.GetConnectionString("Redis"));
+                return ConnectionMultiplexer.Connect("127.0.0.1:6379");
+            });
 
+            //services.AddStackExchangeRedisCache(x =>
+            //{
+            //    //,abortConnect=false
+            //    x.Configuration = "codesphere.cache:6379";
+            //});
 
             #endregion
 

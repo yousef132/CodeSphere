@@ -4,6 +4,7 @@ using CodeSphere.Application.Features.Problem.Queries.GetAll;
 using CodeSphere.Application.Features.Problem.Queries.GetById;
 using CodeSphere.Application.Mapping.Resolvers;
 using CodeSphere.Domain.Models.Entities;
+using CodeSphere.Domain.Responses;
 using CodeSphere.Domain.Responses.ElasticSearchResponses;
 
 namespace CodeSphere.Application.Mapping
@@ -27,7 +28,11 @@ namespace CodeSphere.Application.Mapping
             CreateMap<Testcase, TestCasesDto>()
                 .ForMember(d => d.ExpectedOutput, O => O.MapFrom(S => S.Output));
 
-            
+            CreateMap<Problem, ContestProblemResponse>();
+
+
+
+
         }
     }
 }
