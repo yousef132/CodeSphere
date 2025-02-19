@@ -16,11 +16,13 @@ namespace CodeSphere.Infrastructure.Implementation
         public IProblemRepository ProblemRepository { get; }
         public ISubmissionRepository SubmissionRepository { get; }
         public ITopicRepository TopicRepository { get; }
+        public IBlogRepository BlogRepository { get; }
         public UnitOfWork(ApplicationDbContext context,
             IElasticSearchRepository elasticSearchRepository,
             IProblemRepository problemRepository,
             ISubmissionRepository submissionRepository,
-            ITopicRepository topicRepository)
+            ITopicRepository topicRepository,
+            IBlogRepository blogRepository)
         {
             this.context = context;
             _repositories = new Hashtable();
@@ -28,6 +30,7 @@ namespace CodeSphere.Infrastructure.Implementation
             ProblemRepository = problemRepository;
             SubmissionRepository = submissionRepository;
             TopicRepository = topicRepository;
+            BlogRepository= blogRepository; 
         }
         
 
