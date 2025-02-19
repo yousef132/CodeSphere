@@ -2,9 +2,11 @@
 using CodeSphere.Domain.Abstractions;
 using CodeSphere.Domain.Abstractions.Repositories;
 using CodeSphere.Domain.Models.Entities;
+using CodeSphere.Domain.Models.Identity;
 using CodeSphere.Domain.Premitives;
 using MediatR;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 using System.Net;
 using System.Security.Claims;
@@ -15,20 +17,18 @@ namespace CodeSphere.Application.Features.Submission.Queries.GetProblemSubmissio
     {
         private readonly IMapper _mapper;
         private readonly ISubmissionRepository _submissionRepository;
-        private readonly IHttpContextAccessor contextAccessor;
         private readonly IUnitOfWork unitOfWork;
-        private string UserId;
+        private readonly UserManager<ApplicationUser> userManager;
+
         public GetProblemSubmissionsQueryHandler(IMapper mapper,
             ISubmissionRepository submissionRepository,
-            IHttpContextAccessor contextAccessor,
-            IUnitOfWork unitOfWork)
+            IUnitOfWork unitOfWork,
+            UserManager<ApplicationUser> userManager)
         {
             _mapper = mapper;
             _submissionRepository = submissionRepository;
-            this.contextAccessor = contextAccessor;
             this.unitOfWork = unitOfWork;
-            var user = contextAccessor.HttpContext?.User;
-            UserId = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            this.userManager = userManager;
         }
 
         public async Task<Response> Handle(GetProblemSubmissionsQuery request, CancellationToken cancellationToken)
@@ -37,14 +37,18 @@ namespace CodeSphere.Application.Features.Submission.Queries.GetProblemSubmissio
             var problem = await unitOfWork.Repository<Domain.Models.Entities.Problem>().GetByIdAsync(request.ProblemId);
 
             if (problem is null)
-                return await Response.SuccessAsync(null, "Problem Not Found", HttpStatusCode.NotFound);
+                return await Response.FailureAsync( "Problem Not Found", HttpStatusCode.NotFound);
 
-            var submissions = await _submissionRepository.GetAllSubmissions(request.ProblemId, UserId);
+            var user =await userManager.FindByIdAsync(request.UserId);
+            if (user is null)
+                return await Response.FailureAsync( "user Not Found", HttpStatusCode.NotFound);
 
-            if (submissions.IsNullOrEmpty())
+            var submissions = await _submissionRepository.GetAllSubmissions(request.ProblemId, request.UserId);
+            var submissionsList = submissions.ToList();
+            if (submissionsList.Count() == 0)
                 return await Response.SuccessAsync(null, "No Submissions", HttpStatusCode.NoContent);
 
-            var mappedSubmissions = _mapper.Map<List<GetProblemSubmissionsResponse>>(submissions.ToList());
+            var mappedSubmissions = _mapper.Map<List<GetProblemSubmissionsResponse>>(submissionsList);
 
             return await Response.SuccessAsync(mappedSubmissions, "Submissions fetched successfully", HttpStatusCode.Found);
         }

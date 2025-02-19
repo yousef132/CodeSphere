@@ -16,11 +16,15 @@ namespace CodeSphere.Infrastructure.Implementation
         public IProblemRepository ProblemRepository { get; }
         public ISubmissionRepository SubmissionRepository { get; }
         public ITopicRepository TopicRepository { get; }
+
+        public IContestRepository ContestRepository { get; }
+
         public IBlogRepository BlogRepository { get; }
         public UnitOfWork(ApplicationDbContext context,
             IElasticSearchRepository elasticSearchRepository,
             IProblemRepository problemRepository,
             ISubmissionRepository submissionRepository,
+            IContestRepository contestRepository,
             ITopicRepository topicRepository,
             IBlogRepository blogRepository)
         {
@@ -30,9 +34,10 @@ namespace CodeSphere.Infrastructure.Implementation
             ProblemRepository = problemRepository;
             SubmissionRepository = submissionRepository;
             TopicRepository = topicRepository;
+            ContestRepository = contestRepository;
             BlogRepository= blogRepository; 
         }
-        
+
 
 
         public Task<int> CompleteAsync()

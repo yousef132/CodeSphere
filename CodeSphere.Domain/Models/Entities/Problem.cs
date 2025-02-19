@@ -15,6 +15,7 @@ namespace CodeSphere.Domain.Models.Entities
         public MemoryLimit MemoryLimit { get; set; }
 
         public string Description { get; set; }
+        public ContestPoints ContestPoints { get; set; }
 
 
         [ForeignKey(nameof(ProblemSetterId))]

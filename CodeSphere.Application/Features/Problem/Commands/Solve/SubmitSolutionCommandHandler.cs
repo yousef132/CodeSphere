@@ -44,7 +44,7 @@ namespace CodeSphere.Application.Features.Problem.Commands.SolveProblem
             if (problem == null)
                 return await Response.FailureAsync("Problem Not Found", System.Net.HttpStatusCode.NotFound);
 
-            var contest = await unitOfWork.Repository<Contest>().GetByIdAsync(request.ContestId);
+            var contest = await unitOfWork.Repository<Domain.Models.Entities.Problem>().GetByIdAsync(request.ContestId);
             if (contest == null)
                 return await Response.FailureAsync("Contest Not Found", System.Net.HttpStatusCode.NotFound);
 

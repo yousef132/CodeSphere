@@ -7,6 +7,7 @@ namespace CodeSphere.Domain.Abstractions
     {
         IGenericRepository<TEntity> Repository<TEntity>() where TEntity : BaseEntity;
         IElasticSearchRepository ElasticSearchRepository { get; }
+        IContestRepository ContestRepository { get; }
         IProblemRepository ProblemRepository { get; }
         ISubmissionRepository SubmissionRepository { get; }
         ITopicRepository TopicRepository { get; }

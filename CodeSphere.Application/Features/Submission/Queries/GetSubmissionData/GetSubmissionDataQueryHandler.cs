@@ -14,11 +14,13 @@ namespace CodeSphere.Application.Features.Submission.Queries.GetSubmissionData
         private readonly IMapper _mapper;
         private readonly IHttpContextAccessor contextAccessor;
         private string UserId;
-        public GetSubmissionDataQueryHandler(IUnitOfWork unitOfWork, IMapper mapper, IHttpContextAccessor contextAccessor)
+        public GetSubmissionDataQueryHandler(IUnitOfWork unitOfWork, IMapper mapper ,IHttpContextAccessor httpContextAccessor
+            )
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
-            this.contextAccessor = contextAccessor;
+            this.contextAccessor = httpContextAccessor;
+
             var user = contextAccessor.HttpContext?.User;
             UserId = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
         }
@@ -28,7 +30,10 @@ namespace CodeSphere.Application.Features.Submission.Queries.GetSubmissionData
             var submission = await _unitOfWork.Repository<Submit>().GetByIdAsync(request.SubmissionId);
             if (submission == null)
                 return await Response.FailureAsync("Submission not found", System.Net.HttpStatusCode.NotFound);
-            if (submission.UserId != UserId)
+
+            var result = await _unitOfWork.SubmissionRepository.IsUserAuthorizedToViewSubmission(UserId, request.SubmissionId);
+            
+            if (!result)
                 return await Response.FailureAsync("You are not authorized to view this submission", System.Net.HttpStatusCode.Unauthorized);
 
             var mappedSub = _mapper.Map<GetSubmissionDataQueryResponse>(submission);

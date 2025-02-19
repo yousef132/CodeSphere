@@ -10,8 +10,11 @@ namespace CodeSphere.Domain.Models.Entities
         public string Name { get; set; }
         public decimal Duration { get; set; }
         public DateTime StartDate { get; set; }
-        public DateTime EndDate { get; set; }
+        public DateTime EndDate { get; set; } = DateTime.Now;
         public int? BlogId { get; set; }
+
+        public ContestStatus ContestStatus
+            => DateTime.Now < StartDate ? ContestStatus.Upcoming : DateTime.Now > EndDate ? ContestStatus.Ended : ContestStatus.Running;
 
         [ForeignKey(nameof(BlogId))]
         public Blog Blog { get; set; }

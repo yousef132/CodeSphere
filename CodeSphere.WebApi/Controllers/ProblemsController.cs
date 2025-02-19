@@ -4,7 +4,6 @@ using CodeSphere.Application.Features.Problem.Commands.Run;
 using CodeSphere.Application.Features.Problem.Commands.SolveProblem;
 using CodeSphere.Application.Features.Problem.Queries.GetAll;
 using CodeSphere.Application.Features.Problem.Queries.GetById;
-using CodeSphere.Domain.Abstractions.Repositories;
 using CodeSphere.Domain.Models.Entities;
 using CodeSphere.Domain.Premitives;
 using CodeSphere.WebApi.Filters;
@@ -13,16 +12,11 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace CodeSphere.WebApi.Controllers
 {
-    
+
     public class ProblemsController : BaseController
     {
 
-        private readonly IElasticSearchRepository _elasticSearchRepository;
 
-        public ProblemsController(IElasticSearchRepository elasticSearchRepository)
-        {
-            _elasticSearchRepository = elasticSearchRepository;
-        }
 
         [HttpPost]
         [Authorize(Roles = Roles.Admin)]

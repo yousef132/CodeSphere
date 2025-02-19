@@ -33,7 +33,10 @@ namespace CodeSphere.WebApi.Controllers
                 case HttpStatusCode.Accepted:
                     return new AcceptedResult(string.Empty, response);
                 case HttpStatusCode.UnprocessableEntity:
-                    return new UnprocessableEntityObjectResult(response);
+                    return new UnprocessableEntityObjectResult(response); 
+                case HttpStatusCode.Found:
+                    return new OkObjectResult(response);
+
                 default:
                     return new BadRequestObjectResult(response);
             }
