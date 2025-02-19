@@ -1,7 +1,6 @@
 ﻿using AutoMapper;
 using CodeSphere.Domain.Abstractions;
 using CodeSphere.Domain.Abstractions.Repositories;
-using CodeSphere.Domain.Models.Entities;
 using CodeSphere.Domain.Premitives;
 using CodeSphere.Domain.Responses.ElasticSearchResponses;
 using MediatR;
@@ -24,7 +23,7 @@ namespace CodeSphere.Application.Features.Problem.Commands.Create
         }
         public async Task<Response> Handle(CreateProblemCommand request, CancellationToken cancellationToken)
         {
-            var contest = await unitOfWork.Repository<Contest>().GetByIdAsync(request.ContestId);
+            var contest = await unitOfWork.Repository<CodeSphere.Domain.Models.Entities.Contest>().GetByIdAsync(request.ContestId);
             if (contest == null)
                 return await Response.FailureAsync("Contest Not Found!!", System.Net.HttpStatusCode.NotFound);
 

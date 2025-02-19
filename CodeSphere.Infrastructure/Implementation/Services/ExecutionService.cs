@@ -33,8 +33,6 @@ namespace CodeSphere.Infrastructure.Implementation.Services
             this.fileService = fileService;
             this.unitOfWork = unitOfWork;
         }
-
-
         public async Task<object> ExecuteCodeAsync(string code, Language language, List<CustomTestcaseDto> testcases, decimal runTimeLimit)
         {
             string path = await fileService.CreateCodeFile(code, language, _requestDirectory);
@@ -75,8 +73,6 @@ namespace CodeSphere.Infrastructure.Implementation.Services
                 }
             }
         }
-
-
 
         private async Task<object> CalculateResult(CustomTestcaseDto testcaseDto, int testcaseNumber, decimal runTimeLimit, string code, int totalTestcases)
         {
@@ -150,7 +146,6 @@ namespace CodeSphere.Infrastructure.Implementation.Services
 
         }
 
-
         public async Task<object> ExecuteCodeAsync(string code, Language language, List<Testcase> testCases, decimal runTimeLimit)
         {
             string path = await fileService.CreateCodeFile(code, language, _requestDirectory);
@@ -202,8 +197,6 @@ namespace CodeSphere.Infrastructure.Implementation.Services
 
         }
 
-
-
         //TODO : use strategy patter instead of this function
         private async Task<object> CalculateResult(Testcase testCase, decimal runTimeLimit, string code, int testcaseNumber, int totalTestcases)
         {
@@ -242,7 +235,6 @@ namespace CodeSphere.Infrastructure.Implementation.Services
                 };
             }
 
-
             if (runTime?.Contains("TIMELIMITEXCEEDED") == true)
             {
                 return new TimeLimitExceedResponse
@@ -276,8 +268,6 @@ namespace CodeSphere.Infrastructure.Implementation.Services
                 TotalTestcases = totalTestcases,
             };
         }
-
-
 
         private async Task CreateAndStartContainer(Language language)
         {

@@ -10,7 +10,7 @@ namespace CodeSphere.Infrastructure.Configurations
         public void Configure(EntityTypeBuilder<ApplicationUser> builder)
         {
             builder.Property(u => u.RankName)
-                          .HasConversion(uStatus => uStatus.ToString(), OStatus => (Status)Enum.Parse(typeof(Status), OStatus));
+                          .HasConversion(uStatus => uStatus.ToString(), OStatus => (UserStatus)Enum.Parse(typeof(UserStatus), OStatus));
 
             builder.Property(u => u.Email)
                 .IsRequired();
