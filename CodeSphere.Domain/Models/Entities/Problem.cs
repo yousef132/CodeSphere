@@ -30,6 +30,11 @@ namespace CodeSphere.Domain.Models.Entities
         public ICollection<ProblemTopic> ProblemTopics { get; set; }
 
         public ICollection<Submit> Submissions { get; set; }
+
+        [ForeignKey(nameof(Blog))]
+        public int? BlogId { get; set; }
+        public Blog Blog { get; set; }
+
     }
 
 }

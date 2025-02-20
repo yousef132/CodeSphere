@@ -1,6 +1,7 @@
-﻿using CodeSphere.Domain.Abstractions;
-using CodeSphere.Domain.Models.Entities;
-using Microsoft.AspNetCore.Http;
+﻿using AutoMapper;
+using CodeSphere.Domain.Abstractions;
+using CodeSphere.Domain.Responses;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CodeSphere.WebApi.Controllers
@@ -10,15 +11,24 @@ namespace CodeSphere.WebApi.Controllers
     public class BlogsController : BaseController
     {
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IMapper _mapper;
 
-        public BlogsController(IUnitOfWork unitOfWork)
+        public BlogsController(IUnitOfWork unitOfWork, IMapper mapper)
         {
             _unitOfWork = unitOfWork;
+            _mapper = mapper;
         }
-        //[HttpGet("problems")]
-        //public async Task<IActionResult<IEnumerable<Problem>>> GetProblems()
-        //{
-        //    var problems = await _unitOfWork.BlogRepository
-        //} 
+
+        [HttpGet("problems")]
+        [Authorize]
+        public async Task<ActionResult<IEnumerable<ProblemResponse>>> GetProblemsForBlog()
+        {
+            var problems = await _unitOfWork.BlogRepository.GetProblemsForBlogAsync();
+
+            var problemResponses = _mapper.Map<IEnumerable<ProblemResponse>>(problems);
+
+            return Ok(problemResponses);
+        }
+
     }
 }

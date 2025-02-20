@@ -23,9 +23,8 @@ namespace CodeSphere.Infrastructure.Implementation.Repositories
            
         public async Task AddProblemToBlogAsync(int blogId, int problemId)
         {
-            throw new NotImplementedException();
 
-            // var blog = await _dbContext.Blogs.FindAsync(blogId);    
+            throw new NotImplementedException();
         }
 
         public Task AddSolutionToBlogAsync(int blogId, string solutionContent)
