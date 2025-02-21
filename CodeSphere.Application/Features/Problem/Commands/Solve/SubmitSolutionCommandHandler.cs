@@ -52,7 +52,6 @@ namespace CodeSphere.Application.Features.Problem.Commands.SolveProblem
 
             string codeContent = await fileService.ReadFile(request.Code);
 
-            //codeContent, request.Language, problemTestCases.ToList(), problem.RunTimeLimit, (decimal)problem.MemoryLimit
             var result = await executionService.ExecuteCodeAsync(codeContent, request.Language, problemTestCases.ToList(), problem.RunTimeLimit);
 
             var baseSubmissionResponse = (result as BaseSubmissionResponse);
