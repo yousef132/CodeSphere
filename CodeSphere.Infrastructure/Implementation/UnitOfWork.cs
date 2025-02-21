@@ -17,32 +17,28 @@ namespace CodeSphere.Infrastructure.Implementation
         public IUserContestRepository UserContestRepository { get; }
         public ISubmissionRepository SubmissionRepository { get; }
         public ITopicRepository TopicRepository { get; }
-
         public IContestRepository ContestRepository { get; }
-
         public IBlogRepository BlogRepository { get; }
+
         public UnitOfWork(ApplicationDbContext context,
             IElasticSearchRepository elasticSearchRepository,
             IProblemRepository problemRepository,
             ISubmissionRepository submissionRepository,
             IContestRepository contestRepository,
             ITopicRepository topicRepository,
-            IContestRepository contestRepository,
-            IUserContestRepository userContestRepository)
+            IUserContestRepository userContestRepository,
             IBlogRepository blogRepository)
         {
             this.context = context;
             _repositories = new Hashtable();
-            ElasticSearchRepository = elasticSearchRepository;
-            ProblemRepository = problemRepository;
-            SubmissionRepository = submissionRepository;
-            TopicRepository = topicRepository;
-            ContestRepository = contestRepository;
-            UserContestRepository = userContestRepository;
-            BlogRepository= blogRepository; 
+            this.ElasticSearchRepository = elasticSearchRepository;
+            this.ProblemRepository = problemRepository;
+            this.SubmissionRepository = submissionRepository;
+            this.TopicRepository = topicRepository;
+            this.ContestRepository = contestRepository;
+            this.UserContestRepository = userContestRepository;
+            this.BlogRepository = blogRepository;
         }
-
-
 
         public Task<int> CompleteAsync()
             => context.SaveChangesAsync();
@@ -58,7 +54,6 @@ namespace CodeSphere.Infrastructure.Implementation
             if (!_repositories.ContainsKey(key))
             {
                 var repo = new GenericRepository<TEntity>(context);
-
                 _repositories.Add(key, repo);
             }
 
