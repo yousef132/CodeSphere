@@ -2,9 +2,9 @@
 
 namespace CodeSphere.Application.Features.Contest.Queries
 {
-    public class GetContestQueryValidator : AbstractValidator<GetContestProblemsQuery>
+    public class GetContestProblemsQueryValidator : AbstractValidator<GetContestProblemsQuery>
     {
-        public GetContestQueryValidator()
+        public GetContestProblemsQueryValidator()
         {
             RuleFor(x => x.Id).NotEmpty();
         }
