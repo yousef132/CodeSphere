@@ -1,4 +1,4 @@
-﻿using CodeSphere.Domain.Models.Entities;
+﻿using CodeSphere.Domain.Premitives;
 
 namespace CodeSphere.Domain.Responses.SubmissionResponses
 {

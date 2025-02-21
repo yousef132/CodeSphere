@@ -4,6 +4,6 @@
     {
         Task CacheResponseAsync(string key, object Response, TimeSpan timeToLive);
 
-        Task<IEnumerable<T>> GetCachedResponseAsync<T>(string key) where T : class;
+        Task<string> GetCachedResponseAsync(string key);
     }
 }

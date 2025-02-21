@@ -16,6 +16,6 @@ namespace CodeSphere.Domain.Models.Entities
         public Contest Contest { get; set; }
 
         // the increase || decrease of rank
-        public short RankChange { get; set; }
+        public short RankChange { get; set; } = 0;
     }
 }

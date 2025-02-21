@@ -7,15 +7,15 @@ namespace CodeSphere.Application.Features.Problem.Queries.GetAll
     public class GetAllProblemsQuery : IRequest<Response>
     {
         // public string? UserId { get; set; }
-        public List<string>? TopicsNames { get; set; }
+        public List<int>? Topics { get; set; }
         public string? ProblemName { get; set; }
         public Difficulty? Difficulty { get; set; }
-        public int PageNumber { get; set; }
-        public int PageSize { get; set; }
-        
-        
+        public int PageNumber { get; set; } = 1;
+        public int PageSize { get; set; } = 10;
+
+
         // status : AC , Attempted, Not Attempted
-         public Domain.Models.Entities.ProblemStatus? Status { get; set; }
+        public ProblemStatus? Status { get; set; }
 
         // sortBy : Name, Difficulty, acceptanceRate, 
         public SortBy SortBy { get; set; }
@@ -23,17 +23,17 @@ namespace CodeSphere.Application.Features.Problem.Queries.GetAll
         // order : asc, desc
         public Order Order { get; set; }
         public GetAllProblemsQuery(string? userId,
-            List<string>? topicsNames,
+            List<int>? topicsNames,
             string? problemName,
             Difficulty? difficulty,
             int pageNumber,
             int pageSize,
-            Domain.Models.Entities.ProblemStatus? status,
+            ProblemStatus? status,
             SortBy sortBy,
             Order order)
         {
             // UserId = userId;
-            TopicsNames = topicsNames;
+            Topics = topicsNames;
             ProblemName = problemName;
             Difficulty = difficulty;
             PageNumber = pageNumber;

@@ -27,7 +27,6 @@ namespace CodeSphere.Application
 
 
             // redis
-            services.AddStackExchangeRedisCache(options => options.Configuration = configuration.GetConnectionString("Redis"));
 
 
             // mediator

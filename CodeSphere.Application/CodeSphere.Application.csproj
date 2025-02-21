@@ -20,8 +20,4 @@
     <ProjectReference Include="..\CodeSphere.Domain\CodeSphere.Domain.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Features\Contest\Command\" />
-  </ItemGroup>
-
 </Project>

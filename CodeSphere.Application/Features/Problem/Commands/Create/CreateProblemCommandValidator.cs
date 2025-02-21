@@ -1,4 +1,5 @@
 ﻿using CodeSphere.Domain.Models.Entities;
+using CodeSphere.Domain.Premitives;
 using FluentValidation;
 
 namespace CodeSphere.Application.Features.Problem.Commands.Create

@@ -1,4 +1,4 @@
-﻿namespace CodeSphere.Domain.Models.Entities
+﻿namespace CodeSphere.Domain.Premitives
 {
     public enum SubmissionResult
     {

@@ -1,4 +1,5 @@
-﻿using System.Text.RegularExpressions;
+﻿using System.Text.Json;
+using System.Text.RegularExpressions;
 
 namespace CodeSphere.Domain.Premitives
 {
@@ -27,6 +28,27 @@ namespace CodeSphere.Domain.Premitives
         {
             ScriptFilePath = SetScriptFilePath();
         }
+
+        public static T DeserializeObject<T>(string json)
+        {
+            return JsonSerializer.Deserialize<T>(json);
+        }
+
+        public static IEnumerable<T> DeserializeCollection<T>(string json)
+        {
+            var options = new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true // Allows matching JSON property names with different cases
+            };
+            return JsonSerializer.Deserialize<IEnumerable<T>>(json, options);
+        }
+
+
+        public static string Serialize<T>(T obj)
+        {
+            return JsonSerializer.Serialize(obj);
+        }
+
         public static string SetScriptFilePath()
         {
             string currentDirectory = Directory.GetCurrentDirectory();
