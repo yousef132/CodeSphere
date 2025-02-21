@@ -1,4 +1,5 @@
 ﻿using CodeSphere.Application.Features.Contest.Command.Create;
+using CodeSphere.Application.Features.Contest.Command.Register;
 using CodeSphere.Application.Features.Contest.Queries;
 using CodeSphere.Domain.Abstractions.Services;
 using CodeSphere.Domain.Premitives;
@@ -16,15 +17,27 @@ namespace CodeSphere.WebApi.Controllers
         {
             this.responseCacheService = responseCacheService;
         }
-        [HttpGet("{id}")]
-        public async Task<ActionResult<Response>> GetContestProblems(int id)
+
+
+
+        [HttpGet("{id}/problems")]
+        //[Authorize(Roles = Roles.User)]
+        public async Task<ActionResult<Response>> GetContestProblems([FromRoute] int id)
          => ResponseResult(await mediator.Send(new GetContestProblemsQuery(id)));
 
 
         [HttpPost]
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = Roles.Admin)]
         public async Task<ActionResult<Response>> CreateContest([FromBody] CreateContestCommand command)
            => ResponseResult(await mediator.Send(command));
+
+
+
+        [HttpPost("register/{contestId}")]
+        [Authorize(Roles = Roles.User)]
+        public async Task<ActionResult<Response>> RegisterInContest(int contestId)
+           => ResponseResult(await mediator.Send(new RegisterInContestCommand(contestId)));
+
 
 
 

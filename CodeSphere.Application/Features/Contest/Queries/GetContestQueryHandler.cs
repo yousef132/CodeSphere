@@ -5,6 +5,7 @@ using CodeSphere.Domain.Premitives;
 using CodeSphere.Domain.Responses;
 using MediatR;
 using Microsoft.AspNetCore.Http;
+using System.Security.Claims;
 using System.Text;
 
 namespace CodeSphere.Application.Features.Contest.Queries
@@ -15,13 +16,17 @@ namespace CodeSphere.Application.Features.Contest.Queries
         private readonly IMapper mapper;
         private readonly IResponseCacheService cacheService;
         private readonly IHttpContextAccessor httpContext;
-
+        private string UserId;
         public GetContestQueryHandler(IUnitOfWork unitOfWork, IMapper mapper, IResponseCacheService cacheService, IHttpContextAccessor httpContext)
         {
             this.unitOfWork = unitOfWork;
             this.mapper = mapper;
             this.cacheService = cacheService;
             this.httpContext = httpContext;
+            this.httpContext = httpContext;
+
+            var user = httpContext.HttpContext?.User;
+            UserId = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
         }
         public async Task<Response> Handle(GetContestProblemsQuery request, CancellationToken cancellationToken)
         {
@@ -41,6 +46,10 @@ namespace CodeSphere.Application.Features.Contest.Queries
             // running => check cach first 
             if (contest.ContestStatus == ContestStatus.Running)
             {
+                var isRegistered = await unitOfWork.UserContestRepository.IsRegistered(request.Id, UserId);
+                if (isRegistered == null)
+                    return await Response.FailureAsync("You are not registered in this contest", System.Net.HttpStatusCode.Forbidden);
+
                 // check cache
                 string cacheKey = GenerateCacheKeyFromRequest();
                 string cachedData = await cacheService.GetCachedResponseAsync(cacheKey);
@@ -48,7 +57,7 @@ namespace CodeSphere.Application.Features.Contest.Queries
                 // cache hit => return cached data
                 if (cachedData != null)
                 {
-                    var serializedData = Helper.DeserializeCollection<Domain.Models.Entities.Problem>(cachedData);
+                    var serializedData = Helper.DeserializeCollection<ContestProblemResponse>(cachedData);
                     return await Response.SuccessAsync(serializedData, "Contest Problems fetched successfully", System.Net.HttpStatusCode.Found);
                 }
                 else

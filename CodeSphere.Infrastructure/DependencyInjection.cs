@@ -36,6 +36,7 @@ namespace CodeSphere.Infrastructure
             services.AddScoped(typeof(IResponseCacheService), typeof(ResponseCacheService));
             services.AddScoped(typeof(IEmailService), typeof(EmailService));
             services.AddScoped(typeof(IElasticSearchRepository), typeof(ElasticSearchRepository));
+            services.AddScoped(typeof(IUserContestRepository), typeof(UserContestRepository));
             services.AddScoped(typeof(ITopicRepository), typeof(TopicRepository));
 
             services.AddSingleton<IConnectionMultiplexer>(config =>

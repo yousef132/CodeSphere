@@ -14,10 +14,9 @@ namespace CodeSphere.Infrastructure.Implementation.Repositories
             context = _context;
         }
         public async Task<IReadOnlyList<Problem>> GetContestProblemsByIdAsync(int contestId)
-        {
-            var problems = await context.Problems.Where(x => x.ContestId == contestId)
-                 .ToListAsync();
-            return problems;
-        }
+
+             => await context.Problems.Where(x => x.ContestId == contestId).ToListAsync();
+
+
     }
 }

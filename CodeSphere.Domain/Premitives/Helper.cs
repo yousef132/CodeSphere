@@ -36,7 +36,11 @@ namespace CodeSphere.Domain.Premitives
 
         public static IEnumerable<T> DeserializeCollection<T>(string json)
         {
-            return JsonSerializer.Deserialize<IEnumerable<T>>(json);
+            var options = new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true // Allows matching JSON property names with different cases
+            };
+            return JsonSerializer.Deserialize<IEnumerable<T>>(json, options);
         }
 
 

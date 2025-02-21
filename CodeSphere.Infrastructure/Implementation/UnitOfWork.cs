@@ -14,6 +14,7 @@ namespace CodeSphere.Infrastructure.Implementation
         public IElasticSearchRepository ElasticSearchRepository { get; }
 
         public IProblemRepository ProblemRepository { get; }
+        public IUserContestRepository UserContestRepository { get; }
         public ISubmissionRepository SubmissionRepository { get; }
         public ITopicRepository TopicRepository { get; }
 
@@ -24,7 +25,8 @@ namespace CodeSphere.Infrastructure.Implementation
             IProblemRepository problemRepository,
             ISubmissionRepository submissionRepository,
             ITopicRepository topicRepository,
-            IContestRepository contestRepository)
+            IContestRepository contestRepository,
+            IUserContestRepository userContestRepository)
         {
             this.context = context;
             _repositories = new Hashtable();
@@ -33,6 +35,7 @@ namespace CodeSphere.Infrastructure.Implementation
             SubmissionRepository = submissionRepository;
             TopicRepository = topicRepository;
             ContestRepository = contestRepository;
+            UserContestRepository = userContestRepository;
         }
 
 
