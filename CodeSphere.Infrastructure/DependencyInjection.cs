@@ -33,6 +33,7 @@ namespace CodeSphere.Infrastructure
             services.AddScoped(typeof(IProblemRepository), typeof(ProblemRepository));
             services.AddScoped(typeof(IFileService), typeof(FileService));
             services.AddScoped(typeof(IContestRepository), typeof(ContestRepository));
+            services.AddScoped(typeof(IBlogRepository), typeof(BlogRepository));
             services.AddScoped(typeof(IResponseCacheService), typeof(ResponseCacheService));
             services.AddScoped(typeof(IEmailService), typeof(EmailService));
             services.AddScoped(typeof(IElasticSearchRepository), typeof(ElasticSearchRepository));

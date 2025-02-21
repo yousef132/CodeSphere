@@ -30,6 +30,8 @@ namespace CodeSphere.Application.Mapping
 
             CreateMap<Problem, ContestProblemResponse>();
 
+            CreateMap<Problem, ProblemResponse>();
+
 
 
 

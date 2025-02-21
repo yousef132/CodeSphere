@@ -20,13 +20,16 @@ namespace CodeSphere.Infrastructure.Implementation
 
         public IContestRepository ContestRepository { get; }
 
+        public IBlogRepository BlogRepository { get; }
         public UnitOfWork(ApplicationDbContext context,
             IElasticSearchRepository elasticSearchRepository,
             IProblemRepository problemRepository,
             ISubmissionRepository submissionRepository,
+            IContestRepository contestRepository,
             ITopicRepository topicRepository,
             IContestRepository contestRepository,
             IUserContestRepository userContestRepository)
+            IBlogRepository blogRepository)
         {
             this.context = context;
             _repositories = new Hashtable();
@@ -36,6 +39,7 @@ namespace CodeSphere.Infrastructure.Implementation
             TopicRepository = topicRepository;
             ContestRepository = contestRepository;
             UserContestRepository = userContestRepository;
+            BlogRepository= blogRepository; 
         }
 
 

@@ -5,10 +5,12 @@ namespace CodeSphere.Application.Features.Submission.Queries.GetProblemSubmissio
 {
     public class GetProblemSubmissionsQuery : IRequest<Response>
     {
-        public GetProblemSubmissionsQuery(int problemId)
+        public GetProblemSubmissionsQuery(int problemId, string UserId)
         {
             this.ProblemId = problemId;
+            this.UserId = UserId;   
         }
+        public string UserId { get; set; }
         public int ProblemId { get; set; }
     }
 }

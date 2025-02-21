@@ -54,6 +54,15 @@ namespace CodeSphere.Infrastructure.Implementation.Repositories
             return result;
 
         }
+
+        public async Task<bool> IsUserAuthorizedToViewSubmission(string userId, int submissionId)
+        {
+            var submission =await  _context.Submits.Include(x => x.Contest).FirstOrDefaultAsync(x => x.Id == submissionId);
+            if (submission.Contest.ContestStatus == ContestStatus.Running && submission.UserId != userId)
+                return false;
+
+            return true;
+        }
     }
 
 }

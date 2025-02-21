@@ -1,22 +1,23 @@
 ﻿using CodeSphere.Application.Features.Submission.Queries.GetProblemSubmissions;
 using CodeSphere.Application.Features.Submission.Queries.GetSubmissionData;
 using CodeSphere.Domain.Premitives;
+using Elastic.Clients.Elasticsearch.Security;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Nest;
 
 namespace CodeSphere.WebApi.Controllers
 {
-    [Authorize]
+   
     public class SubmissionsController : BaseController
     {
-        [HttpGet("{id}")]
+        [HttpGet("{submissionId}")]
+        [Authorize]
+        public async Task<ActionResult<Response>> GetSubmissionData([FromRoute] int submissionId)
+            => ResponseResult(await mediator.Send(new GetSubmissionDataQuery(submissionId)));
 
-        public async Task<ActionResult<Response>> GetSubmissionData([FromRoute] int id)
-            => ResponseResult(await mediator.Send(new GetSubmissionDataQuery(id)));
-
-        [HttpGet("Problem/{id}")]
-
-        public async Task<ActionResult<Response>> GetAllSubmissions([FromRoute] int id)
-         => ResponseResult(await mediator.Send(new GetProblemSubmissionsQuery(id)));
+        [HttpGet("Problem/{problemId}")]
+        public async Task<ActionResult<Response>> GetAllSubmissions([FromRoute] int problemId, [FromQuery] string UserId)
+         => ResponseResult(await mediator.Send(new GetProblemSubmissionsQuery(problemId, UserId)));
     }
 }

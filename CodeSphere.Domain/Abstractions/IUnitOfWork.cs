@@ -12,6 +12,7 @@ namespace CodeSphere.Domain.Abstractions
         IProblemRepository ProblemRepository { get; }
         ISubmissionRepository SubmissionRepository { get; }
         ITopicRepository TopicRepository { get; }
+        IBlogRepository BlogRepository { get; } 
         Task<int> CompleteAsync();
     }
 }
