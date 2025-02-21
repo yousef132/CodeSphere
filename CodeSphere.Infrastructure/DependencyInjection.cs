@@ -79,7 +79,7 @@ namespace CodeSphere.Infrastructure
                     options.TokenValidationParameters = new TokenValidationParameters()
                     {
                         ValidateIssuer = true,
-                        ValidIssuer = configuration["JWT:Issuer"],
+                        ValidIssuer = configuration["JWT:Issure"],
                         ValidateAudience = true,
                         ValidAudience = configuration["JWT:Audience"],
                         ValidateIssuerSigningKey = true,

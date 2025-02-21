@@ -1,6 +1,8 @@
-﻿using CodeSphere.Application.Features.Contest.Queries;
+﻿using CodeSphere.Application.Features.Contest.Command.Create;
+using CodeSphere.Application.Features.Contest.Queries;
 using CodeSphere.Domain.Abstractions.Services;
 using CodeSphere.Domain.Premitives;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CodeSphere.WebApi.Controllers
@@ -17,6 +19,15 @@ namespace CodeSphere.WebApi.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<Response>> GetContestProblems(int id)
          => ResponseResult(await mediator.Send(new GetContestProblemsQuery(id)));
+
+
+        [HttpPost]
+        [Authorize(Roles = "Admin")]
+        public async Task<ActionResult<Response>> CreateContest([FromBody] CreateContestCommand command)
+           => ResponseResult(await mediator.Send(command));
+
+
+
 
 
         [HttpPost("cache")]
