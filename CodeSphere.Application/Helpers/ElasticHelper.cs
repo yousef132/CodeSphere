@@ -1,4 +1,4 @@
-﻿using CodeSphere.Domain.Models.Entities;
+﻿using CodeSphere.Domain.Premitives;
 using Elastic.Clients.Elasticsearch;
 using System;
 using System.Collections.Generic;

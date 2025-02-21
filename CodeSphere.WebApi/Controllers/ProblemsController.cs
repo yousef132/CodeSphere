@@ -47,17 +47,17 @@ namespace CodeSphere.WebApi.Controllers
 
         [HttpGet]
         public async Task<ActionResult<Response>> GetProblemsAsync(
-            [FromQuery] List<string>? TopicsNames,
+            [FromQuery] List<int>? Topics,
             [FromQuery] string? problemName,
             [FromQuery] Difficulty? difficulty,
-            [FromQuery] Domain.Models.Entities.ProblemStatus? status,
+            [FromQuery] ProblemStatus? status,
             [FromQuery] SortBy sortBy = SortBy.Name,
             [FromQuery] Order order = Order.Ascending,
             [FromQuery] int pageNumber = 1,
             [FromQuery] int pageSize = 10)
         {
             var query = new GetAllProblemsQuery(null,
-                TopicsNames,
+                Topics,
                 problemName,
                 difficulty,
                 pageNumber,

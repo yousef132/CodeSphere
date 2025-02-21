@@ -1,4 +1,4 @@
-﻿using CodeSphere.Domain.Models.Entities;
+﻿using CodeSphere.Domain.Premitives;
 using System;
 using System.Collections.Generic;
 using System.Linq;

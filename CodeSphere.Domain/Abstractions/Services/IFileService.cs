@@ -1,4 +1,4 @@
-﻿using CodeSphere.Domain.Models.Entities;
+﻿using CodeSphere.Domain.Premitives;
 using Microsoft.AspNetCore.Http;
 
 namespace CodeSphere.Domain.Abstractions.Services

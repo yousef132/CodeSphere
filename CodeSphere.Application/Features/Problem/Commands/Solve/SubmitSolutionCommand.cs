@@ -1,5 +1,4 @@
-﻿using CodeSphere.Domain.Models.Entities;
-using CodeSphere.Domain.Premitives;
+﻿using CodeSphere.Domain.Premitives;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 

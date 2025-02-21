@@ -1,10 +1,8 @@
 ﻿using AutoMapper;
 using CodeSphere.Domain.Abstractions;
-using CodeSphere.Domain.Models.Entities;
 using CodeSphere.Domain.Premitives;
 using MediatR;
 using Microsoft.AspNetCore.Http;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Net;
 using System.Security.Claims;
@@ -29,13 +27,10 @@ namespace CodeSphere.Application.Features.Problem.Queries.GetAll
         }
         public async Task<Response> Handle(GetAllProblemsQuery request, CancellationToken cancellationToken)
         {
-            var topicsIds = await _unitOfWork.TopicRepository
-                .GetTopicIDsByNamesAsync(request.TopicsNames);
-
 
             var (problems, totalNumberOfPages) = await _unitOfWork.ElasticSearchRepository.SearchProblemsAsync(
                 request.ProblemName,
-                topicsIds,
+                request.Topics,
                 request.Difficulty,
                 request.SortBy,
                 request.Order,
@@ -57,7 +52,7 @@ namespace CodeSphere.Application.Features.Problem.Queries.GetAll
                     mappedProblems = mappedProblems
                         .Where(p => allSubmissions.Any(s => s.Key == p.Id && s.Value == SubmissionResult.Accepted))
                         .ToList();
-                } 
+                }
                 else if (status == ProblemStatus.Attempted)
                 {
                     mappedProblems = mappedProblems
@@ -83,7 +78,7 @@ namespace CodeSphere.Application.Features.Problem.Queries.GetAll
                     problem.IsSolved = acceptedSubmissions.Contains(problem.Id);
             }
 
-            return await Response.SuccessAsync(new { mappedProblems, totalNumberOfPages }   , "Problems Found", HttpStatusCode.OK);
+            return await Response.SuccessAsync(new { mappedProblems, totalNumberOfPages }, "Problems Found", HttpStatusCode.OK);
 
         }
 

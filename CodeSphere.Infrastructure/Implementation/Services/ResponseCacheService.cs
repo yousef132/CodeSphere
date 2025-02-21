@@ -12,6 +12,9 @@ namespace CodeSphere.Infrastructure.Implementation.Services
         {
             _Database = multiplexer.GetDatabase();
         }
+
+
+
         public async Task CacheResponseAsync(string key, object Response, TimeSpan timeToiLive)
         {
             if (Response is null)
@@ -22,14 +25,13 @@ namespace CodeSphere.Infrastructure.Implementation.Services
             await _Database.StringSetAsync(key, serializedResponse, timeToiLive);
         }
 
-        public async Task<IEnumerable<T>> GetCachedResponseAsync<T>(string key) where T : class
+        public async Task<string> GetCachedResponseAsync(string key)
         {
             var value = await _Database.StringGetAsync(key);
             if (value.IsNullOrEmpty)
                 return null;
 
-            return JsonSerializer.Deserialize<IEnumerable<T>>(value);
+            return (value);
         }
-
     }
 }

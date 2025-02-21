@@ -21,6 +21,7 @@ namespace CodeSphere.Infrastructure.Implementation.Repositories
             var settings = new ConnectionSettings(new Uri(elasticSetting.Url))
                 .DefaultIndex(elasticSetting.DefaultIndex);
 
+
             this._elasticClient = new ElasticClient(settings);
             this.httpClient = httpClient;
         }
@@ -45,8 +46,8 @@ namespace CodeSphere.Infrastructure.Implementation.Repositories
             Difficulty? difficulty,
             SortBy sortBy,
             Order order,
-            int pageNumber = 1,
-            int pageSize = 10)
+            int pageNumber,
+            int pageSize)
         {
             #region nest
 
@@ -79,12 +80,12 @@ namespace CodeSphere.Infrastructure.Implementation.Repositories
                                             ? srt.Ascending(ElasticHelper.GetSortField(sortBy))
                                             : srt.Descending(ElasticHelper.GetSortField(sortBy))
                                  )
-                                 .From((pageNumber - 1) * pageSize) 
+                                 .From((pageNumber - 1) * pageSize)
                                  .Size(pageSize)
                              );
 
             int TotalNumberOfPages = (int)Math.Ceiling((double)fuzzySearchResponse.Total / pageSize);
-            return (fuzzySearchResponse.Hits.Select(hit => hit.Source) , TotalNumberOfPages);
+            return (fuzzySearchResponse.Hits.Select(hit => hit.Source), TotalNumberOfPages);
             #endregion
 
             #region api call
@@ -220,27 +221,35 @@ namespace CodeSphere.Infrastructure.Implementation.Repositories
 
         public async Task InitializeIndexes()
         {
-            if (!_elasticClient.Indices.Exists(elasticSetting.DefaultIndex).Exists)
-            {
+            var defaultIndexExists = await _elasticClient.Indices.ExistsAsync(elasticSetting.DefaultIndex);
+            var secondaryIndexExists = await _elasticClient.Indices.ExistsAsync(elasticSetting.SecondryIndex);
 
+            if (!defaultIndexExists.Exists)
+            {
                 var createProblemsIndexResponse = await _elasticClient.Indices.CreateAsync(elasticSetting.DefaultIndex, c => c
-                                    .Map<ProblemDocument>(m => m
-                                        .AutoMap()
-                                    )
-                                );
+                    .Map<ProblemDocument>(m => m.AutoMap())
+                );
 
+                if (!createProblemsIndexResponse.IsValid)
+                {
+                    throw new Exception($"Failed to create index {elasticSetting.DefaultIndex}: {createProblemsIndexResponse.DebugInformation}");
+                }
             }
-            if (!_elasticClient.Indices.Exists(elasticSetting.SecondryIndex).Exists)
+
+            if (!secondaryIndexExists.Exists)
             {
-
                 var createBlogIndexResponse = await _elasticClient.Indices.CreateAsync(elasticSetting.SecondryIndex, c => c
-                                    .Map<BlogDocument>(m => m
-                                        .AutoMap()
-                                    )
-                                );
+                    .Map<BlogDocument>(m => m.AutoMap())
+                );
 
+                if (!createBlogIndexResponse.IsValid)
+                {
+                    throw new Exception($"Failed to create index {elasticSetting.SecondryIndex}: {createBlogIndexResponse.DebugInformation}");
+                }
             }
         }
+
+
     }
 
 }

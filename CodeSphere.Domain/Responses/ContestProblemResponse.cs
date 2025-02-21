@@ -5,8 +5,8 @@ namespace CodeSphere.Domain.Responses
 {
     public class ContestProblemResponse
     {
-        public string ProblemSetterId { get; set; }
-        public int ContestId { get; set; }
+        // all these properties are cached for the problems while the contest 
+        public int Id { get; set; }
         public string Name { get; set; }
         public Difficulty Difficulty { get; set; }
 

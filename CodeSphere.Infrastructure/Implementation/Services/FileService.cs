@@ -1,5 +1,5 @@
 ﻿using CodeSphere.Domain.Abstractions.Services;
-using CodeSphere.Domain.Models.Entities;
+using CodeSphere.Domain.Premitives;
 using Microsoft.AspNetCore.Http;
 
 namespace CodeSphere.Infrastructure.Implementation.Services

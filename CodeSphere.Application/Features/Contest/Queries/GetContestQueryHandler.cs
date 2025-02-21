@@ -43,12 +43,13 @@ namespace CodeSphere.Application.Features.Contest.Queries
             {
                 // check cache
                 string cacheKey = GenerateCacheKeyFromRequest();
-                var cachedData = await cacheService.GetCachedResponseAsync<Domain.Models.Entities.Problem>(cacheKey);
+                string cachedData = await cacheService.GetCachedResponseAsync(cacheKey);
 
                 // cache hit => return cached data
                 if (cachedData != null)
                 {
-                    return await Response.SuccessAsync(cachedData, "Contest Problems fetched successfully", System.Net.HttpStatusCode.Found);
+                    var serializedData = Helper.DeserializeCollection<Domain.Models.Entities.Problem>(cachedData);
+                    return await Response.SuccessAsync(serializedData, "Contest Problems fetched successfully", System.Net.HttpStatusCode.Found);
                 }
                 else
                 {
