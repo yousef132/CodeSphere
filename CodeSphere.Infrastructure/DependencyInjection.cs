@@ -84,11 +84,11 @@ namespace CodeSphere.Infrastructure
                     options.TokenValidationParameters = new TokenValidationParameters()
                     {
                         ValidateIssuer = true,
-                        ValidIssuer = configuration["JWT:ValidIssure"],
+                        ValidIssuer = configuration["JWT:Issuer"],
                         ValidateAudience = true,
-                        ValidAudience = configuration["JWT:ValidAudience"],
+                        ValidAudience = configuration["JWT:Audience"],
                         ValidateIssuerSigningKey = true,
-                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["JWT:AuthKey"] ?? string.Empty)),
+                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["JWT:Key"] ?? string.Empty)),
                         ValidateLifetime = true,
                         ClockSkew = TimeSpan.Zero,
                     };

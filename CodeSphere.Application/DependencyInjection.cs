@@ -17,6 +17,13 @@ namespace CodeSphere.Application
             var assembly = typeof(DependencyInjection).Assembly;
             services.Configure<EmailSettings>(configuration.GetSection("EmailSettings"));
             services.Configure<ElasticSetting>(configuration.GetSection("ElasticSearch"));
+            //services.Configure<JwtOptions>(configuration.GetSection("JWT"));
+
+            services.AddOptions<JwtOptions>()
+                .BindConfiguration(JwtOptions.SectionName)
+                .ValidateDataAnnotations()
+                .ValidateOnStart();
+
 
 
             // redis
