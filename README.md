@@ -43,10 +43,10 @@ Code Sphere is an open-source online judge and contest platform built using vari
 
 ## Performance and Security
 
-- Uses Docker to run code in a sandbox container, executing it against all problem test cases in an isolated environment with limited resources such as memory and time, returning the results.
-- Implements rate limiting, as executing code requires creating a sandbox container and running all test cases, making it a costly process; thus, it is limited to 3 requests per minute.
-- To handle the expected surge in requests during contests, problems are cached, and Sorted Sets (ZSETs), a Redis data structure, are used to store leaderboards, which suits our needs for contest standings.
-- Since the primary search object is the problems, a robust searching strategy is essential; therefore, Elasticsearch is employed to enable high-performance searching with easy and fast filtering.
+- Uses Docker to run code in a `sandbox` container, executing it against all problem test cases in an isolated environment with limited resources such as memory and time, returning the results.
+- Implements `rate limiting`, as executing code requires creating a sandbox container and running all test cases, making it a costly process; thus, it is limited to 3 requests per minute.
+- To handle the expected surge in requests during contests, problems are cached, and `Sorted Sets (ZSETs)` which is a Redis data structure used to store leaderboards, which suits our needs for contest standings.
+- Since the primary search object is the problems, a robust searching strategy is essential; therefore, `Elasticsearch` is employed to enable high-performance and fuzzy searching with easy and fast filtering.
 
 ## Run Locally
 
