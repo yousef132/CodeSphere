@@ -66,7 +66,11 @@ Code Sphere is an open-source online judge and contest platform built using vari
    ```
    This will pull the necessary Docker images specified in the compose file (if they don't already exist) and start the services, including Redis, Elasticsearch, and Kibana, on your local machine.
 3. Verify the database connection string for the SQL Server database.
-4. Open the `Package Manager Console` and run:
+4. pull compilers images for the language you need to try 
+  * for example :
+    *  `docker pull gcc:latest` for c++ 
+    *  `python:3.8-slim` for python
+6. Open the `Package Manager Console` and run:
    ```sh
    update-database
    ```
