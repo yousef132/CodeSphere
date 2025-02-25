@@ -8,7 +8,7 @@ namespace CodeSphere.Domain.Models.Entities
     {
         public string ProblemSetterId { get; set; }
         public string Name { get; set; }
-        public decimal Duration { get; set; }
+        public TimeSpan Duration => EndDate.Subtract(StartDate);
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; } = DateTime.Now;
         public int? BlogId { get; set; }
