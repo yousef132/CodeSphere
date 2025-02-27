@@ -52,7 +52,8 @@ namespace CodeSphere.Infrastructure.Implementation.Services
                         {
                             plagiarismCases.Add(new PlagiarismCaseDTO
                             {
-                                Submissions = new KeyValuePair<Submit, Submit>(subList[i], subList[j]),
+                                FirstSubmission = subList[i],
+                                SecondSubmission = subList[j],
                                 Similarity = similarity,
                                 ProblemId = subList[i].ProblemId
                             });

@@ -9,7 +9,8 @@ namespace CodeSphere.Domain.DTOs
 {
     public class PlagiarismCaseDTO
     {
-        public KeyValuePair<Submit, Submit> Submissions { get; set; }
+        public Submit FirstSubmission { get; set; }
+        public Submit SecondSubmission { get; set; }
         public decimal Similarity { get; set; }
         public int ProblemId { get; set; }
     }
