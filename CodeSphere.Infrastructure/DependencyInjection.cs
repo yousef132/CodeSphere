@@ -39,6 +39,8 @@ namespace CodeSphere.Infrastructure
             services.AddScoped(typeof(IElasticSearchRepository), typeof(ElasticSearchRepository));
             services.AddScoped(typeof(IUserContestRepository), typeof(UserContestRepository));
             services.AddScoped(typeof(ITopicRepository), typeof(TopicRepository));
+            services.AddScoped(typeof(IPlagiarismService), typeof(PlagiarismService));
+
 
             services.AddSingleton<IConnectionMultiplexer>(config =>
             {
