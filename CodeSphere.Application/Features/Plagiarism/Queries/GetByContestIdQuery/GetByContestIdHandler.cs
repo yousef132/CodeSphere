@@ -1,4 +1,6 @@
-﻿using CodeSphere.Domain.Abstractions.Services;
+﻿using AutoMapper;
+using CodeSphere.Domain.Abstractions.Services;
+using CodeSphere.Domain.DTOs;
 using CodeSphere.Domain.Premitives;
 using MediatR;
 using Microsoft.IdentityModel.Tokens;
@@ -13,9 +15,11 @@ namespace CodeSphere.Application.Features.Plagiarism.Queries.GetByContestIdQuery
     public class GetByContestIdHandler : IRequestHandler<GetByContestIdQuery, Response>
     {
         IPlagiarismService plagiarismService;
-        public GetByContestIdHandler(IPlagiarismService plagiarismService)
+        IMapper mapper;
+        public GetByContestIdHandler(IPlagiarismService plagiarismService, IMapper mapper)
         {
             this.plagiarismService = plagiarismService;
+            this.mapper = mapper;
         }
         public async Task<Response> Handle(GetByContestIdQuery request, CancellationToken cancellationToken)
         {
@@ -24,7 +28,15 @@ namespace CodeSphere.Application.Features.Plagiarism.Queries.GetByContestIdQuery
             {
                 return await Response.FailureAsync("No cases found");
             }
-            return await Response.SuccessAsync(cases);
+            var mappedCases = cases.Select(c => new GetByContestIdResponse
+            {
+                FirstSubmission = mapper.Map<SubmissionDTO>(c.FirstSubmission),
+                SecondSubmission = mapper.Map<SubmissionDTO>(c.SecondSubmission),
+                ProblemId = c.ProblemId,
+                Similarity = c.Similarity,
+                
+            });
+            return await Response.SuccessAsync(mappedCases);
         }
     }
 }
