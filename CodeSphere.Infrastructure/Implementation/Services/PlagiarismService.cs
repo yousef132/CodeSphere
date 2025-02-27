@@ -16,7 +16,7 @@ namespace CodeSphere.Infrastructure.Implementation.Services
     {
         const uint FNV_PRIME = 16777619;  // https://en.wikipedia.org/wiki/Fowler%E2%80%93Noll%E2%80%93Vo_hash_function#FNV_hash_parameters
         const uint OFFSET_BASIS = 2166136261;
-        const uint N = 3;
+        const uint N = 6;
         const uint WINDOW_SIZE = 5;
 
 
@@ -161,6 +161,11 @@ namespace CodeSphere.Infrastructure.Implementation.Services
             }
 
             return fingerPrints;
+        }
+
+        public decimal GetSimilarity(string code1, string code2)
+        {
+            return CalculateJaccardSimilarity(code1, code2);
         }
     }
 }

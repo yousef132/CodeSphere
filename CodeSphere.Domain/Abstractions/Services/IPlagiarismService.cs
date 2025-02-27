@@ -10,5 +10,6 @@ namespace CodeSphere.Domain.Abstractions.Services
     public interface IPlagiarismService
     {
         Task<IEnumerable<PlagiarismCaseDTO>> GetPlagiarismCases(int contestId, List<int> exceptProblemIds, int threshold);
+        decimal GetSimilarity(string code1, string code2); // for testing purposes
     }
 }
