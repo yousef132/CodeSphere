@@ -9,11 +9,10 @@ namespace CodeSphere.Application.Features.Problem.Queries.GetById
         public Difficulty Difficulty { get; set; }
         public List<TestCasesDto> TestCases { get; set; }
         public List<TopicDto> Topics { get; set; }
-
+        public int ContestId { get; set; }
         public decimal Accepted { get; set; }
         public decimal Submissions { get; set; }
         public decimal AcceptanceRate => Submissions > 0 ? Accepted / Submissions * 100 : 0;
-
         public bool IsSolved { get; set; }
 
     }

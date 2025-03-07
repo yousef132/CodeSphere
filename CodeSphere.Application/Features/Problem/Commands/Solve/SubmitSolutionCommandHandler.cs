@@ -40,19 +40,16 @@ namespace CodeSphere.Application.Features.Problem.Commands.SolveProblem
         }
         public async Task<Response> Handle(SubmitSolutionCommand request, CancellationToken cancellationToken)
         {
-            var problem = await unitOfWork.Repository<Domain.Models.Entities.Problem>().GetByIdAsync(request.ProblemId);
+            var problem = await unitOfWork.ProblemRepository.GetProblemIncludingContestAndTestcases(request.ProblemId);
             if (problem == null)
                 return await Response.FailureAsync("Problem Not Found", System.Net.HttpStatusCode.NotFound);
 
-            var contest = await unitOfWork.Repository<Domain.Models.Entities.Problem>().GetByIdAsync(request.ContestId);
-            if (contest == null)
+            if (problem.Contest == null)
                 return await Response.FailureAsync("Contest Not Found", System.Net.HttpStatusCode.NotFound);
-
-            var problemTestCases = problemRepository.GetTestCasesByProblemId(request.ProblemId);
 
             string codeContent = await fileService.ReadFile(request.Code);
 
-            var result = await executionService.ExecuteCodeAsync(codeContent, request.Language, problemTestCases.ToList(), problem.RunTimeLimit);
+            var result = await executionService.ExecuteCodeAsync(codeContent, request.Language, problem.Testcases.ToList(), problem.RunTimeLimit);
 
             var baseSubmissionResponse = (result as BaseSubmissionResponse);
             var acceptedSubmission = (result as AcceptedResponse);
@@ -71,13 +68,19 @@ namespace CodeSphere.Application.Features.Problem.Commands.SolveProblem
                 SubmitMemory = 0m
             };
 
+
+            if (problem.Contest.ContestStatus == ContestStatus.Running)
+            {
+                // cache contest standing
+
+            }
+            // insert the result in the database 
+
             await unitOfWork.Repository<Submit>().AddAsync(submission);
             await unitOfWork.CompleteAsync();
 
             // save submission result in database
             return await Response.SuccessAsync(result, "Submitted Successfully", System.Net.HttpStatusCode.Created);
         }
-
-
     }
 }

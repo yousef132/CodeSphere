@@ -1,8 +1,10 @@
 ﻿using CodeSphere.Application.Features.Contest.Command.Create;
 using CodeSphere.Application.Features.Contest.Command.Register;
-using CodeSphere.Application.Features.Contest.Queries;
+using CodeSphere.Application.Features.Contest.Queries.GetAllContests;
+using CodeSphere.Application.Features.Contest.Queries.GetContestProblems;
 using CodeSphere.Domain.Abstractions.Services;
 using CodeSphere.Domain.Premitives;
+using CodeSphere.Domain.Responses;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -19,11 +21,11 @@ namespace CodeSphere.WebApi.Controllers
         }
 
 
-
         [HttpGet("{id}/problems")]
-        //[Authorize(Roles = Roles.User)]
+        [Authorize(Roles = Roles.User)]
+        [ProducesResponseType(typeof(ContestProblemResponse), StatusCodes.Status200OK)]
         public async Task<ActionResult<Response>> GetContestProblems([FromRoute] int id)
-         => ResponseResult(await mediator.Send(new GetContestProblemsQuery(id)));
+           => ResponseResult(await mediator.Send(new GetContestProblemsQuery(id)));
 
 
         [HttpPost]
@@ -39,6 +41,9 @@ namespace CodeSphere.WebApi.Controllers
            => ResponseResult(await mediator.Send(new RegisterInContestCommand(contestId)));
 
 
+        [HttpGet]
+        public async Task<ActionResult<Response>> GetAllContests()
+          => ResponseResult(await mediator.Send(new GetAllContestsQuery()));
 
 
 

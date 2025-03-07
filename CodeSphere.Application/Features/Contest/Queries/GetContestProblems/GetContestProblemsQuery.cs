@@ -1,7 +1,7 @@
 ﻿using CodeSphere.Domain.Premitives;
 using MediatR;
 
-namespace CodeSphere.Application.Features.Contest.Queries
+namespace CodeSphere.Application.Features.Contest.Queries.GetContestProblems
 {
     public class GetContestProblemsQuery : IRequest<Response>
     {
