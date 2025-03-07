@@ -72,6 +72,7 @@ namespace CodeSphere.Application.Features.Problem.Commands.SolveProblem
             if (problem.Contest.ContestStatus == ContestStatus.Running)
             {
                 // cache contest standing
+
             }
             // insert the result in the database 
 

@@ -55,10 +55,11 @@ namespace CodeSphere.Application.Features.Contest.Queries
 
             if (!string.IsNullOrEmpty(cachedData))
             {
+                // cache hit
                 var serializedData = Helper.DeserializeCollection<ContestProblemResponse>(cachedData);
                 return await Response.SuccessAsync(serializedData, "Contest Problems fetched successfully", System.Net.HttpStatusCode.Found);
             }
-
+            // cache miss
             return await FetchAndCacheContestProblems(request.Id, cacheKey);
         }
 
