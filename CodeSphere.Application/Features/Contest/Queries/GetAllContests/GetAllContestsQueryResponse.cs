@@ -9,6 +9,7 @@ namespace CodeSphere.Application.Features.Contest.Queries.GetAllContests
 
         public string Name { get; set; }
 
+        public bool UserRegistered { get; set; }
         public DateTime StartDate { get; set; }
 
         public DateTime EndDate { get; set; }

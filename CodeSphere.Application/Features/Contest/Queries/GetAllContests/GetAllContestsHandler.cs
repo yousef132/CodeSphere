@@ -18,7 +18,8 @@ namespace CodeSphere.Application.Features.Contest.Queries.GetAllContests
 
         public async Task<Response> Handle(GetAllContestsQuery request, CancellationToken cancellationToken)
         {
-            var contests = await unitOfWork.Repository<Domain.Models.Entities.Contest>().GetAllAsync();
+            var contests = await unitOfWork.Repository<Domain.Models.Entities.Contest>().GetAllAsync(); ;
+            //var contests = await unitOfWork.ContestRepository.GetAllContestWithRegisteredUserAsync();
 
             var mappedContests = mapper.Map<IReadOnlyList<GetAllContestsQueryResponse>>(contests);
 

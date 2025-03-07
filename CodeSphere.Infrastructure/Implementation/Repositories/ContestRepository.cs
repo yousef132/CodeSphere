@@ -13,6 +13,19 @@ namespace CodeSphere.Infrastructure.Implementation.Repositories
         {
             context = _context;
         }
+
+        public Task<IReadOnlyList<(Contest, bool)>> GetAllContestWithRegisteredUserAsync(string userId)
+        {
+            throw new NotImplementedException();
+        }
+
+        //public async Task<IReadOnlyList<(Contest, bool)>> GetAllContestWithRegisteredUserAsync(string userId)
+        //    => await context.Contests.Include(c => c.Registrations.Where(r => r.UserId == userId)).Select(c=>
+        //    {
+        //        var isRegistered = c.Registrations.Any();
+        //        return (c, isRegistered);
+        //    }).ToListAsync();
+
         public async Task<IReadOnlyList<Problem>> GetContestProblemsByIdAsync(int contestId)
 
              => await context.Problems.Where(x => x.ContestId == contestId).ToListAsync();

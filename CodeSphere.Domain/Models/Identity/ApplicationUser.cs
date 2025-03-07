@@ -9,6 +9,9 @@ namespace CodeSphere.Domain.Models.Identity
         public UserStatus RankName { get; set; } = UserStatus.UnRanked; // ex: pupil
         public string? ImagePath { get; set; }
         public short Rating { get; set; } = 0; // ex: 1200 
+        public Gender? Gender { get; set; }
+
+        public string? Name { get; set; }
 
         public ICollection<Contest> Contests { get; set; } // Contests created by this user (Setter)
         public ICollection<Problem> Problems { get; set; } // Problems set by this user (Setter)

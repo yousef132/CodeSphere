@@ -22,7 +22,7 @@ namespace CodeSphere.WebApi.Controllers
 
 
         [HttpGet("{id}/problems")]
-        [Authorize(Roles = Roles.User)]
+        //[Authorize(Roles = Roles.User)]
         [ProducesResponseType(typeof(ContestProblemResponse), StatusCodes.Status200OK)]
         public async Task<ActionResult<Response>> GetContestProblems([FromRoute] int id)
            => ResponseResult(await mediator.Send(new GetContestProblemsQuery(id)));

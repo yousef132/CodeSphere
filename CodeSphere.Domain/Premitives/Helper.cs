@@ -9,6 +9,7 @@ namespace CodeSphere.Domain.Premitives
         public const string PythonCompiler = "python:3.8-slim";
         public const string CppCompiler = "gcc:latest";
         public const string CSharpCompiler = "mcr.microsoft.com/dotnet/sdk:5.0";
+        public const string ImagesDirectory = "UsersImages";
 
         //public static string ExecuteCodeCommand(string containerId, decimal timeLimit,decimal memoryLimit)
         //{

@@ -7,6 +7,7 @@ namespace CodeSphere.Domain.Abstractions.Services
     {
         bool CheckFileExtension(IFormFile file, Language language);
 
+        Task<string> UploadFileAsync(IFormFile file, string directory);
         Task<string> ReadFile(IFormFile file);
         Task<string> ReadFileAsync(string filePath);
 

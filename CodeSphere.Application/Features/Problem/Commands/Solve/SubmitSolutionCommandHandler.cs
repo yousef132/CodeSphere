@@ -68,7 +68,6 @@ namespace CodeSphere.Application.Features.Problem.Commands.SolveProblem
                 SubmitMemory = 0m
             };
 
-
             if (problem.Contest.ContestStatus == ContestStatus.Running)
             {
                 // cache contest standing

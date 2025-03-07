@@ -1,11 +1,18 @@
 ﻿using CodeSphere.Domain.Abstractions.Services;
 using CodeSphere.Domain.Premitives;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 
 namespace CodeSphere.Infrastructure.Implementation.Services
 {
     public class FileService : IFileService
     {
+
+        private readonly IWebHostEnvironment webHostEnvironment;
+        public FileService(IWebHostEnvironment webHostEnvironment)
+        {
+            this.webHostEnvironment = webHostEnvironment;
+        }
         public bool CheckFileExtension(IFormFile file, Language language)
         {
             var extension = System.IO.Path.GetExtension(file.FileName);
@@ -50,6 +57,40 @@ namespace CodeSphere.Infrastructure.Implementation.Services
                 content = await reader.ReadToEndAsync();
             }
             return content;
+        }
+
+        public async Task<string> UploadFileAsync(IFormFile file, string directory)
+        {
+            var serverPath = webHostEnvironment.WebRootPath;
+            var extension = Path.GetExtension(file.FileName);
+            var imagePath = $"/{directory}/{Guid.NewGuid().ToString().Replace("-", string.Empty)}{extension}";
+
+            var fullPath = serverPath + imagePath;
+
+            if (file.Length > 0)
+            {
+                try
+                {
+                    if (!Directory.Exists(serverPath))
+                        // if directory not found then make one
+                        Directory.CreateDirectory(serverPath);
+
+                    using (FileStream stream = File.Create(fullPath))
+                    {
+                        await file.CopyToAsync(stream);
+                        await stream.FlushAsync();
+                        return imagePath;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    return "FailedToUploadImage";
+                    throw;
+                }
+
+            }
+            else
+                return "NoImage";
         }
     }
 }
