@@ -63,6 +63,12 @@ namespace CodeSphere.Infrastructure.Implementation.Repositories
 
             return true;
         }
+        public async Task<List<Submit>> GetContestACSubmissionsByProblemIdsAsync(int contestId, List<int> problemIds)
+        {
+            return await _context.Submits
+                .Where(s => s.ContestId == contestId && problemIds.Contains(s.ProblemId) && s.Result == SubmissionResult.Accepted)
+                .ToListAsync();
+        }
     }
 
 }

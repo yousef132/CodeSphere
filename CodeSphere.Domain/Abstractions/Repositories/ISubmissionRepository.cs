@@ -10,6 +10,8 @@ namespace CodeSphere.Domain.Abstractions.Repositories
         Task<HashSet<int>> GetUserAcceptedSubmissionIdsAsync(string userId);
         Task<Dictionary<int, SubmissionResult>> GetUserSubmissionsAsync(string userId);
         Task<bool> IsUserAuthorizedToViewSubmission (string userId, int submissionId);
+        Task<List<Submit>> GetContestACSubmissionsByProblemIdsAsync(int contestId, List<int> problemIds);
+
 
     }
 
