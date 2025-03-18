@@ -24,7 +24,6 @@ namespace CodeSphere.WebApi.Hubs
             var roomId = GenerateRoomId();
             _rooms.TryAdd(roomId, true);
             _userConnections[Context.ConnectionId] = roomId;
-            await JoinRoom(userName, roomId);
             return roomId;
         }
 
@@ -50,7 +49,7 @@ namespace CodeSphere.WebApi.Hubs
                 return;
             }
 
-            await Clients.OthersInGroup(roomId).SendAsync("ReceiveCode", code);
+            await Clients.Group(roomId).SendAsync("ReceiveCode", code);
         }
 
         public async Task SendLanguage(string roomId, string language)
