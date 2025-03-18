@@ -49,7 +49,7 @@ namespace CodeSphere.WebApi.Hubs
                 return;
             }
 
-            await Clients.Group(roomId).SendAsync("ReceiveCode", code);
+            await Clients.OthersInGroup(roomId).SendAsync("ReceiveCode", code);
         }
 
         public async Task SendLanguage(string roomId, string language)
@@ -60,7 +60,7 @@ namespace CodeSphere.WebApi.Hubs
                 return;
             }
 
-            await Clients.Group(roomId).SendAsync("ReceiveLanguage", language);
+            await Clients.OthersInGroup(roomId).SendAsync("ReceiveLanguage", language);
         }
 
         public override async Task OnDisconnectedAsync(Exception exception)
