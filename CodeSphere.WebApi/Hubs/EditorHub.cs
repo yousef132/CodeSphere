@@ -68,12 +68,8 @@ namespace CodeSphere.WebApi.Hubs
             if (_userConnections.TryGetValue(Context.ConnectionId, out string roomId))
             {
                 _userConnections.Remove(Context.ConnectionId);
-                if (_rooms.Contains(roomId))
-                {
-                    _rooms.Remove(roomId);
-                }
 
-                if (_userConnections.Values.All(x => x != roomId))
+                if (!_userConnections.Values.Contains(roomId))
                 {
                     _rooms.Remove(roomId);
                 }
