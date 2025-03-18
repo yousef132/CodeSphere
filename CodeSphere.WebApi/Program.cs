@@ -39,16 +39,15 @@ builder.Services.AddHttpContextAccessor();
 var Cors = "_CORS";
 builder.Services.AddCors(opt =>
 {
-    opt.AddPolicy(name: Cors,
-        policy =>
-        {
-            policy.AllowAnyHeader();
-            policy.AllowAnyMethod();
-            policy.AllowAnyOrigin();
-            policy.AllowCredentials();
-        }
-    );
+    opt.AddPolicy(name: Cors, policy =>
+    {
+        policy.AllowAnyHeader();
+        policy.AllowAnyMethod();
+        policy.SetIsOriginAllowed(_ => true) 
+              .AllowCredentials(); 
+    });
 });
+
 
 
 var app = builder.Build();
