@@ -13,9 +13,11 @@ namespace CodeSphere.WebApi.Hubs
         public string Code { get; set; } = string.Empty;
         public string Language { get; set; } = "c++";
 
-        public Room(string id)
+        public Room(string id, string code, string lang)
         {
             Id = id;
+            Code = code;
+            Language = lang;
         }
     }
 
@@ -24,29 +26,29 @@ namespace CodeSphere.WebApi.Hubs
         private static readonly ConcurrentDictionary<string, string> _userConnections = new(); // connectionId, roomId
         private static readonly ConcurrentDictionary<string, Room> _rooms = new();
 
-        private Room GenerateRoomId()
+        private string GenerateRoomId()
         {
             const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
             var random = new Random();
-            string id = new string(Enumerable.Repeat(chars, 6)   
-                .Select(s => s[random.Next(s.Length)]).ToArray());
-            return new Room(id);   
+            return new string(Enumerable.Repeat(chars, 6)   
+                .Select(s => s[random.Next(s.Length)]).ToArray());   
         }
 
-        public async Task<string> CreateRoom(string userName)
+        public async Task<string> CreateRoom(string code, string lang)
         {
-            var room = GenerateRoomId();
+            var id = GenerateRoomId();
+            var room = new Room(id, code, lang);
             _rooms.TryAdd(room.Id, room);
             _userConnections[Context.ConnectionId] = room.Id;
             return room.Id;
         }
 
-        public async Task JoinRoom(string userName, string roomId)
+        public async Task<(string, string)> JoinRoom(string userName, string roomId)
         {
             if (!_rooms.ContainsKey(roomId))
             {
                 await Clients.Caller.SendAsync("RoomNotFound", "Room not found");
-                return;
+                return ("", "");
             }
 
             _userConnections[Context.ConnectionId] = roomId;
@@ -56,8 +58,7 @@ namespace CodeSphere.WebApi.Hubs
 
             // Send the code & lang to the new user
 
-            await Clients.Caller.SendAsync("ReceiveCode", _rooms[roomId].Code);
-            await Clients.Caller.SendAsync("ReceiveLanguage", _rooms[roomId].Language);
+            return (_rooms[roomId].Code, _rooms[roomId].Language);
         }
 
         public async Task SendCode(string roomId, string code)
