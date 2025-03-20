@@ -43,12 +43,12 @@ namespace CodeSphere.WebApi.Hubs
             return room.Id;
         }
 
-        public async Task<(string, string)> JoinRoom(string userName, string roomId)
+        public async Task<Object> JoinRoom(string userName, string roomId)
         {
             if (!_rooms.ContainsKey(roomId))
             {
                 await Clients.Caller.SendAsync("RoomNotFound", "Room not found");
-                return ("", "");
+                return null;
             }
 
             _userConnections[Context.ConnectionId] = roomId;
@@ -58,7 +58,7 @@ namespace CodeSphere.WebApi.Hubs
 
             // Send the code & lang to the new user
 
-            return (_rooms[roomId].Code, _rooms[roomId].Language);
+            return new { code = _rooms[roomId].Code, language = _rooms[roomId].Language };
         }
 
         public async Task SendCode(string roomId, string code)
