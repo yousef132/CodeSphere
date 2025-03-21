@@ -21,10 +21,20 @@ namespace CodeSphere.WebApi.Hubs
         }
     }
 
+    public class ConnectionData
+    {
+        public string RoomId { get; set; }
+        public string UserName { get; set; }
+        public int CursorPosition { get; set; }
+        public string Color { get; set; }
+    }
+
     public class EditorHub : Hub
     {
-        private static readonly ConcurrentDictionary<string, string> _userConnections = new(); // connectionId, roomId
-        private static readonly ConcurrentDictionary<string, Room> _rooms = new();
+
+        private static ConcurrentDictionary<string, ConnectionData> _userConnections = new(); // connectionId, roomId
+        private static ConcurrentDictionary<string, Room> _rooms = new();
+        
 
         private string GenerateRoomId()
         {
@@ -39,7 +49,7 @@ namespace CodeSphere.WebApi.Hubs
             var id = GenerateRoomId();
             var room = new Room(id, code, lang);
             _rooms.TryAdd(room.Id, room);
-            _userConnections[Context.ConnectionId] = room.Id;
+            _userConnections[Context.ConnectionId].RoomId = room.Id;
             return room.Id;
         }
 
@@ -51,7 +61,8 @@ namespace CodeSphere.WebApi.Hubs
                 return null;
             }
 
-            _userConnections[Context.ConnectionId] = roomId;
+            _userConnections[Context.ConnectionId].RoomId = roomId;
+            _userConnections[Context.ConnectionId].UserName = userName;
 
             await Groups.AddToGroupAsync(Context.ConnectionId, roomId);
             await Clients.Group(roomId).SendAsync("UserJoined", $"{userName} has joined the room");
@@ -85,16 +96,50 @@ namespace CodeSphere.WebApi.Hubs
             await Clients.OthersInGroup(roomId).SendAsync("ReceiveLanguage", language);
         }
 
+        public async Task SendCursorPosition(string roomId, int cursorPosition, string color, string username)
+        {
+            if (!_rooms.ContainsKey(roomId))
+            {
+                await Clients.Caller.SendAsync("RoomNotFound", "Room not found");
+                return;
+            }
+            
+            var data = _userConnections[Context.ConnectionId];
+
+            data.CursorPosition = cursorPosition;
+            data.Color = color;
+
+            await Clients.OthersInGroup(roomId).SendAsync("ReceiveCursorPosition",
+                new { 
+                    username = data.UserName,
+                    index = data.CursorPosition,
+                    color = data.Color
+                });
+        }
+
         public override async Task OnDisconnectedAsync(Exception exception)
         {
-            if (_userConnections.TryGetValue(Context.ConnectionId, out string roomId))
+            if (_userConnections.TryGetValue(Context.ConnectionId, out ConnectionData data))
             {
-                _userConnections.TryRemove(Context.ConnectionId, out string _);
+                _userConnections.TryRemove(Context.ConnectionId, out ConnectionData _);
 
-                if (!_userConnections.Values.Contains(roomId))
+                var roomId = data.RoomId;
+
+                bool hasUser = false;
+                foreach (var connection in _userConnections.Values)
+                {
+                    if (connection.RoomId == roomId)
+                    {
+                        hasUser = true;
+                        break;
+                    }
+                }
+
+                if (!hasUser)
                 {
                     _rooms.TryRemove(roomId, out Room _);
                 }
+
                 await Groups.RemoveFromGroupAsync(Context.ConnectionId, roomId);
                 await Clients.Group(roomId).SendAsync("UserLeft", $"{Context.ConnectionId} has left the room");
             }
