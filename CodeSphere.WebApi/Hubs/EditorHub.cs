@@ -49,7 +49,7 @@ namespace CodeSphere.WebApi.Hubs
             var id = GenerateRoomId();
             var room = new Room(id, code, lang);
             _rooms.TryAdd(room.Id, room);
-            _userConnections[Context.ConnectionId].RoomId = room.Id;
+            _userConnections[Context.ConnectionId] = new ConnectionData() { RoomId= id };
             return room.Id;
         }
 
