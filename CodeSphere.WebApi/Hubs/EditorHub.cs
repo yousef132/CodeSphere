@@ -49,11 +49,12 @@ namespace CodeSphere.WebApi.Hubs
             var id = GenerateRoomId();
             var room = new Room(id, code, lang);
             _rooms.TryAdd(room.Id, room);
-            _userConnections[Context.ConnectionId] = new ConnectionData() { RoomId= id };
+            _userConnections.TryAdd(Context.ConnectionId, new ConnectionData { RoomId = room.Id});
+
             return room.Id;
         }
 
-        public async Task<Object> JoinRoom(string userName, string roomId)
+        public async Task<Object> JoinRoom(string userName, string roomId, string color)
         {
             if (!_rooms.ContainsKey(roomId))
             {
@@ -63,6 +64,7 @@ namespace CodeSphere.WebApi.Hubs
 
             _userConnections[Context.ConnectionId].RoomId = roomId;
             _userConnections[Context.ConnectionId].UserName = userName;
+            _userConnections[Context.ConnectionId].Color = color;
 
             await Groups.AddToGroupAsync(Context.ConnectionId, roomId);
             await Clients.Group(roomId).SendAsync("UserJoined", $"{userName} has joined the room");
