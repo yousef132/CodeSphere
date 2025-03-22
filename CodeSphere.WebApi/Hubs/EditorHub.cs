@@ -16,12 +16,15 @@ namespace CodeSphere.WebApi.Hubs
         public string Id { get; set; } = string.Empty;
         public string Code { get; set; } = string.Empty;
         public string Language { get; set; } = "c++";
+        public int ProblemId { get; set; }
 
-        public Room(string id, string code, string lang)
+
+        public Room(string id, string code, string lang, int problemId)
         {
             Id = id;
             Code = code;
             Language = lang;
+            ProblemId = problemId;
         }
         public class ConnectionData
         {
@@ -69,24 +72,34 @@ namespace CodeSphere.WebApi.Hubs
                 .Select(s => s[random.Next(s.Length)]).ToArray());
         }
 
-        public async Task<string> CreateRoom(string code, string lang)
+        public async Task<string> CreateRoom(string code, string lang, int problemId)
         {
             var id = GenerateRoomId();
-            var room = new Room(id, code, lang);
+            var room = new Room(id, code, lang, problemId);
             _rooms.TryAdd(room.Id, room);
             _userConnections[Context.ConnectionId] = new ConnectionData { RoomId = room.Id };
             return room.Id;
         }
 
-        public async Task<Object> JoinRoom(string roomId)
+        public async Task<Object> JoinRoom(string roomId, int problemId)
         {
 
             var userName = await GetCurrentUserName();
 
-            if (!_rooms.ContainsKey(roomId))
+            if (!_rooms.ContainsKey(roomId) || _rooms[roomId].ProblemId != problemId)
             {
                 await Clients.Caller.SendAsync("RoomNotFound", "Room not found");
                 return null;
+            }
+
+            foreach (var connection in _userConnections.Values)
+            {
+                if (connection.UserName == userName)
+                {
+                    await Clients.Caller.SendAsync("RoomNotFound", "you are already in the room");
+                    Context.Abort();
+                    return null;
+                }
             }
 
             _userConnections[Context.ConnectionId] = new ConnectionData { RoomId = roomId,UserName=userName,Color= GetRandomColor() };
