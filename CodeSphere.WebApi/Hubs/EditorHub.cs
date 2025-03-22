@@ -1,4 +1,7 @@
-﻿using Microsoft.AspNetCore.SignalR;
+﻿using CodeSphere.Domain.Models.Identity;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.SignalR;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -29,11 +32,25 @@ namespace CodeSphere.WebApi.Hubs
         }
     }
 
-
+    [Authorize]
     public class EditorHub : Hub
     {
         private static readonly ConcurrentDictionary<string, ConnectionData> _userConnections = new(); // connectionId, roomId
         private static readonly ConcurrentDictionary<string, Room> _rooms = new();
+        UserManager<ApplicationUser> _userManager;
+
+        public EditorHub(UserManager<ApplicationUser> userManager)
+        {
+            _userManager = userManager;
+        }
+
+
+        private async Task<string> GetCurrentUserName()
+        {
+            var user = await _userManager.GetUserAsync(Context.User);
+            return user?.UserName;
+        }
+
         private string GetRandomColor()
         {
             Random random = new Random();
@@ -61,8 +78,11 @@ namespace CodeSphere.WebApi.Hubs
             return room.Id;
         }
 
-        public async Task<Object> JoinRoom(string userName, string roomId)
+        public async Task<Object> JoinRoom(string roomId)
         {
+
+            var userName = await GetCurrentUserName();
+
             if (!_rooms.ContainsKey(roomId))
             {
                 await Clients.Caller.SendAsync("RoomNotFound", "Room not found");
@@ -77,7 +97,7 @@ namespace CodeSphere.WebApi.Hubs
 
             // Send the code & lang to the new user
 
-            return new { code = _rooms[roomId].Code, language = _rooms[roomId].Language };
+            return new { code = _rooms[roomId].Code, language = _rooms[roomId].Language, username = userName };
         }
 
         public async Task SendCode(string roomId, string code)
@@ -103,8 +123,12 @@ namespace CodeSphere.WebApi.Hubs
             _rooms[roomId].Language = language;
             await Clients.OthersInGroup(roomId).SendAsync("ReceiveLanguage", language);
         }
-        public async Task SendCursorPosition(string roomId, int cursorPosition, string username)
+        public async Task SendCursorPosition(string roomId, int cursorPosition)
         {
+
+            var userName = await GetCurrentUserName();
+
+
             if (!_rooms.ContainsKey(roomId))
             {
                 await Clients.Caller.SendAsync("RoomNotFound", "Room not found");
@@ -115,17 +139,21 @@ namespace CodeSphere.WebApi.Hubs
 
             data.CursorPosition = cursorPosition;
 
-            await Clients.OthersInGroup(roomId).SendAsync("ReceiveCursorPosition",
+            await Clients.Group(roomId).SendAsync("ReceiveCursorPosition",
                 new
                 {
-                    username = data.UserName,
+                    username = userName,
                     index = data.CursorPosition,
                     color = data.Color
                 });
         }
 
-        public async Task SendResultMessage(string roomId, string username, string msg)
+        public async Task SendResultMessage(string roomId, string msg)
         {
+
+            var user = await _userManager.GetUserAsync(Context.User);
+            var username = user.UserName;
+
             if (!_rooms.ContainsKey(roomId))
             {
                 await Clients.Caller.SendAsync("RoomNotFound", "Room not found");
