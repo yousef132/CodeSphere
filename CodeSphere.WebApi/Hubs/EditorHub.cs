@@ -3,6 +3,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using static CodeSphere.WebApi.Hubs.Room;
 
 namespace CodeSphere.WebApi.Hubs
 {
@@ -19,29 +20,36 @@ namespace CodeSphere.WebApi.Hubs
             Code = code;
             Language = lang;
         }
+        public class ConnectionData
+        {
+            public string RoomId { get; set; }
+            public string UserName { get; set; }
+            public int CursorPosition { get; set; }
+            public string Color { get; set; }
+        }
     }
 
-    public class ConnectionData
-    {
-        public string RoomId { get; set; }
-        public string UserName { get; set; }
-        public int CursorPosition { get; set; }
-        public string Color { get; set; }
-    }
 
     public class EditorHub : Hub
     {
+        private static readonly ConcurrentDictionary<string, ConnectionData> _userConnections = new(); // connectionId, roomId
+        private static readonly ConcurrentDictionary<string, Room> _rooms = new();
+        private string GetRandomColor()
+        {
+            Random random = new Random();
 
-        private static ConcurrentDictionary<string, ConnectionData> _userConnections = new(); // connectionId, roomId
-        private static ConcurrentDictionary<string, Room> _rooms = new();
-        
+            int r = random.Next(50, 200); 
+            int g = random.Next(150, 255); 
+            int b = random.Next(50, 200); 
 
+            return $"#{r:X2}{g:X2}{b:X2}";
+        }
         private string GenerateRoomId()
         {
             const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
             var random = new Random();
-            return new string(Enumerable.Repeat(chars, 6)   
-                .Select(s => s[random.Next(s.Length)]).ToArray());   
+            return new string(Enumerable.Repeat(chars, 6)
+                .Select(s => s[random.Next(s.Length)]).ToArray());
         }
 
         public async Task<string> CreateRoom(string code, string lang)
@@ -49,12 +57,11 @@ namespace CodeSphere.WebApi.Hubs
             var id = GenerateRoomId();
             var room = new Room(id, code, lang);
             _rooms.TryAdd(room.Id, room);
-            _userConnections.TryAdd(Context.ConnectionId, new ConnectionData { RoomId = room.Id});
-
+            _userConnections[Context.ConnectionId] = new ConnectionData { RoomId = room.Id };
             return room.Id;
         }
 
-        public async Task<Object> JoinRoom(string userName, string roomId, string color)
+        public async Task<Object> JoinRoom(string userName, string roomId)
         {
             if (!_rooms.ContainsKey(roomId))
             {
@@ -62,12 +69,11 @@ namespace CodeSphere.WebApi.Hubs
                 return null;
             }
 
-            _userConnections[Context.ConnectionId].RoomId = roomId;
-            _userConnections[Context.ConnectionId].UserName = userName;
-            _userConnections[Context.ConnectionId].Color = color;
+            _userConnections[Context.ConnectionId] = new ConnectionData { RoomId = roomId,UserName=userName,Color= GetRandomColor() };
+
 
             await Groups.AddToGroupAsync(Context.ConnectionId, roomId);
-            await Clients.Group(roomId).SendAsync("UserJoined", $"{userName} has joined the room");
+            await Clients.OthersInGroup(roomId).SendAsync("UserJoined", $"{userName} has joined the room");
 
             // Send the code & lang to the new user
 
@@ -83,7 +89,7 @@ namespace CodeSphere.WebApi.Hubs
             }
 
             _rooms[roomId].Code = code;
-            await Clients.Group(roomId).SendAsync("ReceiveCode", code);
+            await Clients.OthersInGroup(roomId).SendAsync("ReceiveCode", code);
         }
 
         public async Task SendLanguage(string roomId, string language)
@@ -97,28 +103,26 @@ namespace CodeSphere.WebApi.Hubs
             _rooms[roomId].Language = language;
             await Clients.OthersInGroup(roomId).SendAsync("ReceiveLanguage", language);
         }
-
-        public async Task SendCursorPosition(string roomId, int cursorPosition, string color, string username)
+        public async Task SendCursorPosition(string roomId, int cursorPosition, string username)
         {
             if (!_rooms.ContainsKey(roomId))
             {
                 await Clients.Caller.SendAsync("RoomNotFound", "Room not found");
                 return;
             }
-            
+
             var data = _userConnections[Context.ConnectionId];
 
             data.CursorPosition = cursorPosition;
-            data.Color = color;
 
             await Clients.OthersInGroup(roomId).SendAsync("ReceiveCursorPosition",
-                new { 
+                new
+                {
                     username = data.UserName,
                     index = data.CursorPosition,
                     color = data.Color
                 });
         }
-
         public override async Task OnDisconnectedAsync(Exception exception)
         {
             if (_userConnections.TryGetValue(Context.ConnectionId, out ConnectionData data))
