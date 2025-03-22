@@ -123,6 +123,23 @@ namespace CodeSphere.WebApi.Hubs
                     color = data.Color
                 });
         }
+
+        public async Task SendResultMessage(string roomId, string username, string msg)
+        {
+            if (!_rooms.ContainsKey(roomId))
+            {
+                await Clients.Caller.SendAsync("RoomNotFound", "Room not found");
+                return;
+            }
+
+            await Clients.OthersInGroup(roomId).SendAsync("ReceiveResultMessage",
+                new
+                {
+                    username = username,
+                    message = msg
+                });
+        }
+
         public override async Task OnDisconnectedAsync(Exception exception)
         {
             if (_userConnections.TryGetValue(Context.ConnectionId, out ConnectionData data))
