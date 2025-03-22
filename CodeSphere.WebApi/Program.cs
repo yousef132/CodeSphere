@@ -72,6 +72,7 @@ if (app.Environment.IsDevelopment())
 app.UseMiddleware<ErrorHandlerMiddleware>();
 app.UseHttpsRedirection();
 app.UseCors(Cors);
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapHub<EditorHub>("/editorHub");
