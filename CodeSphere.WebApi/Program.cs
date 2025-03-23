@@ -75,7 +75,7 @@ app.UseCors(Cors);
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.MapHub<EditorHub>("/editorHub");
 app.MapControllers();
+app.MapHub<EditorHub>("/editorHub");
 
 app.Run();
