@@ -51,7 +51,7 @@ namespace CodeSphere.WebApi.Hubs
         private async Task<string> GetCurrentUserName()
         {
             var user = await _userManager.GetUserAsync(Context.User);
-            return user?.UserName;
+            return user?.UserName ?? $"Guest - {new Random().Next(1,100)}";
         }
 
         private string GetRandomColor()
@@ -92,13 +92,12 @@ namespace CodeSphere.WebApi.Hubs
                 return null;
             }
 
-            foreach (var connection in _userConnections.Values)
+            foreach (var (key, connection) in _userConnections)
             {
                 if (connection.UserName == userName)
                 {
                     await Clients.Caller.SendAsync("RoomNotFound", "you are already in the room");
-                    Context.Abort();
-                    return null;
+                    await Clients.Client(key).SendAsync("ForceDisconnect", "You have been disconnected because you tried to join again.");   
                 }
             }
 
@@ -139,8 +138,6 @@ namespace CodeSphere.WebApi.Hubs
         public async Task SendCursorPosition(string roomId, int cursorPosition)
         {
 
-            var userName = await GetCurrentUserName();
-
 
             if (!_rooms.ContainsKey(roomId))
             {
@@ -155,7 +152,7 @@ namespace CodeSphere.WebApi.Hubs
             await Clients.Group(roomId).SendAsync("ReceiveCursorPosition",
                 new
                 {
-                    username = userName,
+                    username = data.UserName,
                     index = data.CursorPosition,
                     color = data.Color
                 });
@@ -164,8 +161,7 @@ namespace CodeSphere.WebApi.Hubs
         public async Task SendResultMessage(string roomId, string msg)
         {
 
-            var user = await _userManager.GetUserAsync(Context.User);
-            var username = user.UserName;
+          
 
             if (!_rooms.ContainsKey(roomId))
             {
@@ -176,7 +172,7 @@ namespace CodeSphere.WebApi.Hubs
             await Clients.OthersInGroup(roomId).SendAsync("ReceiveResultMessage",
                 new
                 {
-                    username = username,
+                    username = _userConnections[Context.ConnectionId].UserName,
                     message = msg
                 });
         }
@@ -185,6 +181,7 @@ namespace CodeSphere.WebApi.Hubs
         {
             if (_userConnections.TryGetValue(Context.ConnectionId, out ConnectionData data))
             {
+                var username = _userConnections[Context.ConnectionId].UserName;
                 _userConnections.TryRemove(Context.ConnectionId, out ConnectionData _);
 
                 var roomId = data.RoomId;
@@ -205,7 +202,7 @@ namespace CodeSphere.WebApi.Hubs
                 }
 
                 await Groups.RemoveFromGroupAsync(Context.ConnectionId, roomId);
-                await Clients.Group(roomId).SendAsync("UserLeft", $"{Context.ConnectionId} has left the room");
+                await Clients.Group(roomId).SendAsync("UserLeft", $"{username} has left the room");
             }
 
             await base.OnDisconnectedAsync(exception);
