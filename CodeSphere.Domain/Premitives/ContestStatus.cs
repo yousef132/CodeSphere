@@ -11,6 +11,4 @@ namespace CodeSphere.Domain.Premitives
         [EnumMember(Value = "Ended")]
         Ended
     }
-
-
 }

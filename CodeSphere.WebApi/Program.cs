@@ -5,6 +5,7 @@ using CodeSphere.Domain.Models.Identity;
 using CodeSphere.Infrastructure;
 using CodeSphere.Infrastructure.Seeder;
 using CodeSphere.WebApi.Extentions;
+using CodeSphere.WebApi.Hubs;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Identity;
 
@@ -14,6 +15,8 @@ builder.Services.AddControllers().AddNewtonsoftJson(opt =>
 {
     opt.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
 });
+
+builder.Services.AddSignalR();
 
 
 // swagger documentation
@@ -36,15 +39,15 @@ builder.Services.AddHttpContextAccessor();
 var Cors = "_CORS";
 builder.Services.AddCors(opt =>
 {
-    opt.AddPolicy(name: Cors,
-        policy =>
-        {
-            policy.AllowAnyHeader();
-            policy.AllowAnyMethod();
-            policy.AllowAnyOrigin();
-        }
-    );
+    opt.AddPolicy(name: Cors, policy =>
+    {
+        policy.AllowAnyHeader();
+        policy.AllowAnyMethod();
+        policy.SetIsOriginAllowed(_ => true) 
+              .AllowCredentials(); 
+    });
 });
+
 
 
 var app = builder.Build();
@@ -69,8 +72,10 @@ if (app.Environment.IsDevelopment())
 app.UseMiddleware<ErrorHandlerMiddleware>();
 app.UseHttpsRedirection();
 app.UseCors(Cors);
+app.UseAuthentication();
 app.UseAuthorization();
 
+app.MapHub<EditorHub>("/editorHub");
 app.MapControllers();
 
 app.Run();
