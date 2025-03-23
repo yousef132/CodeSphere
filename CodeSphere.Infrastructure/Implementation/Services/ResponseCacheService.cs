@@ -1,4 +1,6 @@
 ﻿using CodeSphere.Domain.Abstractions.Services;
+using CodeSphere.Domain.Models.Entities;
+using CodeSphere.Domain.Premitives;
 using StackExchange.Redis;
 using System.Text.Json;
 
@@ -33,5 +35,44 @@ namespace CodeSphere.Infrastructure.Implementation.Services
 
             return (value);
         }
+
+        public async Task UpdateContestCache(Submit submission)
+        {
+            string userKey = $"leaderboard:user:{submission.UserId}";
+            string globalKey = "leaderboard:global";
+
+            string problemField = $"problem:{submission.ProblemId}";
+            string submissionData = $"{submission.Id},{submission.SubmissionDate:O},{(int)submission.Result}";
+
+            var db = _Database;
+
+            // Start Redis transaction
+            var tran = db.CreateTransaction();
+
+            // Check if the problem was already solved
+            bool alreadyAccepted = false;
+            var existingSubmission = await db.HashGetAsync(userKey, problemField);
+            if (existingSubmission.HasValue)
+            {
+                var submissionParts = existingSubmission.ToString().Split(',');
+                if (submissionParts.Length > 1 && Enum.TryParse(submissionParts[1], out SubmissionResult result))
+                {
+                    alreadyAccepted = (result == SubmissionResult.Accepted);
+                }
+            }
+
+            // Update User-Specific Hash (always update)
+            tran.HashSetAsync(userKey, problemField, submissionData);
+
+            // Update Global Score only if it's the first accepted submission for this problem
+            if (submission.Result == SubmissionResult.Accepted && !alreadyAccepted)
+            {
+                tran.SortedSetIncrementAsync(globalKey, submission.UserId, 1);
+            }
+
+            // Execute transaction
+            await tran.ExecuteAsync();
+        }
+
     }
 }

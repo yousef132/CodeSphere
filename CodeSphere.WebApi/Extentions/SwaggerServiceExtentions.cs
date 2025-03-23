@@ -1,4 +1,5 @@
-﻿using Microsoft.OpenApi.Models;
+﻿
+using Microsoft.OpenApi.Models;
 
 namespace CodeSphere.WebApi.Extentions
 {
@@ -52,6 +53,7 @@ namespace CodeSphere.WebApi.Extentions
 
                 options.AddSecurityRequirement(securityRequirments);
             });
+
             return services;
         }
     }

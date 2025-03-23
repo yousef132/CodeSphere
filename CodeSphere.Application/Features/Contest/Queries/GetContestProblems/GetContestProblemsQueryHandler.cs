@@ -3,7 +3,7 @@ using CodeSphere.Application.Features.Contest.Queries.GetContestProblems;
 using CodeSphere.Domain.Abstractions;
 using CodeSphere.Domain.Abstractions.Services;
 using CodeSphere.Domain.Premitives;
-using CodeSphere.Domain.Responses;
+using CodeSphere.Domain.Responses.Contest;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using System.Security.Claims;

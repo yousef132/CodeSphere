@@ -5,6 +5,7 @@ using CodeSphere.Application.Features.Problem.Queries.GetById;
 using CodeSphere.Application.Mapping.Resolvers;
 using CodeSphere.Domain.Models.Entities;
 using CodeSphere.Domain.Responses;
+using CodeSphere.Domain.Responses.Contest;
 using CodeSphere.Domain.Responses.ElasticSearchResponses;
 
 namespace CodeSphere.Application.Mapping
