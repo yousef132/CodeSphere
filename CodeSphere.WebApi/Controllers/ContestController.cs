@@ -2,9 +2,10 @@
 using CodeSphere.Application.Features.Contest.Command.Register;
 using CodeSphere.Application.Features.Contest.Queries.GetAllContests;
 using CodeSphere.Application.Features.Contest.Queries.GetContestProblems;
+using CodeSphere.Application.Features.Contest.Queries.GetContestStanding;
 using CodeSphere.Domain.Abstractions.Services;
 using CodeSphere.Domain.Premitives;
-using CodeSphere.Domain.Responses;
+using CodeSphere.Domain.Responses.Contest;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -62,9 +63,15 @@ namespace CodeSphere.WebApi.Controllers
             return Ok(result);
         }
 
+        [HttpGet("standing")]
 
+
+        public async Task<ActionResult<Response>> GetContestStanding(int contestId)
+        {
+            return ResponseResult(await mediator.Send(new GetContestStandingQuery(contestId)));
+
+
+        }
 
     }
-
-
 }

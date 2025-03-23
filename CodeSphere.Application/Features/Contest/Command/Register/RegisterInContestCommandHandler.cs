@@ -27,11 +27,13 @@ namespace CodeSphere.Application.Features.Contest.Command.Register
             if (contest != null)
                 return await Response.FailureAsync("No Contest Found", HttpStatusCode.NotFound);
 
-
+            if (contest.ContestStatus == ContestStatus.Ended)
+                return await Response.FailureAsync("Contest Ended", HttpStatusCode.Forbidden);
 
             var isRegistered = await unitOfWork.UserContestRepository.IsRegistered(request.Id, UserId);
             if (isRegistered != null)
                 return await Response.FailureAsync("Already registered in this contest", System.Net.HttpStatusCode.BadRequest);
+
 
 
             var registration = new UserContest

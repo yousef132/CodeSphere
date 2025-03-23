@@ -1,7 +1,7 @@
 ﻿using CodeSphere.Domain.Models.Entities;
 using CodeSphere.Domain.Premitives;
 
-namespace CodeSphere.Domain.Responses
+namespace CodeSphere.Domain.Responses.Contest
 {
     public class ContestProblemResponse
     {
