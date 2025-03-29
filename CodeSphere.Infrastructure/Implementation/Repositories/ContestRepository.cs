@@ -1,5 +1,6 @@
 ﻿using CodeSphere.Domain.Abstractions.Repositories;
 using CodeSphere.Domain.Models.Entities;
+using CodeSphere.Domain.Premitives;
 using CodeSphere.Domain.Responses.Contest;
 using CodeSphere.Infrastructure.Context;
 using Microsoft.EntityFrameworkCore;
@@ -63,8 +64,7 @@ namespace CodeSphere.Infrastructure.Implementation.Repositories
 
 
             #endregion
-
-            return standing.ToList();
+            //return standing.ToList();
             #region with groupby
             //var standing = from c in context.Contests
             //               join s in context.Submits on c.Id equals s.ContestId
@@ -93,6 +93,42 @@ namespace CodeSphere.Infrastructure.Implementation.Repositories
 
             #endregion
 
+            // get contest standing
+
+            var uniqueSubmissions = new HashSet<int>();
+
+            var standing = await context.Submits
+                                  .Where(s => s.ContestId == contestId && s.Result == SubmissionResult.Accepted) // Filter accepted submissions
+                                  .GroupBy(s => new { s.UserId, s.ProblemId }) // Ensure unique problem submissions per user
+                                  .Select(g => g.OrderBy(s => s.SubmissionDate).First()) // Keep only the first accepted submission per problem
+                                  .GroupBy(s => s.UserId) // Group again by UserId
+                                  .OrderByDescending(g => g.Sum(s => (int)s.Problem.ContestPoints)) // Rank users by total contest points
+                                  .Select(g => new StandingDto
+                                  {
+                                      UserId = g.Key,
+                                      UserImage = g.First().User.ImagePath,
+                                      UserName = g.First().User.UserName,
+                                      Rank = g.Sum(s => (int)s.Problem.ContestPoints) // Total points across unique problems
+                                  }).ToListAsync();
+
+
+
+            //var standing = await context.Submits
+            //    .Where(s => s.ContestId == contestId && s.Result == SubmissionResult.Accepted)
+            //    .GroupBy(s => new { s.UserId, s.ProblemId }) // Ensure unique problem submissions per user
+            //    .Where(s => uniqueSubmissions.Add(s.Select(s=>s.Id)) // Add ID to HashSet and filter out duplicates
+            //    .GroupBy(s => s.UserId) // Group again by user
+            //    .OrderByDescending(g => g.Sum(s => (int)s.Problem.ContestPoints)) // Rank users by total points
+            //    .Select(g => new StandingDto
+            //    {
+            //        UserId = g.Key,
+            //        UserImage = g.First().User.ImagePath,
+            //        UserName = g.First().User.UserName,
+            //        Rank = g.Sum(s => (int)s.Problem.ContestPoints), // Sum of unique problem points
+            //    })
+            //    .ToListAsync();
+
+            return standing;
         }
     }
 

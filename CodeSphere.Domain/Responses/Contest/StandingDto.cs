@@ -9,6 +9,7 @@ namespace CodeSphere.Domain.Responses.Contest
         public string UserName { get; set; }
 
         public string UserImage { get; set; }
+        public decimal Rank { get; set; }
 
         // for problemId = 1, the submissionId = 2 and the date = ~ and the language = C# and the fail count = 0
         public List<Dictionary<int, UserProblemSubmission>> UserProblemSubmissions { get; set; }
