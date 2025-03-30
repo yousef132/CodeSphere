@@ -35,7 +35,7 @@ namespace CodeSphere.Application.Features.Contest.Queries.GetContestStanding
             //    // return the data from cache
             //}
 
-            var standing = await unitOfWork.ContestRepository.GetContestStanding(request.ContestId);
+            var standing = await unitOfWork.ContestRepository.GetContestStanding(request.ContestId, 0, 10);
             return await Response.SuccessAsync(standing, "Contest Standing Fetched Successfully", System.Net.HttpStatusCode.OK);
 
 

@@ -1,9 +1,10 @@
 ﻿using CodeSphere.Domain.Abstractions.Repositories;
 using CodeSphere.Domain.Models.Entities;
-using CodeSphere.Domain.Premitives;
 using CodeSphere.Domain.Responses.Contest;
 using CodeSphere.Infrastructure.Context;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using System.Data;
 
 namespace CodeSphere.Infrastructure.Implementation.Repositories
 {
@@ -32,104 +33,70 @@ namespace CodeSphere.Infrastructure.Implementation.Repositories
 
              => await context.Problems.Where(x => x.ContestId == contestId).ToListAsync();
 
-        public async Task<IReadOnlyList<StandingDto>> GetContestStanding(int contestId)
+        public async Task<IReadOnlyList<StandingDto>> GetContestStanding(int contestId, int index, int pageSize)
         {
-            #region MyRegion
-            //join contest with submits and group by user id
-            //var standing = from c in context.Contests
-            //               join s in context.Submits on c.Id equals s.ContestId
-            //               join u in context.Users on s.UserId equals u.Id
-            //               where c.Id == contestId
-            //               select new StandingDto
-            //               {
-            //                   UserId = s.UserId,
-            //                   UserImage = u.ImagePath,
-            //                   UserName = u.UserName,
-            //                   UserProblemSubmissions = new List<Dictionary<int, UserProblemSubmission>>()
-            //                  {
-            //                          new Dictionary<int, UserProblemSubmission>()
-            //                          {
-            //                              {s.ProblemId, new UserProblemSubmission()
-            //                              {
-            //                                  SubmissionId = s.Id,
-            //                                  SubmissionDate = s.SubmissionDate,
-            //                                  Language = s.Language,
-            //                                  FailCount = s.Result != SubmissionResult.Accepted ? 1 : 0
-            //                              }
-            //                              // key with the problemId
-            //                              }
-            //                          }
-            //                  }
-            //               };
+            var result1 = await context.Database.SqlQuery<ContestStandingResposne>($@"
+                                          SELECT 
+                                              UniqueSubmissions.UserId, 
+                                              u.UserName,
+                                              u.ImagePath,
+                                              SUM(p.ContestPoints) AS TotalPoints
+                                          FROM (
+                                        		-- get first accepted submission for each problem and user
+                                              SELECT MIN(s.SubmissionDate) AS FirstSubmission, s.UserId, s.ProblemId
+                                              FROM  Submits s 
+                                              JOIN Contests c ON s.ContestId = c.Id
+                                              WHERE s.ContestId = {contestId} 
+                                                AND s.Result = 0  
+                                                AND s.SubmissionDate BETWEEN c.StartDate AND c.EndDate
+                                              GROUP BY s.UserId, s.ProblemId
+                                          ) AS UniqueSubmissions
+                                          JOIN Problems p ON UniqueSubmissions.ProblemId = p.Id join AspNetUsers u  on UniqueSubmissions.userid = u.id
+                                          GROUP BY UniqueSubmissions.UserId,u.UserName,u.ImagePath
+                                          ORDER BY TotalPoints DESC, MIN(UniqueSubmissions.FirstSubmission) ASC
+                                          ").ToListAsync();//OFFSET 1 ROWS FETCH NEXT 11 ROWS ONLY;
 
-
-            #endregion
-            //return standing.ToList();
-            #region with groupby
-            //var standing = from c in context.Contests
-            //               join s in context.Submits on c.Id equals s.ContestId
-            //               join u in context.Users on s.UserId equals u.Id
-            //               where c.Id == contestId
-            //               group s by new { s.UserId, u.ImagePath, u.UserName } into userGroup
-            //               select new StandingDto
-            //               {
-            //                   UserId = userGroup.Key.UserId,
-            //                   UserImage = userGroup.Key.ImagePath,
-            //                   UserName = userGroup.Key.UserName,
-            //                   UserProblemSubmissions = new List<Dictionary<int, UserProblemSubmission>>
-            //                   {
-            //                        userGroup.GroupBy(s => s.ProblemId).ToDictionary(
-            //                            x => x.Key, x => new UserProblemSubmission
-            //                        {
-            //                            SubmissionId = x.FirstOrDefault().Id,
-            //                            SubmissionDate = x.FirstOrDefault().SubmissionDate,
-            //                            Language = x.FirstOrDefault().Language,
-            //                            FailCount = x.Count(s => s.Result != SubmissionResult.Accepted)
-            //                        })
-            //                   }
-
-
-            //               };
-
-            #endregion
-
-            // get contest standing
-
-            var uniqueSubmissions = new HashSet<int>();
-
-            var standing = await context.Submits
-                                  .Where(s => s.ContestId == contestId && s.Result == SubmissionResult.Accepted) // Filter accepted submissions
-                                  .GroupBy(s => new { s.UserId, s.ProblemId }) // Ensure unique problem submissions per user
-                                  .Select(g => g.OrderBy(s => s.SubmissionDate).First()) // Keep only the first accepted submission per problem
-                                  .GroupBy(s => s.UserId) // Group again by UserId
-                                  .OrderByDescending(g => g.Sum(s => (int)s.Problem.ContestPoints)) // Rank users by total contest points
-                                  .Select(g => new StandingDto
-                                  {
-                                      UserId = g.Key,
-                                      UserImage = g.First().User.ImagePath,
-                                      UserName = g.First().User.UserName,
-                                      Rank = g.Sum(s => (int)s.Problem.ContestPoints) // Total points across unique problems
-                                  }).ToListAsync();
+            var usersRanking = result1.Select(x => new StandingDto
+            {
+                UserId = x.UserId,
+                TotalPoints = x.TotalPoints,
+                ImagePath = x.ImagePath,
+                UserName = x.UserName
+            }).ToList();
 
 
 
-            //var standing = await context.Submits
-            //    .Where(s => s.ContestId == contestId && s.Result == SubmissionResult.Accepted)
-            //    .GroupBy(s => new { s.UserId, s.ProblemId }) // Ensure unique problem submissions per user
-            //    .Where(s => uniqueSubmissions.Add(s.Select(s=>s.Id)) // Add ID to HashSet and filter out duplicates
-            //    .GroupBy(s => s.UserId) // Group again by user
-            //    .OrderByDescending(g => g.Sum(s => (int)s.Problem.ContestPoints)) // Rank users by total points
-            //    .Select(g => new StandingDto
-            //    {
-            //        UserId = g.Key,
-            //        UserImage = g.First().User.ImagePath,
-            //        UserName = g.First().User.UserName,
-            //        Rank = g.Sum(s => (int)s.Problem.ContestPoints), // Sum of unique problem points
-            //    })
-            //    .ToListAsync();
+            if (!usersRanking.Any())
+                return usersRanking;
 
-            return standing;
+            string usersIdString = string.Join("|", usersRanking.Select(s => s.UserId));
+
+
+            var result = await context.Database
+                       .SqlQueryRaw<UserProblemSubmission>(
+                           "EXEC GetProblemSubmissionsCountByProblemAndUser @ContestId, @UsersId",
+                           new SqlParameter("@ContestId", contestId),
+                           new SqlParameter("@UsersId", usersIdString))
+                       .ToListAsync();
+
+
+            foreach (var user in usersRanking)
+                user.UserProblemSubmissions = result.Where(r => r.UserId == user.UserId).Select(r => new UserProblemSubmissionWithoutUserId
+                {
+                    FailureCount = r.FailureCount,
+                    Language = r.Language,
+                    ProblemId = r.ProblemId,
+                    SubmissionDate = r.SubmissionDate,
+                    SuccessCount = r.SuccessCount
+
+                }).ToList();
+
+
+            return usersRanking;
         }
+
+
+
     }
 
 

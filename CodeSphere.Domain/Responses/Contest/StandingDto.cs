@@ -2,26 +2,33 @@
 
 namespace CodeSphere.Domain.Responses.Contest
 {
-    public class StandingDto
+    public class StandingDto : ContestStandingResposne
+    {
+        // for problemId = 1, the submissionId = 2 and the date = ~ and the language = C# and the fail count = 0
+        public List<UserProblemSubmissionWithoutUserId>? UserProblemSubmissions { get; set; }
+
+
+    }
+    public class ContestStandingResposne
+    {
+        public string UserId { get; set; }
+        public string UserName { get; set; }
+        public string? ImagePath { get; set; }
+        public int TotalPoints { get; set; }
+    }
+
+    public class UserProblemSubmission : UserProblemSubmissionWithoutUserId
     {
         public string UserId { get; set; }
 
-        public string UserName { get; set; }
-
-        public string UserImage { get; set; }
-        public decimal Rank { get; set; }
-
-        // for problemId = 1, the submissionId = 2 and the date = ~ and the language = C# and the fail count = 0
-        public List<Dictionary<int, UserProblemSubmission>> UserProblemSubmissions { get; set; }
     }
-
-    public class UserProblemSubmission
+    public class UserProblemSubmissionWithoutUserId
     {
-        public int SubmissionId { get; set; }
+        public int ProblemId { get; set; }
+        public int SuccessCount { get; set; }
+        public int FailureCount { get; set; }
         public DateTime SubmissionDate { get; set; }
-
         public Language Language { get; set; }
-        public int FailCount { get; set; }
     }
 
 }

@@ -20,6 +20,8 @@ namespace CodeSphere.Infrastructure.Context
         public DbSet<ProblemTopic> ProblemTopics { get; set; }
         public DbSet<Submit> Submits { get; set; }
 
+
+
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) { }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
