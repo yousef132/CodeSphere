@@ -7,12 +7,14 @@ using CodeSphere.Infrastructure.Implementation;
 using CodeSphere.Infrastructure.Implementation.Repositories;
 using CodeSphere.Infrastructure.Implementation.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Hosting.Server;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using StackExchange.Redis;
+using System.Net.WebSockets;
 using System.Text;
 
 
@@ -90,6 +92,24 @@ namespace CodeSphere.Infrastructure
                         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["JWT:Key"] ?? string.Empty)),
                         ValidateLifetime = true,
                         ClockSkew = TimeSpan.Zero,
+                    };
+                   
+                    options.Events = new JwtBearerEvents
+                    {
+                      OnMessageReceived = context =>
+                      {
+                            var accessToken = context.Request.Query["access_token"];
+
+                            // If the request is for our SignalR hub...
+                            var path = context.HttpContext.Request.Path;
+                            if (!string.IsNullOrEmpty(accessToken) && path.StartsWithSegments("/EditorHub"))
+                            {
+                                // Assign the token to the context
+                                context.Token = accessToken;
+                            }
+
+                          return Task.CompletedTask;
+                      }
                     };
                 });
 
