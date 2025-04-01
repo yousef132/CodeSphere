@@ -1,4 +1,5 @@
-﻿using System.Text.Json;
+﻿using Microsoft.AspNetCore.Http;
+using System.Text.Json;
 using System.Text.RegularExpressions;
 
 namespace CodeSphere.Domain.Premitives
@@ -12,7 +13,7 @@ namespace CodeSphere.Domain.Premitives
         public const string ImagesDirectory = "UsersImages";
 
         //public static string ExecuteCodeCommand(string containerId, decimal timeLimit,decimal memoryLimit)
-        //{
+        //{ 
         //    string runTimeLimit = $"{timeLimit}s";
         //    string runMemoryLimit = $"{memoryLimit}mb";
         //    // Prepare the docker exec command to run the script inside the container
@@ -125,6 +126,21 @@ namespace CodeSphere.Domain.Premitives
             {
                 return 0;
             }
+        }
+
+        public static bool ValidateFile(Language fileType, decimal maxSizeInMb, decimal minSizeInMb, IFormFile file)
+        {
+            var extention = Path.GetExtension(file.FileName); // .cs,.cpp, .py, .java
+            var size = file.Length;
+
+            string requiredType = '.' + fileType.ToString();
+            if (extention != requiredType)
+                return false;
+
+            if (size > maxSizeInMb * 1024 * 1024 || size < minSizeInMb * 1024 * 1024)
+                return false;
+
+            return true;
         }
     }
 }

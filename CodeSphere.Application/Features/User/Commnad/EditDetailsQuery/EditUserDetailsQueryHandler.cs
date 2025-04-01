@@ -2,7 +2,9 @@
 using CodeSphere.Domain.Models.Identity;
 using CodeSphere.Domain.Premitives;
 using MediatR;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
+using System.Security.Claims;
 
 namespace CodeSphere.Application.Features.User.Commnad.EditDetailsQuery
 {
@@ -10,14 +12,21 @@ namespace CodeSphere.Application.Features.User.Commnad.EditDetailsQuery
     {
         private readonly UserManager<ApplicationUser> userManager;
         private readonly IFileService _fileService;
-        public EditUserDetailsQueryHandler(UserManager<ApplicationUser> userManager, IFileService _fileService)
+        private readonly IHttpContextAccessor contextAccessor;
+        private readonly string UserId;
+        public EditUserDetailsQueryHandler(UserManager<ApplicationUser> userManager,
+                                            IFileService _fileService,
+                                            IHttpContextAccessor contextAccessor)
         {
             this.userManager = userManager;
             this._fileService = _fileService;
+            this.contextAccessor = contextAccessor;
+            var user = contextAccessor.HttpContext?.User;
+            UserId = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
         }
         public async Task<Response> Handle(EditUserDetailsQuery request, CancellationToken cancellationToken)
         {
-            var user = await userManager.FindByIdAsync(request.UserId);
+            var user = await userManager.FindByIdAsync(UserId);
             if (user == null)
                 return await Response.FailureAsync(message: "User not found");
 
