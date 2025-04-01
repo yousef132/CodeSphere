@@ -130,15 +130,26 @@ namespace CodeSphere.Infrastructure.Implementation.Services
             //  expiration for 2 hours 
             _Database.KeyExpire(key, TimeSpan.FromHours(2));
         }
-        public void CacheUserSubmissionUsingHash()
+        public void CacheUserSubmission(SubmissionToCache submission, int contestId)
+        {
+            string key = Helper.GenerateUserSubmissionKey(submission.UserId, contestId);
 
+            // Serialize the new submission to a JSON string
+            string serializedSubmission = JsonSerializer.Serialize(submission);
+
+            // Append the serialized submission to the list (no need to load the entire list)
+            _Database.ListRightPush(key, serializedSubmission);
+        }
 
 
         public async Task<IReadOnlyList<ContestStandingResposne>> GetContestStanding(int contestId, int start, int stop)
         {
             string key = Helper.GenerateContestKey(contestId);
+            // o(log n + m) where n is the number of elements in the sorted set and m the number of elements returned.
             var leaderboard = _Database.SortedSetRangeByRankWithScores(key, start, stop, StackExchange.Redis.Order.Descending);
 
+
+            // foreach returned element get the submsission list 
             return leaderboard.Select(entry =>
             {
                 var parts = entry.Element.ToString().Split('|');

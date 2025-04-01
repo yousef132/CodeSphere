@@ -17,6 +17,11 @@ namespace CodeSphere.Domain.Premitives
         {
             return $"contest:{contestId}:standing";
         }
+        public static string GenerateUserSubmissionKey(string userId, int contestId)
+        {
+            // key contains userid and contest id 
+            return $"user:{userId}:contest:{contestId}:submissions";
+        }
         public static string CreateExecuteCodeCommand(string containerId, decimal timeLimit)
         {
             string runTimeLimit = $"{timeLimit}s";
