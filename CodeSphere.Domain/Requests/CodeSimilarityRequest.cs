@@ -13,12 +13,10 @@ namespace CodeSphere.Domain.Requests
         public string UserId { get; set; }
         public string ImagePath { get; set; }
         public string UserName { get; set; }
-
     }
 
     public class SubmissionToCache
     {
-        public string UserId { get; set; }
         public int ProblemId { get; set; }
         public SubmissionResult Result { get; set; }
         public Language Language { get; set; }

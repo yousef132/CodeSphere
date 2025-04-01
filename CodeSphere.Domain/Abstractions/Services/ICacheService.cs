@@ -10,8 +10,8 @@ namespace CodeSphere.Domain.Abstractions.Services
         Task CacheResponseAsync(string key, object Response, TimeSpan timeToLive);
         Task UpdateContestCache(Submit submission);
         Task<string> GetCachedResponseAsync(string key);
-        void UpdateStanding(ContestPoints points, UserToCache user, int ContestId);
-        Task<IReadOnlyList<ContestStandingResposne>> GetContestStanding(int contestId, int start, int stop);
+        void CacheContestStanding(ContestPoints points, UserToCache user, int ContestId);
+        IReadOnlyList<StandingDto> GetContestStanding(int contestId, int start, int stop);
         Task TestCache();
     }
 }

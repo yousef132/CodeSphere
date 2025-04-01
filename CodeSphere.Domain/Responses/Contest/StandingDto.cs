@@ -6,8 +6,6 @@ namespace CodeSphere.Domain.Responses.Contest
     {
         // for problemId = 1, the submissionId = 2 and the date = ~ and the language = C# and the fail count = 0
         public List<UserProblemSubmissionWithoutUserId>? UserProblemSubmissions { get; set; }
-
-
     }
     public class ContestStandingResposne
     {
@@ -22,13 +20,18 @@ namespace CodeSphere.Domain.Responses.Contest
         public string UserId { get; set; }
 
     }
-    public class UserProblemSubmissionWithoutUserId
+    public class UserProblemSubmissionWithoutUserId : ProblemSubmissionsCount
     {
+
         public int ProblemId { get; set; }
-        public int SuccessCount { get; set; }
-        public int FailureCount { get; set; }
+
         public DateTime SubmissionDate { get; set; }
         public Language Language { get; set; }
+    }
+    public class ProblemSubmissionsCount
+    {
+        public int SuccessCount { get; set; }
+        public int FailureCount { get; set; }
     }
 
 }

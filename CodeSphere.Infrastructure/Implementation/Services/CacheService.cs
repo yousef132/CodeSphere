@@ -112,55 +112,95 @@ namespace CodeSphere.Infrastructure.Implementation.Services
             await tran.ExecuteAsync();
         }
 
-        public void UpdateStanding(ContestPoints points, UserToCache user, int ContestId)
+        public void CacheContestStanding(ContestPoints points, UserToCache user, int ContestId)
         {
             string key = Helper.GenerateContestKey(ContestId);
-            string member = Helper.ConvertUserToRedisMemeber(user);
+            //string member = Helper.ConvertUserToRedisMemeber(user);
+            var serializedUser = JsonSerializer.Serialize(user);
 
-            // Check if the user exists in the leaderboard
-            long? rank = _Database.SortedSetRank(key, member, StackExchange.Redis.Order.Descending);
+            // Increase or add the user with their points
+            _Database.SortedSetIncrement(key, serializedUser, (int)points);
 
-            // Add user first time
-            if (rank is null)
-                _Database.SortedSetAdd(key, member, (int)points);
-
-            // Increase score
-            _Database.SortedSetIncrement(key, member, (int)points);
-
-            //  expiration for 2 hours 
-            _Database.KeyExpire(key, TimeSpan.FromHours(2));
+            SetKeyExpiration(key, 2);
         }
-        public void CacheUserSubmission(SubmissionToCache submission, int contestId)
+
+        public IReadOnlyList<StandingDto> GetContestStanding(int contestId, int start, int stop)
         {
-            string key = Helper.GenerateUserSubmissionKey(submission.UserId, contestId);
+            // total complexity is o(log n + m) * o(s) where is the NO submission in the list for each user in the leadboard
+
+            string key = Helper.GenerateContestKey(contestId);
+            // o(log n + m) where n is the number of elements in the sorted set and m the number of elements returned.
+            var leaderboard = _Database.SortedSetRangeByRankWithScores(key, start, stop, StackExchange.Redis.Order.Descending);
+
+            // foreach returned user get the submsissions list 
+            return leaderboard.Select(entry =>
+            {
+
+                var user = JsonSerializer.Deserialize<UserToCache>(entry.Element);
+                return new StandingDto
+                {
+                    UserId = user.UserId,
+                    UserName = user.UserName,
+                    ImagePath = user.ImagePath,
+                    TotalPoints = (int)entry.Score,
+                    UserProblemSubmissions = GetUserSubmissionsList(user.UserId, contestId)
+                };
+            }).ToList();
+        }
+
+
+        public void CacheUserSubmission(SubmissionToCache submission, string userId, int contestId)
+        {
+            string key = Helper.GenerateUserSubmissionsKey(userId, contestId);
 
             // Serialize the new submission to a JSON string
             string serializedSubmission = JsonSerializer.Serialize(submission);
 
             // Append the serialized submission to the list (no need to load the entire list)
             _Database.ListRightPush(key, serializedSubmission);
+            SetKeyExpiration(key, 2);
         }
 
 
-        public async Task<IReadOnlyList<ContestStandingResposne>> GetContestStanding(int contestId, int start, int stop)
+
+        #region Private
+        private void SetKeyExpiration(string key, double time)
+             => _Database.KeyExpire(key, TimeSpan.FromHours(time));
+        private List<UserProblemSubmissionWithoutUserId> GetUserSubmissionsList(string userId, int contestId)
         {
-            string key = Helper.GenerateContestKey(contestId);
-            // o(log n + m) where n is the number of elements in the sorted set and m the number of elements returned.
-            var leaderboard = _Database.SortedSetRangeByRankWithScores(key, start, stop, StackExchange.Redis.Order.Descending);
+            var key = Helper.GenerateUserSubmissionsKey(userId, contestId);
+            var submissionsStrings = _Database.ListRange(key, 0, -1);
 
+            // o(n) where n is the number of submissions in the list
+            var problemSubmissions = new Dictionary<int, ProblemSubmissionsCount>();
 
-            // foreach returned element get the submsission list 
-            return leaderboard.Select(entry =>
+            var submissions = submissionsStrings
+                .Select(submissionStr => JsonSerializer.Deserialize<SubmissionToCache>(submissionStr))
+                .Where(sub => sub != null)
+                .ToList();
+
+            foreach (var submission in submissions)
             {
-                var parts = entry.Element.ToString().Split('|');
-                return new StandingDto
-                {
-                    UserId = parts[0],
-                    UserName = parts[1],
-                    ImagePath = parts[2],
-                    TotalPoints = (int)entry.Score
-                };
+                var count = problemSubmissions.GetValueOrDefault(submission.ProblemId) ?? new ProblemSubmissionsCount();
+
+                if (submission.Result == SubmissionResult.Accepted)
+                    count.SuccessCount++;
+                else
+                    count.FailureCount++;
+
+                problemSubmissions[submission.ProblemId] = count;
+            }
+
+            return submissions.Select(sub => new UserProblemSubmissionWithoutUserId
+            {
+                ProblemId = sub.ProblemId,
+                SuccessCount = problemSubmissions[sub.ProblemId].SuccessCount,
+                FailureCount = problemSubmissions[sub.ProblemId].FailureCount,
+                SubmissionDate = sub.Date,
+                Language = sub.Language
             }).ToList();
         }
+
+        #endregion
     }
 }

@@ -82,7 +82,7 @@ namespace CodeSphere.Application.Features.Problem.Commands.SolveProblem
                 // if the user has not submitted the problem then update the global sorted set
                 // the key for the hash : leaderboard:submission:{submissionId}
 
-                //cacheService.UpdateStanding
+                cacheService.CacheContestStanding()
             }
             // insert the result in the database 
 
