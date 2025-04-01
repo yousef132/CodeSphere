@@ -15,9 +15,9 @@ namespace CodeSphere.WebApi.Controllers
 {
     public class ContestController : BaseController
     {
-        private readonly IResponseCacheService responseCacheService;
+        private readonly ICacheService responseCacheService;
 
-        public ContestController(IResponseCacheService responseCacheService)
+        public ContestController(ICacheService responseCacheService)
         {
             this.responseCacheService = responseCacheService;
         }
@@ -83,6 +83,16 @@ namespace CodeSphere.WebApi.Controllers
 
 
         }
+
+        [HttpGet("standing1")]
+        public async Task<ActionResult<Response>> testcache(int contestId)
+        {
+            responseCacheService.TestCache();
+            return Ok();
+
+        }
+
+
 
     }
 }

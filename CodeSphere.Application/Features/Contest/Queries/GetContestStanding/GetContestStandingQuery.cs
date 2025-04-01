@@ -16,10 +16,10 @@ namespace CodeSphere.Application.Features.Contest.Queries.GetContestStanding
 
     public class GetContestStandingQueryHandler : IRequestHandler<GetContestStandingQuery, Response>
     {
-        private readonly IResponseCacheService cacheService;
+        private readonly ICacheService cacheService;
         private readonly IUnitOfWork unitOfWork;
 
-        public GetContestStandingQueryHandler(IResponseCacheService cacheService, IUnitOfWork unitOfWork)
+        public GetContestStandingQueryHandler(ICacheService cacheService, IUnitOfWork unitOfWork)
         {
             this.cacheService = cacheService;
             this.unitOfWork = unitOfWork;

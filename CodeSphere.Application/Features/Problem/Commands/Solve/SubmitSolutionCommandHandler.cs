@@ -19,6 +19,7 @@ namespace CodeSphere.Application.Features.Problem.Commands.SolveProblem
         private readonly IExecutionService executionService;
         private readonly IFileService fileService;
         private readonly IHttpContextAccessor contextAccessor;
+        private readonly ICacheService cacheService;
         private string UserId;
 
         public SubmitSolutionCommandHandler(IProblemRepository problemRepository,
@@ -26,7 +27,8 @@ namespace CodeSphere.Application.Features.Problem.Commands.SolveProblem
                                              IMapper mapper,
                                              IExecutionService executionService,
                                              IFileService fileService,
-                                             IHttpContextAccessor contextAccessor)
+                                             IHttpContextAccessor contextAccessor,
+                                             ICacheService cacheService)
         {
             this.problemRepository = problemRepository;
             this.unitOfWork = unitOfWork;
@@ -34,7 +36,7 @@ namespace CodeSphere.Application.Features.Problem.Commands.SolveProblem
             this.executionService = executionService;
             this.fileService = fileService;
             this.contextAccessor = contextAccessor;
-
+            this.cacheService = cacheService;
             var user = contextAccessor.HttpContext?.User;
             UserId = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
         }
@@ -68,11 +70,19 @@ namespace CodeSphere.Application.Features.Problem.Commands.SolveProblem
                 SubmitMemory = 0m
             };
 
-            // check if the user has already submitted the problem, then 
+
             if (problem.Contest.ContestStatus == ContestStatus.Running)
             {
-                // cache contest standing
+                // while the contest  : 
 
+                // update the sorted set and add the submission for the cache as (submittionId, submissionDate, result)
+                // always add the submission to the user hash
+                // for the sorted set : 
+                // if the user has already submitted the problem (accepted) then don't update the global sorted set
+                // if the user has not submitted the problem then update the global sorted set
+                // the key for the hash : leaderboard:submission:{submissionId}
+
+                //cacheService.UpdateStanding
             }
             // insert the result in the database 
 

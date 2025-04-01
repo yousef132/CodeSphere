@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using CodeSphere.Domain.Requests;
+using Microsoft.AspNetCore.Http;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 
@@ -12,13 +13,10 @@ namespace CodeSphere.Domain.Premitives
         public const string CSharpCompiler = "mcr.microsoft.com/dotnet/sdk:5.0";
         public const string ImagesDirectory = "UsersImages";
 
-        //public static string ExecuteCodeCommand(string containerId, decimal timeLimit,decimal memoryLimit)
-        //{ 
-        //    string runTimeLimit = $"{timeLimit}s";
-        //    string runMemoryLimit = $"{memoryLimit}mb";
-        //    // Prepare the docker exec command to run the script inside the container
-        //    return $"docker exec {containerId} /usr/bin/bash /run_code.sh {runTimeLimit} {runMemoryLimit}";
-        //}
+        public static string GenerateContestKey(int contestId)
+        {
+            return $"contest:{contestId}:standing";
+        }
         public static string CreateExecuteCodeCommand(string containerId, decimal timeLimit)
         {
             string runTimeLimit = $"{timeLimit}s";
@@ -141,6 +139,22 @@ namespace CodeSphere.Domain.Premitives
                 return false;
 
             return true;
+        }
+
+
+        public static string ConvertUserToRedisMemeber(UserToCache user)
+            => $"{user.UserId}|{user.UserName}|{user.ImagePath}";
+
+        public static UserToCache ConvertRedisMemberToUser(string member)
+        {
+            // TODO : username may have | in it
+            string[] parts = member.Split('|');
+            return new UserToCache
+            {
+                UserId = parts[0],
+                UserName = parts[1],
+                ImagePath = parts[2]
+            };
         }
     }
 }

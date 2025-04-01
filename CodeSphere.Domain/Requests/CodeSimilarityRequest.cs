@@ -1,14 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace CodeSphere.Domain.Requests
+﻿namespace CodeSphere.Domain.Requests
 {
     public class CodeSimilarityRequest
     {
         public string Code1 { get; set; }
         public string Code2 { get; set; }
+    }
+
+    public class UserToCache
+    {
+        public string UserId { get; set; }
+        public string ImagePath { get; set; }
+        public string UserName { get; set; }
+
     }
 }
