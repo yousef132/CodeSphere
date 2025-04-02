@@ -99,7 +99,6 @@ namespace CodeSphere.Application.Features.Problem.Commands.SolveProblem
                     ProblemId = submission.ProblemId,
                     Result = submission.Result
                 }, UserId, submission.ContestId.Value);
-
             }
             // insert the result in the database 
 

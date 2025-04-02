@@ -22,9 +22,11 @@ services:
       - elk
   codesphere.cache:
     image: redis:latest
+    networks:
+      - elk
     restart: always
     ports:
-      - '6379:6379'
+      - "6379:6379"
     
 
 networks:
