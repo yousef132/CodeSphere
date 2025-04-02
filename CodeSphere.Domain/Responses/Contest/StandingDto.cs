@@ -1,6 +1,4 @@
-﻿using CodeSphere.Domain.Premitives;
-
-namespace CodeSphere.Domain.Responses.Contest
+﻿namespace CodeSphere.Domain.Responses.Contest
 {
     public class StandingDto : ContestStandingResposne
     {
@@ -22,11 +20,8 @@ namespace CodeSphere.Domain.Responses.Contest
     }
     public class UserProblemSubmissionWithoutUserId : ProblemSubmissionsCount
     {
-
         public int ProblemId { get; set; }
-
-        public DateTime SubmissionDate { get; set; }
-        public Language Language { get; set; }
+        public DateTime? EarliestSuccessDate { get; set; }
     }
     public class ProblemSubmissionsCount
     {

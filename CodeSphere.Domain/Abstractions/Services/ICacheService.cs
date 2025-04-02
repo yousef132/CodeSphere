@@ -12,6 +12,8 @@ namespace CodeSphere.Domain.Abstractions.Services
         Task<string> GetCachedResponseAsync(string key);
         void CacheContestStanding(ContestPoints points, UserToCache user, int ContestId);
         IReadOnlyList<StandingDto> GetContestStanding(int contestId, int start, int stop);
+        void CacheUserSubmission(SubmissionToCache submission, string userId, int contestId);
+        bool IsUserSolvedTheProblem(string userId, int contestId, int problemId);
         Task TestCache();
     }
 }

@@ -71,7 +71,7 @@ namespace CodeSphere.Infrastructure.Implementation.Repositories
 
             string usersIdString = string.Join("|", usersRanking.Select(s => s.UserId));
 
-
+            // get all the submissions for the users
             var result = await context.Database
                        .SqlQueryRaw<UserProblemSubmission>(
                            "EXEC GetProblemSubmissionsCountByProblemAndUser @ContestId, @UsersId",
@@ -84,9 +84,8 @@ namespace CodeSphere.Infrastructure.Implementation.Repositories
                 user.UserProblemSubmissions = result.Where(r => r.UserId == user.UserId).Select(r => new UserProblemSubmissionWithoutUserId
                 {
                     FailureCount = r.FailureCount,
-                    Language = r.Language,
                     ProblemId = r.ProblemId,
-                    SubmissionDate = r.SubmissionDate,
+                    EarliestSuccessDate = r.EarliestSuccessDate,
                     SuccessCount = r.SuccessCount
 
                 }).ToList();

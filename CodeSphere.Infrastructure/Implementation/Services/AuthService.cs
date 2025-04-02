@@ -32,9 +32,10 @@ namespace CodeSphere.Infrastructure.Implementation.Services
             //1. Privat Claims[User - Defined]
             var AuthClaims = new List<Claim>()
             {
-                new Claim(JwtRegisteredClaimNames.Sub, User.Id)
-				//new Claim(ClaimTypes.Sid, User.Id)
-			};
+                new Claim(JwtRegisteredClaimNames.Sub, User.Id),
+                new Claim(ClaimTypes.Name, User.UserName),
+                new Claim("ImagePath", User.ImagePath??"")
+            };
 
             var UserRoles = await userManager.GetRolesAsync(User);
             foreach (var role in UserRoles)

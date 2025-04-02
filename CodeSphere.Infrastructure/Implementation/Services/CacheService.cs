@@ -130,7 +130,7 @@ namespace CodeSphere.Infrastructure.Implementation.Services
 
             string key = Helper.GenerateContestKey(contestId);
             // o(log n + m) where n is the number of elements in the sorted set and m the number of elements returned.
-            var leaderboard = _Database.SortedSetRangeByRankWithScores(key, start, stop, StackExchange.Redis.Order.Descending);
+            var leaderboard = _Database.SortedSetRangeByRankWithScores(key, 0, -1, StackExchange.Redis.Order.Descending);
 
             // foreach returned user get the submsissions list 
             return leaderboard.Select(entry =>
@@ -196,9 +196,23 @@ namespace CodeSphere.Infrastructure.Implementation.Services
                 ProblemId = sub.ProblemId,
                 SuccessCount = problemSubmissions[sub.ProblemId].SuccessCount,
                 FailureCount = problemSubmissions[sub.ProblemId].FailureCount,
-                SubmissionDate = sub.Date,
-                Language = sub.Language
+                EarliestSuccessDate = sub.Date,
             }).ToList();
+        }
+
+        public bool IsUserSolvedTheProblem(string userId, int contestId, int problemId)
+        {
+            string key = Helper.GenerateUserSubmissionsKey(userId, contestId);
+            var submissionsStrings = _Database.ListRange(key, 0, -1);
+
+
+            var submissions = submissionsStrings
+                .Select(submissionStr => JsonSerializer.Deserialize<SubmissionToCache>(submissionStr))
+                .Where(sub => sub != null)
+                .ToList();
+
+            return submissions.Any(s => s.ProblemId == problemId && s.Result == SubmissionResult.Accepted);
+
         }
 
         #endregion

@@ -84,14 +84,6 @@ namespace CodeSphere.WebApi.Controllers
 
         }
 
-        [HttpGet("standing1")]
-        public async Task<ActionResult<Response>> testcache(int contestId)
-        {
-            responseCacheService.TestCache();
-            return Ok();
-
-        }
-
 
 
     }

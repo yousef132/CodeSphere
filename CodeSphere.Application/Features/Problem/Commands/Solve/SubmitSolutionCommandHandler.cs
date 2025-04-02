@@ -22,6 +22,7 @@ namespace CodeSphere.Application.Features.Problem.Commands.SolveProblem
         private readonly ICacheService cacheService;
         private string UserId;
 
+
         public SubmitSolutionCommandHandler(IProblemRepository problemRepository,
                                              IUnitOfWork unitOfWork,
                                              IMapper mapper,
@@ -73,16 +74,32 @@ namespace CodeSphere.Application.Features.Problem.Commands.SolveProblem
 
             if (problem.Contest.ContestStatus == ContestStatus.Running)
             {
-                // while the contest  : 
-
-                // update the sorted set and add the submission for the cache as (submittionId, submissionDate, result)
                 // always add the submission to the user hash
                 // for the sorted set : 
                 // if the user has already submitted the problem (accepted) then don't update the global sorted set
                 // if the user has not submitted the problem then update the global sorted set
-                // the key for the hash : leaderboard:submission:{submissionId}
+                var user = contextAccessor.HttpContext?.User;
+                if (submission.Result == SubmissionResult.Accepted)
+                {
+                    if (!cacheService.IsUserSolvedTheProblem(UserId, problem.ContestId, problem.Id))
+                    {
+                        // user solve the problem for the first time
+                        cacheService.CacheContestStanding(problem.ContestPoints, new Domain.Requests.UserToCache
+                        {
+                            UserId = UserId,
+                            ImagePath = user.FindFirst("ImagePath")?.Value,
+                            UserName = user.FindFirstValue(ClaimTypes.Name),
+                        }, problem.ContestId);
+                    }
+                }
+                cacheService.CacheUserSubmission(new Domain.Requests.SubmissionToCache
+                {
+                    Date = submission.SubmissionDate,
+                    Language = submission.Language,
+                    ProblemId = submission.ProblemId,
+                    Result = submission.Result
+                }, UserId, submission.ContestId.Value);
 
-                cacheService.CacheContestStanding()
             }
             // insert the result in the database 
 
