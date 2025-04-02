@@ -64,11 +64,11 @@ namespace CodeSphere.Application.Features.Problem.Commands.SolveProblem
                 ContestId = request.ContestId,
                 Language = request.Language,
                 Result = baseSubmissionResponse.SubmissionResult,
-                Error = (result as CompilationErrorResponse)?.Message ?? "",
+                Error = (result as CompilationErrorResponse)?.Message ?? null,
                 ProblemId = request.ProblemId,
                 SubmitTime = acceptedSubmission?.ExecutionTime ?? null,
                 Code = codeContent,
-                SubmitMemory = 0m
+                SubmitMemory = 0m // TODO : implement memory usage in the shellscript
             };
 
 
