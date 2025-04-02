@@ -34,12 +34,12 @@ namespace CodeSphere.Application.Features.Contest.Queries.GetContestStanding
             if (contest == null)
                 return await Response.FailureAsync("Contest Not Found", System.Net.HttpStatusCode.NotFound);
 
-            //if (contest.ContestStatus == ContestStatus.Running)
-            //{
-            //    // return the data from cache
-            //    var leaderboard = cacheService.GetContestStanding(request.ContestId, request.Start, request.Stop);
-            //    return await Response.SuccessAsync(leaderboard, "Contest Standing Fetched Successfully", System.Net.HttpStatusCode.OK);
-            //}
+            if (contest.ContestStatus == ContestStatus.Running)
+            {
+                // return the data from cache
+                var leaderboard = cacheService.GetContestStanding(request.ContestId, request.Start, request.Stop);
+                return await Response.SuccessAsync(leaderboard, "Contest Standing Fetched Successfully", System.Net.HttpStatusCode.OK);
+            }
 
             var standing = await unitOfWork.ContestRepository.GetContestStanding(request.ContestId, 0, 10);
             return await Response.SuccessAsync(standing, "Contest Standing Fetched Successfully", System.Net.HttpStatusCode.OK);

@@ -38,42 +38,6 @@ namespace CodeSphere.Infrastructure.Implementation.Services
             return (value);
         }
 
-        public async Task TestCache()
-        {
-            // Connect to Redis
-
-
-            string key = "leaderboard";
-
-            // Add players to sorted set (ZADD)
-            _Database.SortedSetAdd(key, "Alice", 1500);
-            _Database.SortedSetAdd(key, "Bob", 1800);
-            _Database.SortedSetAdd(key, "Charlie", 1700);
-
-            // Get sorted elements (ZRANGE with scores)
-            Console.WriteLine("Leaderboard:");
-            foreach (var entry in _Database.SortedSetRangeByRankWithScores(key, order: StackExchange.Redis.Order.Descending))
-            {
-                Console.WriteLine($"{entry.Element}: {entry.Score}");
-            }
-
-            // Get the rank of a specific player (ZRANK)
-            long? rank = _Database.SortedSetRank(key, "Alice", StackExchange.Redis.Order.Descending);
-            Console.WriteLine($"Alice's Rank: {rank + 1}");
-
-            // Increment score (ZINCRBY)
-            _Database.SortedSetIncrement(key, "Alice", 300);
-            Console.WriteLine("Alice's new score: " + _Database.SortedSetScore(key, "Alice"));
-
-            // Get top 2 players (ZRANGE with limit)
-            Console.WriteLine("Top 2 Players:");
-            var topPlayers = _Database.SortedSetRangeByRankWithScores(key, 0, 1, StackExchange.Redis.Order.Descending);
-            foreach (var player in topPlayers)
-            {
-                Console.WriteLine($"{player.Element}: {player.Score}");
-            }
-        }
-
         public async Task UpdateContestCache(Submit submission)
         {
             string userKey = $"leaderboard:user:{submission.UserId}";
@@ -130,7 +94,7 @@ namespace CodeSphere.Infrastructure.Implementation.Services
 
             string key = Helper.GenerateContestKey(contestId);
             // o(log n + m) where n is the number of elements in the sorted set and m the number of elements returned.
-            var leaderboard = _Database.SortedSetRangeByRankWithScores(key, 0, -1, StackExchange.Redis.Order.Descending);
+            var leaderboard = _Database.SortedSetRangeByRankWithScores(key, start, stop, StackExchange.Redis.Order.Descending);
 
             // foreach returned user get the submsissions list 
             return leaderboard.Select(entry =>
@@ -148,7 +112,6 @@ namespace CodeSphere.Infrastructure.Implementation.Services
             }).ToList();
         }
 
-
         public void CacheUserSubmission(SubmissionToCache submission, string userId, int contestId)
         {
             string key = Helper.GenerateUserSubmissionsKey(userId, contestId);
@@ -161,8 +124,6 @@ namespace CodeSphere.Infrastructure.Implementation.Services
             SetKeyExpiration(key, 2);
         }
 
-
-
         #region Private
         private void SetKeyExpiration(string key, double time)
              => _Database.KeyExpire(key, TimeSpan.FromHours(time));
@@ -171,34 +132,41 @@ namespace CodeSphere.Infrastructure.Implementation.Services
             var key = Helper.GenerateUserSubmissionsKey(userId, contestId);
             var submissionsStrings = _Database.ListRange(key, 0, -1);
 
-            // o(n) where n is the number of submissions in the list
             var problemSubmissions = new Dictionary<int, ProblemSubmissionsCount>();
-
-            var submissions = submissionsStrings
-                .Select(submissionStr => JsonSerializer.Deserialize<SubmissionToCache>(submissionStr))
-                .Where(sub => sub != null)
-                .ToList();
-
-            foreach (var submission in submissions)
+            SubmissionToCache submission = null;
+            foreach (var submissionStr in submissionsStrings)
             {
-                var count = problemSubmissions.GetValueOrDefault(submission.ProblemId) ?? new ProblemSubmissionsCount();
+                submission = JsonSerializer.Deserialize<SubmissionToCache>(submissionStr);
+                if (submission == null) continue;
+
+                if (!problemSubmissions.TryGetValue(submission.ProblemId, out var count))
+                {
+                    count = new ProblemSubmissionsCount();
+                    problemSubmissions[submission.ProblemId] = count;
+                }
 
                 if (submission.Result == SubmissionResult.Accepted)
+                {
                     count.SuccessCount++;
+                    count.EarliestSuccessDate = count.EarliestSuccessDate == null || count.EarliestSuccessDate > submission.Date
+                        ? submission.Date
+                        : count.EarliestSuccessDate;
+                }
                 else
+                {
                     count.FailureCount++;
-
-                problemSubmissions[submission.ProblemId] = count;
+                }
             }
 
-            return submissions.Select(sub => new UserProblemSubmissionWithoutUserId
+            return problemSubmissions.Select(kvp => new UserProblemSubmissionWithoutUserId
             {
-                ProblemId = sub.ProblemId,
-                SuccessCount = problemSubmissions[sub.ProblemId].SuccessCount,
-                FailureCount = problemSubmissions[sub.ProblemId].FailureCount,
-                EarliestSuccessDate = sub.Date,
+                ProblemId = kvp.Key,
+                SuccessCount = kvp.Value.SuccessCount,
+                FailureCount = kvp.Value.FailureCount,
+                EarliestSuccessDate = kvp.Value.EarliestSuccessDate
             }).ToList();
         }
+
 
         public bool IsUserSolvedTheProblem(string userId, int contestId, int problemId)
         {

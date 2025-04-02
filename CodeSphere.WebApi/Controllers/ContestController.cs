@@ -59,30 +59,26 @@ namespace CodeSphere.WebApi.Controllers
         public async Task<ActionResult<Response>> GetAllContests()
           => ResponseResult(await mediator.Send(new GetAllContestsQuery()));
 
-        [HttpPost("cache")]
-        public async Task<ActionResult<Response>> cache(string key, string value)
-        {
-            await responseCacheService.CacheResponseAsync(key, value, TimeSpan.FromSeconds(6000));
-            return Ok();
+        //[HttpPost("cache")]
+        //public async Task<ActionResult<Response>> cache(string key, string value)
+        //{
+        //    await responseCacheService.CacheResponseAsync(key, value, TimeSpan.FromSeconds(6000));
+        //    return Ok();
 
-        }
+        //}
 
-        [HttpGet("get-cache")]
-        public async Task<ActionResult<Response>> Getcache(string key)
-        {
-            var result = await responseCacheService.GetCachedResponseAsync(key);
-            return Ok(result);
-        }
+        //[HttpGet("get-cache")]
+        //public async Task<ActionResult<Response>> Getcache(string key)
+        //{
+        //    var result = await responseCacheService.GetCachedResponseAsync(key);
+        //    return Ok(result);
+        //}
 
-        [HttpGet("standing")]
-
-
+        [HttpGet("{contestId}/standing")]
         public async Task<ActionResult<Response>> GetContestStanding(int contestId)
-        {
-            return ResponseResult(await mediator.Send(new GetContestStandingQuery(contestId)));
+         => ResponseResult(await mediator.Send(new GetContestStandingQuery(contestId)));
 
 
-        }
 
 
 
