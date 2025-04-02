@@ -15,12 +15,12 @@ namespace CodeSphere.Application.Features.Contest.Queries
     {
         private readonly IUnitOfWork unitOfWork;
         private readonly IMapper mapper;
-        private readonly IResponseCacheService cacheService;
+        private readonly ICacheService cacheService;
         private readonly IHttpContextAccessor httpContext;
         private readonly string UserId;
         private const int CacheDurationHours = 2;
 
-        public GetContestProblemsQueryHandler(IUnitOfWork unitOfWork, IMapper mapper, IResponseCacheService cacheService, IHttpContextAccessor httpContext)
+        public GetContestProblemsQueryHandler(IUnitOfWork unitOfWork, IMapper mapper, ICacheService cacheService, IHttpContextAccessor httpContext)
         {
             this.unitOfWork = unitOfWork;
             this.mapper = mapper;

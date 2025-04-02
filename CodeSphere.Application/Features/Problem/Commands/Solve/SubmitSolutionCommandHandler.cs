@@ -19,14 +19,17 @@ namespace CodeSphere.Application.Features.Problem.Commands.SolveProblem
         private readonly IExecutionService executionService;
         private readonly IFileService fileService;
         private readonly IHttpContextAccessor contextAccessor;
+        private readonly ICacheService cacheService;
         private string UserId;
+
 
         public SubmitSolutionCommandHandler(IProblemRepository problemRepository,
                                              IUnitOfWork unitOfWork,
                                              IMapper mapper,
                                              IExecutionService executionService,
                                              IFileService fileService,
-                                             IHttpContextAccessor contextAccessor)
+                                             IHttpContextAccessor contextAccessor,
+                                             ICacheService cacheService)
         {
             this.problemRepository = problemRepository;
             this.unitOfWork = unitOfWork;
@@ -34,7 +37,7 @@ namespace CodeSphere.Application.Features.Problem.Commands.SolveProblem
             this.executionService = executionService;
             this.fileService = fileService;
             this.contextAccessor = contextAccessor;
-
+            this.cacheService = cacheService;
             var user = contextAccessor.HttpContext?.User;
             UserId = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
         }
@@ -61,18 +64,41 @@ namespace CodeSphere.Application.Features.Problem.Commands.SolveProblem
                 ContestId = request.ContestId,
                 Language = request.Language,
                 Result = baseSubmissionResponse.SubmissionResult,
-                Error = (result as CompilationErrorResponse)?.Message ?? "",
+                Error = (result as CompilationErrorResponse)?.Message ?? null,
                 ProblemId = request.ProblemId,
                 SubmitTime = acceptedSubmission?.ExecutionTime ?? null,
                 Code = codeContent,
-                SubmitMemory = 0m
+                SubmitMemory = 0m // TODO : implement memory usage in the shellscript
             };
 
-            // check if the user has already submitted the problem, then 
+
             if (problem.Contest.ContestStatus == ContestStatus.Running)
             {
-                // cache contest standing
-
+                // always add the submission to the user hash
+                // for the sorted set : 
+                // if the user has already submitted the problem (accepted) then don't update the global sorted set
+                // if the user has not submitted the problem then update the global sorted set
+                var user = contextAccessor.HttpContext?.User;
+                if (submission.Result == SubmissionResult.Accepted)
+                {
+                    if (!cacheService.IsUserSolvedTheProblem(UserId, problem.ContestId, problem.Id))
+                    {
+                        // user solve the problem for the first time
+                        cacheService.CacheContestStanding(problem.ContestPoints, new Domain.Requests.UserToCache
+                        {
+                            UserId = UserId,
+                            ImagePath = user.FindFirst("ImagePath")?.Value,
+                            UserName = user.FindFirstValue(ClaimTypes.Name),
+                        }, problem.ContestId);
+                    }
+                }
+                cacheService.CacheUserSubmission(new Domain.Requests.SubmissionToCache
+                {
+                    Date = submission.SubmissionDate,
+                    Language = submission.Language,
+                    ProblemId = submission.ProblemId,
+                    Result = submission.Result
+                }, UserId, submission.ContestId.Value);
             }
             // insert the result in the database 
 

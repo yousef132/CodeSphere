@@ -1,4 +1,5 @@
 ﻿using CodeSphere.Domain.Abstractions.Services;
+using CodeSphere.Domain.Premitives;
 using FluentValidation;
 
 namespace CodeSphere.Application.Features.Problem.Commands.SolveProblem
@@ -38,10 +39,8 @@ namespace CodeSphere.Application.Features.Problem.Commands.SolveProblem
                 .WithMessage("Invalid language value. Must be a defined enum.");
 
             // Validate Code
-            RuleFor(x => x.Code)
-                .NotNull()
-                .WithMessage("Code file is required.")
-                .Must(file => file.Length > 0)
+            RuleFor(x => x)
+                .Must(x => Helper.ValidateFile(x.Language, 5, 0, x.Code))
                 .WithMessage("Code file cannot be empty.");
 
             // Validate ProblemId
