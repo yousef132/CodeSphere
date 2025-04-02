@@ -77,5 +77,6 @@ app.UseAuthorization();
 
 app.MapControllers();
 app.MapHub<EditorHub>("/editorHub");
+app.MapHub<VideoChatHub>("/videoChatHub");
 
 app.Run();

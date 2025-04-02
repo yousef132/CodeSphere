@@ -107,6 +107,11 @@ namespace CodeSphere.Infrastructure
                                 // Assign the token to the context
                                 context.Token = accessToken;
                             }
+                          
+                            if (!string.IsNullOrEmpty(accessToken) && path.StartsWithSegments("/VideoChatHub"))
+                            {
+                                context.Token = accessToken;
+                            }
 
                           return Task.CompletedTask;
                       }
