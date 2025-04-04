@@ -60,9 +60,7 @@ namespace CodeSphere.Application.Features.Authentication.Commands.Register
 
             var registerCommandHandler = new RegisterCommandResponse()
             {
-                Password = request.Password,
                 Email = request.Email,
-                Token = await _authService.CreateTokenAsync(mappedUser, _userManager)
             };
 
             return await Response.SuccessAsync(registerCommandHandler, "Registered Successfully", System.Net.HttpStatusCode.Created);
