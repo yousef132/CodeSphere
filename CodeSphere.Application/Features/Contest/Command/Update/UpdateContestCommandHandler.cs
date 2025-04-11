@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
 using CodeSphere.Domain.Abstractions;
-using CodeSphere.Domain.DTOs;
 using CodeSphere.Domain.Premitives;
 using MediatR;
 
@@ -25,17 +24,13 @@ namespace CodeSphere.Application.Features.Contest.Command.Update
                 return await Response.FailureAsync("Contest not found", System.Net.HttpStatusCode.NotFound);
             }
 
-            mapper.Map(request, contest);
-            await unitOfWork.Repository<Domain.Models.Entities.Contest>().UpdateAsync(contest);
+            var mappedContest = mapper.Map(request, contest);
+            await unitOfWork.Repository<Domain.Models.Entities.Contest>().UpdateAsync(mappedContest);
             await unitOfWork.CompleteAsync();
 
-            var responseDto = new ContestResponseDto
-            {
-                Id = contest.Id,
-                Name = contest.Name
-            };
 
-            return await Response.SuccessAsync(responseDto, "Contest updated successfully", System.Net.HttpStatusCode.OK);
+
+            return await Response.SuccessAsync(request, "Contest updated successfully", System.Net.HttpStatusCode.OK);
         }
     }
 }
