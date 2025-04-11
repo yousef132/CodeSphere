@@ -10,7 +10,13 @@ namespace CodeSphere.Application.Mapping
         public ContestProfile()
         {
             CreateMap<CreateContestCommand, Contest>();
-            CreateMap<Contest, GetAllContestsQueryResponse>();
+            CreateMap<Tuple<Contest, bool>, GetAllContestsQueryResponse>()
+                .ForMember(dest => dest.UserRegistered, opt => opt.MapFrom(src => src.Item2))
+                .ForMember(dest => dest.EndDate, opt => opt.MapFrom(src => src.Item1.EndDate))
+                .ForMember(dest => dest.StartDate, opt => opt.MapFrom(src => src.Item1.StartDate))
+                .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Item1.Name))
+                .ForMember(dest => dest.ContestStatus, opt => opt.MapFrom(src => src.Item1.ContestStatus))
+                .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Item1.Id));
         }
     }
 }

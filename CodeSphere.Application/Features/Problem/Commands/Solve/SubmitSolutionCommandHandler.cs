@@ -50,6 +50,15 @@ namespace CodeSphere.Application.Features.Problem.Commands.SolveProblem
             if (problem.Contest == null)
                 return await Response.FailureAsync("Contest Not Found", System.Net.HttpStatusCode.NotFound);
 
+
+            if (problem.Contest.ContestStatus == ContestStatus.Running)
+            {
+                // return bad request if not registered 
+                var isRegistered = await unitOfWork.UserContestRepository.IsRegistered(problem.ContestId, UserId);
+                if (isRegistered == null)
+                    return await Response.FailureAsync("You are not registered in this contest", System.Net.HttpStatusCode.Forbidden);
+            }
+
             string codeContent = await fileService.ReadFile(request.Code);
 
             var result = await executionService.ExecuteCodeAsync(codeContent, request.Language, problem.Testcases.ToList(), problem.RunTimeLimit);

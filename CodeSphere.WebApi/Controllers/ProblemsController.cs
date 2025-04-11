@@ -34,6 +34,7 @@ namespace CodeSphere.WebApi.Controllers
 
 
         [HttpPost("run")]
+        [Authorize]
         [RateLimitingFilter(5)]
         public async Task<ActionResult<Response>> RunProblemTestcasesAsync([FromForm] RunCodeCommand command)
          => ResponseResult(await mediator.Send(command));

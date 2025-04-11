@@ -2,6 +2,10 @@
 
 namespace CodeSphere.Application.Features.Contest.Queries.GetAllContests
 {
+
+
+
+
     public class GetAllContestsQueryResponse
     {
         public int Id { get; set; }
@@ -13,5 +17,7 @@ namespace CodeSphere.Application.Features.Contest.Queries.GetAllContests
         public DateTime StartDate { get; set; }
 
         public DateTime EndDate { get; set; }
+
+
     }
 }
