@@ -5,6 +5,7 @@ using MediatR;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using StackExchange.Redis;
 using System.Reflection;
 
 namespace CodeSphere.Application
@@ -27,6 +28,12 @@ namespace CodeSphere.Application
 
 
             // redis
+
+            services.AddSingleton<IConnectionMultiplexer>(config =>
+            {
+                var configs = ConfigurationOptions.Parse(configuration.GetConnectionString("Redis"));
+                return ConnectionMultiplexer.Connect(configs);
+            });
 
 
             // mediator
