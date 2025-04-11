@@ -8,13 +8,13 @@ using System.Security.Claims;
 
 namespace CodeSphere.Application.Features.Problem.Queries.GetById
 {
-    public class GetByIdQueryHandler : IRequestHandler<GetByIdQuery, Response>
+    public class GetProblemByIdQueryHandler : IRequestHandler<GetProblemByIdQuery, Response>
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
         private readonly IHttpContextAccessor contextAccessor;
         private string UserId;
-        public GetByIdQueryHandler(IUnitOfWork unitOfWork,
+        public GetProblemByIdQueryHandler(IUnitOfWork unitOfWork,
             IMapper mapper,
             IHttpContextAccessor contextAccessor)
         {
@@ -25,22 +25,33 @@ namespace CodeSphere.Application.Features.Problem.Queries.GetById
             var user = contextAccessor.HttpContext?.User;
             UserId = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
         }
-        public async Task<Response> Handle(GetByIdQuery request, CancellationToken cancellationToken)
+        public async Task<Response> Handle(GetProblemByIdQuery request, CancellationToken cancellationToken)
         {
             // Get the Problem Details from Repository
-            var getSpecificProblem = await _unitOfWork.ProblemRepository
-            .GetProblemDetailsAsync(request.ProblemId, cancellationToken);
+            var problem = await _unitOfWork.ProblemRepository.GetProblemIncludingContestAndTestcases(request.ProblemId);
+
 
 
             // Check if Problem was not Found
-            if (getSpecificProblem is null)
+            if (problem is null)
                 return await Response.FailureAsync("Problem not Found", HttpStatusCode.NotFound);
 
 
-            getSpecificProblem.Testcases = getSpecificProblem.Testcases?.Take(3).ToList() ?? [];
+            if (problem.Contest.ContestStatus == ContestStatus.Upcoming)
+                return await Response.FailureAsync("Contest is Upcoming", HttpStatusCode.Forbidden);
+
+            if (problem.Contest.ContestStatus == ContestStatus.Running)
+            {
+                // return bad request if not registered 
+                var isRegistered = await _unitOfWork.UserContestRepository.IsRegistered(problem.ContestId, UserId);
+                if (isRegistered == null)
+                    return await Response.FailureAsync("You are not registered in this contest", HttpStatusCode.Forbidden);
+            }
+
+            problem.Testcases = problem.Testcases?.Take(3).ToList() ?? [];
 
             // Map to the response 
-            var response = _mapper.Map<GetByIdQueryResponse>(getSpecificProblem);
+            var response = _mapper.Map<GetByIdQueryResponse>(problem);
 
             // Populate Accepted and Submissions counts
             response.Accepted = _unitOfWork.ProblemRepository.GetAcceptedProblemCount(request.ProblemId);

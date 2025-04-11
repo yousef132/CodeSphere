@@ -43,8 +43,8 @@ builder.Services.AddCors(opt =>
     {
         policy.AllowAnyHeader();
         policy.AllowAnyMethod();
-        policy.SetIsOriginAllowed(_ => true) 
-              .AllowCredentials(); 
+        policy.SetIsOriginAllowed(_ => true)
+              .AllowCredentials();
     });
 });
 
@@ -61,7 +61,7 @@ using (var scope = app.Services.CreateScope())
     var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
     await RoleSeeder.SeedAsync(roleManager);
     await UserSeeder.SeedAsync(userManager);
-    //await elasticSearch.InitializeIndexes();
+    await elasticSearch.InitializeIndexes();
 
 }
 // Configure the HTTP request pipeline.

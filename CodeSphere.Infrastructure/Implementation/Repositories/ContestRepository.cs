@@ -17,11 +17,12 @@ namespace CodeSphere.Infrastructure.Implementation.Repositories
             context = _context;
         }
 
-        public async Task<IReadOnlyList<Tuple<Contest, bool>>> GetAllContestWithRegisteredUserAsync(string? userId)
+        public async Task<IEnumerable<Tuple<Contest, bool>>> GetAllContestWithRegisteredUserAsync(string? userId)
         {
-            return await context.Contests
-                .Include(c => c.Registrations.Where(r => r.UserId == userId))
-                .Select(c => new Tuple<Contest, bool>(c, c.Registrations.Any())).ToListAsync();
+            var contests = await context.Contests
+                .Include(c => c.Registrations.Where(r => r.UserId == userId)).ToListAsync();
+
+            return contests.Select(c => new Tuple<Contest, bool>(c, c.Registrations.Any()));
         }
 
         //public async Task<IReadOnlyList<(Contest, bool)>> GetAllContestWithRegisteredUserAsync(string userId)

@@ -51,7 +51,7 @@ namespace CodeSphere.WebApi.Controllers
         => ResponseResult(await mediator.Send(new GetContestProblemsQuery(id)));
 
         [HttpPost("register/{contestId}")]
-        [Authorize(Roles = Roles.User)]
+        [Authorize]
         public async Task<ActionResult<Response>> RegisterInContest(int contestId)
            => ResponseResult(await mediator.Send(new RegisterInContestCommand(contestId)));
 

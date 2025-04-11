@@ -57,7 +57,7 @@ namespace CodeSphere.Infrastructure.Implementation.Repositories
 
         public async Task<bool> IsUserAuthorizedToViewSubmission(string userId, int submissionId)
         {
-            var submission =await  _context.Submits.Include(x => x.Contest).FirstOrDefaultAsync(x => x.Id == submissionId);
+            var submission = await _context.Submits.Include(x => x.Contest).FirstOrDefaultAsync(x => x.Id == submissionId);
             if (submission.Contest.ContestStatus == ContestStatus.Running && submission.UserId != userId)
                 return false;
 
@@ -68,6 +68,12 @@ namespace CodeSphere.Infrastructure.Implementation.Repositories
             return await _context.Submits
                 .Where(s => s.ContestId == contestId && problemIds.Contains(s.ProblemId) && s.Result == SubmissionResult.Accepted)
                 .ToListAsync();
+        }
+
+        public async Task<IReadOnlyList<Submit>> GetUserContestSubmissions(int contestId, string userId)
+        {
+            return await _context.Submits.Include(s => s.Problem)
+                .Where(s => s.ContestId == contestId && s.UserId == userId).ToListAsync();
         }
     }
 

@@ -2,7 +2,7 @@
 
 namespace CodeSphere.Application.Features.Problem.Queries.GetById
 {
-    public class GetByIdQueryValidator : AbstractValidator<GetByIdQuery>
+    public class GetByIdQueryValidator : AbstractValidator<GetProblemByIdQuery>
     {
         public GetByIdQueryValidator()
         {

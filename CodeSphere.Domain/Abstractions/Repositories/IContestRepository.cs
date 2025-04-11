@@ -6,7 +6,7 @@ namespace CodeSphere.Domain.Abstractions.Repositories
     public interface IContestRepository
     {
         Task<IReadOnlyList<Domain.Models.Entities.Problem>> GetContestProblemsByIdAsync(int contestId);
-        Task<IReadOnlyList<Tuple<Contest, bool>>> GetAllContestWithRegisteredUserAsync(string? userId);
+        Task<IEnumerable<Tuple<Contest, bool>>> GetAllContestWithRegisteredUserAsync(string? userId);
 
         Task<IReadOnlyList<StandingDto>> GetContestStanding(int contestId, int index, int pageSize);
 
