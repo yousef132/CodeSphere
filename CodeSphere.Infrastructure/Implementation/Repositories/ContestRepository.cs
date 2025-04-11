@@ -17,9 +17,12 @@ namespace CodeSphere.Infrastructure.Implementation.Repositories
             context = _context;
         }
 
-        public Task<IReadOnlyList<(Contest, bool)>> GetAllContestWithRegisteredUserAsync(string userId)
+        public async Task<IEnumerable<Tuple<Contest, bool>>> GetAllContestWithRegisteredUserAsync(string? userId)
         {
-            throw new NotImplementedException();
+            var contests = await context.Contests
+                .Include(c => c.Registrations.Where(r => r.UserId == userId)).ToListAsync();
+
+            return contests.Select(c => new Tuple<Contest, bool>(c, c.Registrations.Any()));
         }
 
         //public async Task<IReadOnlyList<(Contest, bool)>> GetAllContestWithRegisteredUserAsync(string userId)
@@ -94,8 +97,8 @@ namespace CodeSphere.Infrastructure.Implementation.Repositories
             return usersRanking;
         }
 
-
-
+        public async Task<bool> IsRegistered(string userId, int contestId)
+         => await context.Registers.AnyAsync(x => x.UserId == userId && x.ContestId == contestId);
     }
 
 

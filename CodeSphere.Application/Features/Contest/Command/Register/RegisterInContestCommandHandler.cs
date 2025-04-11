@@ -24,11 +24,11 @@ namespace CodeSphere.Application.Features.Contest.Command.Register
         public async Task<Response> Handle(RegisterInContestCommand request, CancellationToken cancellationToken)
         {
             var contest = await unitOfWork.Repository<Domain.Models.Entities.Contest>().GetByIdAsync(request.Id);
-            if (contest != null)
+            if (contest == null)
                 return await Response.FailureAsync("No Contest Found", HttpStatusCode.NotFound);
 
-            if (contest.ContestStatus == ContestStatus.Ended)
-                return await Response.FailureAsync("Contest Ended", HttpStatusCode.Forbidden);
+            if (contest.ContestStatus != ContestStatus.Running)
+                return await Response.FailureAsync("Contest is not Running Now !!", HttpStatusCode.Forbidden);
 
             var isRegistered = await unitOfWork.UserContestRepository.IsRegistered(request.Id, UserId);
             if (isRegistered != null)

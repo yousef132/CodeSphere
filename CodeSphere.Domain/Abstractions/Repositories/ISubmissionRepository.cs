@@ -9,8 +9,10 @@ namespace CodeSphere.Domain.Abstractions.Repositories
         IQueryable<Submit> GetSolvedSubmissions(int problemId, string userId);
         Task<HashSet<int>> GetUserAcceptedSubmissionIdsAsync(string userId);
         Task<Dictionary<int, SubmissionResult>> GetUserSubmissionsAsync(string userId);
-        Task<bool> IsUserAuthorizedToViewSubmission (string userId, int submissionId);
+        Task<bool> IsUserAuthorizedToViewSubmission(string userId, int submissionId);
         Task<List<Submit>> GetContestACSubmissionsByProblemIdsAsync(int contestId, List<int> problemIds);
+
+        Task<IReadOnlyList<Models.Entities.Submit>> GetUserContestSubmissions(int contestId, string userId);
 
 
     }

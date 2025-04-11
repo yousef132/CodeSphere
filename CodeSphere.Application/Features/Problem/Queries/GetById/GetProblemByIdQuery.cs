@@ -3,11 +3,11 @@ using MediatR;
 
 namespace CodeSphere.Application.Features.Problem.Queries.GetById
 {
-    public class GetByIdQuery : IRequest<Response>
+    public class GetProblemByIdQuery : IRequest<Response>
     {
         public int ProblemId { get; set; }
 
-        public GetByIdQuery(int problemId)
+        public GetProblemByIdQuery(int problemId)
         {
             ProblemId = problemId;
         }

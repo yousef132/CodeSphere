@@ -27,6 +27,8 @@ namespace CodeSphere.Application.Features.Problem.Commands.Create
             if (contest == null)
                 return await Response.FailureAsync("Contest Not Found!!", System.Net.HttpStatusCode.NotFound);
 
+
+            // TODO : TO MINIMIZE DB CALLS => load all topics in memory then check if incomming topics are valid or not
             Domain.Models.Entities.Topic currentTopic = default;
             foreach (var topic in request.Topics)
             {
