@@ -5,14 +5,9 @@ using MediatR;
 
 namespace CodeSphere.Application.Features.Contest.Command.Delete
 {
-    public class DeleteContestCommandHandler : IRequestHandler<DeleteContestCommand, Response>
+    public class DeleteContestCommandHandler(IUnitOfWork unitOfWork) : IRequestHandler<DeleteContestCommand, Response>
     {
-        private readonly IUnitOfWork unitOfWork;
-
-        public DeleteContestCommandHandler(IUnitOfWork unitOfWork)
-        {
-            this.unitOfWork = unitOfWork;
-        }
+        private readonly IUnitOfWork unitOfWork = unitOfWork;
 
         public async Task<Response> Handle(DeleteContestCommand request, CancellationToken cancellationToken)
         {

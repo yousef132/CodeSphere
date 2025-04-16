@@ -1,20 +1,17 @@
 ﻿using AutoMapper;
 using CodeSphere.Domain.Abstractions;
+using CodeSphere.Domain.Abstractions.Repositories;
 using CodeSphere.Domain.Premitives;
 using MediatR;
+using System.Net;
 
 namespace CodeSphere.Application.Features.Testcases.Commands.Update
 {
-    public class UpdateTestcaseCommandHandler : IRequestHandler<UpdateTestcaseCommand, Response>
+    public class UpdateTestcaseCommandHandler(IMapper mapper, IUnitOfWork unitOfWork, IProblemRepository problemRepository) : IRequestHandler<UpdateTestcaseCommand, Response>
     {
-        private readonly IMapper _mapper;
-        private readonly IUnitOfWork _unitOfWork;
-
-        public UpdateTestcaseCommandHandler(IMapper mapper, IUnitOfWork unitOfWork)
-        {
-            _mapper = mapper;
-            _unitOfWork = unitOfWork;
-        }
+        private readonly IMapper _mapper = mapper;
+        private readonly IUnitOfWork _unitOfWork = unitOfWork;
+        private readonly IProblemRepository _problemRepository = problemRepository;
 
         public async Task<Response> Handle(UpdateTestcaseCommand request, CancellationToken cancellationToken)
         {
@@ -22,16 +19,27 @@ namespace CodeSphere.Application.Features.Testcases.Commands.Update
             if (existingTestcase == null)
                 return await Response.FailureAsync("Testcase not found!", System.Net.HttpStatusCode.NotFound);
 
-            var problem = await _unitOfWork.Repository<CodeSphere.Domain.Models.Entities.Problem>().GetByIdAsync(request.ProblemId);
-            if (problem == null)
-                return await Response.FailureAsync("Problem not found!", System.Net.HttpStatusCode.NotFound);
-
             _mapper.Map(request, existingTestcase);
 
             await _unitOfWork.Repository<CodeSphere.Domain.Models.Entities.Testcase>().UpdateAsync(existingTestcase);
             await _unitOfWork.CompleteAsync();
 
-            return await Response.SuccessAsync(existingTestcase, "Test case updated successfully.", System.Net.HttpStatusCode.OK);
+            var testCases = _problemRepository.GetTestCasesByProblemId(existingTestcase.ProblemId);
+
+            var formattedTestCases = testCases.Select(tc => new
+            {
+                tc.Id,
+                Input = tc.Input.Replace("\r", "").Replace("\n", ""),
+                tc.Output
+            });
+
+            var result = new
+            {
+                existingTestcase.ProblemId,
+                TestCases = formattedTestCases
+            };
+
+            return await Response.SuccessAsync(result, "Testcases updated successfully", HttpStatusCode.OK);
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using CodeSphere.Application.Features.Contest.Command.Create;
+using CodeSphere.Application.Features.Contest.Command.Update;
 using CodeSphere.Application.Features.Contest.Queries.GetAllContests;
 using CodeSphere.Domain.Models.Entities;
 
@@ -17,6 +18,8 @@ namespace CodeSphere.Application.Mapping
                 .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Item1.Name))
                 .ForMember(dest => dest.ContestStatus, opt => opt.MapFrom(src => src.Item1.ContestStatus))
                 .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Item1.Id));
+
+            CreateMap<UpdateContestCommand, Contest>();
         }
     }
 }

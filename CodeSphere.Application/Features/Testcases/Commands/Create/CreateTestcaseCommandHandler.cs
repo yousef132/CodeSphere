@@ -1,21 +1,14 @@
-﻿using AutoMapper;
-using CodeSphere.Application.Features.TestCase.Commands.Create;
+﻿using CodeSphere.Application.Features.TestCase.Commands.Create;
 using CodeSphere.Domain.Abstractions;
+using CodeSphere.Domain.DTOs;
 using CodeSphere.Domain.Premitives;
 using MediatR;
 
 namespace CodeSphere.Application.Features.TestCases.Commands.Create
 {
-    public class CreateTestcaseCommandHandler : IRequestHandler<CreateTestcaseCommand, Response>
+    public class CreateTestcaseCommandHandler(IUnitOfWork unitOfWork) : IRequestHandler<CreateTestcaseCommand, Response>
     {
-        private readonly IMapper _mapper;
-        private readonly IUnitOfWork _unitOfWork;
-
-        public CreateTestcaseCommandHandler(IMapper mapper, IUnitOfWork unitOfWork)
-        {
-            _mapper = mapper;
-            _unitOfWork = unitOfWork;
-        }
+        private readonly IUnitOfWork _unitOfWork = unitOfWork;
 
         public async Task<Response> Handle(CreateTestcaseCommand request, CancellationToken cancellationToken)
         {
@@ -23,12 +16,24 @@ namespace CodeSphere.Application.Features.TestCases.Commands.Create
             if (problem == null)
                 return await Response.FailureAsync("Problem not found!", System.Net.HttpStatusCode.NotFound);
 
-            var newTestcase = _mapper.Map<CodeSphere.Domain.Models.Entities.Testcase>(request);
+            var newTestcase = new Domain.Models.Entities.Testcase
+            {
+                ProblemId = request.ProblemId,
+                Input = request.Input,
+                Output = request.expectedOutput
+            };
 
             await _unitOfWork.Repository<CodeSphere.Domain.Models.Entities.Testcase>().AddAsync(newTestcase);
             await _unitOfWork.CompleteAsync();
 
-            return await Response.SuccessAsync(newTestcase, "Test case added successfully.", System.Net.HttpStatusCode.Created);
+            var responseDto = new TestcaseResponseDTO
+            {
+                Id = newTestcase.Id,
+                Input = newTestcase.Input,
+                Output = newTestcase.Output
+            };
+
+            return await Response.SuccessAsync(responseDto, "Test case added successfully.", System.Net.HttpStatusCode.Created);
         }
     }
 }

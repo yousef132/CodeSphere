@@ -12,20 +12,15 @@ namespace CodeSphere.Application.Features.Contest.Command.Create
     {
         private readonly IUnitOfWork unitOfWork;
         private readonly IMapper mapper;
-        private readonly IHttpContextAccessor contextAccessor;
-        private string UserId;
+        private readonly string UserId;
         public CreateContestCommandHandler(IUnitOfWork unitOfWork, IMapper mapper, IHttpContextAccessor contextAccessor)
         {
             this.unitOfWork = unitOfWork;
             this.mapper = mapper;
-            this.contextAccessor = contextAccessor;
 
             var user = contextAccessor.HttpContext?.User;
             UserId = user?.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? string.Empty;
         }
-
-
-
 
         public async Task<Response> Handle(CreateContestCommand request, CancellationToken cancellationToken)
         {
