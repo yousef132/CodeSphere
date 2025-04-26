@@ -9,7 +9,6 @@ namespace CodeSphere.Application.Features.Contest.Command.Update
         {
             RuleFor(x => x.Id).GreaterThan(0);
             RuleFor(x => x.Name).NotEmpty().NotNull();
-            RuleFor(x => x.Description).NotEmpty().NotNull();
             RuleFor(x => x.StartTime).NotEmpty().NotNull();
             RuleFor(x => x.EndTime).NotEmpty().NotNull();
         }
