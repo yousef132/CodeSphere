@@ -2,6 +2,16 @@
 
 Code Sphere is an open-source online judge and contest platform built using various technologies, focusing on performance and security.
 
+## Design and Architecture
+
+- Utilizes clean architecture with separated layers to ensure a clear separation of concerns.
+- Implements the Mediator Pattern, CQRS Pattern, Fluent Validation, and provides a unified response for all endpoints.
+
+### 🧩 System Architecture
+
+![Code Sphere Architecture](https://drive.google.com/uc?export=view&id=15SdlCAYca5hw87ddERx3jZE7wUA935O6)
+
+This diagram represents the high-level structure of the system, showing interactions between components like frontend, backend services, judge engine, Docker, Redis, and Elasticsearch.
 ## Table of Contents
 
 - [Design and Architecture](#design-and-architecture)
