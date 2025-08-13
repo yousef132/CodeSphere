@@ -33,6 +33,7 @@ namespace CodeSphere.Infrastructure.Implementation.Services
             this.fileService = fileService;
             this.unitOfWork = unitOfWork;
         }
+
         public async Task<object> ExecuteCodeAsync(string code, Language language, List<CustomTestcaseDto> testcases, decimal runTimeLimit)
         {
             string path = await fileService.CreateCodeFile(code, language, _requestDirectory);
@@ -41,12 +42,13 @@ namespace CodeSphere.Infrastructure.Implementation.Services
             {
                 // create container 
                 await CreateAndStartContainer(language);
-
+                //await fileService.CreateTestCasesFile(testcases[i].Input, _requestDirectory);
 
                 for (int i = 0; i < testcases.Count; i++)
                 {
 
                     await fileService.CreateTestCasesFile(testcases[i].Input, _requestDirectory);
+                    //await fileService.UpdateTestCasesFileAsync(testcases[i].Input, _requestDirectory);
 
                     await ExecuteCodeInContainer(runTimeLimit);
 

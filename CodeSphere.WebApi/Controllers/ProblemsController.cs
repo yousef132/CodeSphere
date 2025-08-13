@@ -19,7 +19,7 @@ namespace CodeSphere.WebApi.Controllers
 
 
         [HttpPost]
-        [Authorize(Roles = Roles.Admin)]
+        //[Authorize(Roles = Roles.Admin)]
 
         public async Task<ActionResult<Response>> CreateProblemAsync([FromBody] CreateProblemCommand command)
          => ResponseResult(await mediator.Send(command));

@@ -14,6 +14,7 @@ services:
     image: kibana:8.15.0
     ports:
       - "5601:5601"
+- 
     depends_on:
       - elasticsearch
     environment:

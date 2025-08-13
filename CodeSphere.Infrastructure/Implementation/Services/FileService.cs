@@ -40,6 +40,29 @@ namespace CodeSphere.Infrastructure.Implementation.Services
             return testCasesPath;
         }
 
+        public async Task<string> UpdateTestCasesFileAsync(string testCasesContent, string filePathOrDirectory)
+        {
+            string filePath = filePathOrDirectory;
+
+            // If it's a directory, append "testcases.txt"
+            if (Directory.Exists(filePathOrDirectory))
+            {
+                filePath = Path.Combine(filePathOrDirectory, "testcases.txt");
+            }
+
+            // Ensure the directory exists
+            string directory = Path.GetDirectoryName(filePath)!;
+            if (!Directory.Exists(directory))
+            {
+                Directory.CreateDirectory(directory);
+            }
+
+            // Overwrite file from the beginning
+            await File.WriteAllTextAsync(filePath, testCasesContent);
+            return filePath;
+        }
+
+
         public async Task<string> CreateCodeFile(string code, Language language, string requestDirectory)
         {
 
